@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파닉스 게임 - 새봄이 영어 공부</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="새봄이 영어 공부">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .game-container {
+            padding: 30px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .score-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .score, .round, .set {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-weight: bold;
+        }
+
+        .score { color: #28a745; }
+        .round { color: #007bff; }
+        .set { color: #6f42c1; }
+
+        .game-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .question-area {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .play-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #e9ecef;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .option-btn.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .option-btn.correct {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .result-correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: particle-animation 1s ease-out forwards;
+        }
+
+        @keyframes particle-animation {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        .completion-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .popup-title {
+            font-size: 2rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .popup-score {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .popup-video {
+            width: 100%;
+            max-width: 400px;
+            height: 225px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .popup-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .score-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← 뒤로가기</button>
+            <h1>🎵 파닉스 게임</h1>
+            <p>소리를 듣고 올바른 단어를 찾아보세요!</p>
+        </div>
+
+        <div class="game-container">
+            <div class="game-info">
+                <div class="score-info">
+                    <div class="score">점수: <span id="currentScore">0</span></div>
+                    <div class="round">라운드: <span id="currentRound">1</span>/5</div>
+                    <div class="set">세트: <span id="currentSet">1</span>/3</div>
+                </div>
+                <button class="btn btn-warning" onclick="resetGame()">게임 초기화</button>
+            </div>
+
+            <div class="game-area">
+                <div class="question-area">
+                    <div class="question-text" id="questionText">게임을 시작하려면 아래 버튼을 클릭하세요!</div>
+                    <button class="play-btn" id="playBtn" onclick="playSound()">🔊 소리 듣기</button>
+                </div>
+
+                <div class="options-grid" id="optionsGrid">
+                    <!-- 옵션 버튼들이 여기에 생성됩니다 -->
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()" disabled>정답 확인</button>
+                    <button class="btn btn-success" id="nextBtn" onclick="nextRound()" disabled>다음 라운드</button>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="completion-popup" id="completionPopup">
+        <div class="popup-content">
+            <div class="popup-title">🎉 축하합니다!</div>
+            <div class="popup-score">최종 점수: <span id="finalScore">0</span>점</div>
+            <iframe class="popup-video" id="completionVideo" frameborder="0" allowfullscreen></iframe>
+            <button class="popup-btn" onclick="closeCompletionPopup()">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        // 게임 데이터
+        const gameData = {
+            words: {
+                'a': ['cat', 'hat', 'bat', 'rat', 'mat', 'sat', 'fat', 'pat', 'map', 'cap', 'tap', 'lap', 'gap', 'nap', 'rap', 'sap', 'bag', 'tag', 'rag', 'wag', 'jag', 'lag', 'mag', 'nag', 'sag', 'tag', 'wag', 'zag', 'dag', 'fag', 'gag', 'hag'],
+                'e': ['bed', 'red', 'fed', 'led', 'wed', 'get', 'let', 'met', 'net', 'pet', 'set', 'wet', 'bet', 'jet', 'vet', 'yet', 'den', 'hen', 'men', 'pen', 'ten', 'zen', 'ben', 'ken', 'len', 'ren', 'sen', 'wen', 'yen', 'zen', 'fen', 'gen'],
+                'i': ['big', 'dig', 'fig', 'jig', 'pig', 'rig', 'wig', 'zig', 'bit', 'fit', 'hit', 'kit', 'lit', 'pit', 'sit', 'wit', 'bin', 'din', 'fin', 'gin', 'kin', 'pin', 'sin', 'tin', 'win', 'yin', 'zin', 'bin', 'din', 'fin', 'gin', 'kin'],
+                'o': ['dog', 'fog', 'hog', 'jog', 'log', 'cog', 'bog', 'tog', 'got', 'hot', 'lot', 'not', 'pot', 'rot', 'tot', 'dot', 'cot', 'bot', 'box', 'fox', 'pox', 'sox', 'cox', 'dox', 'lox', 'mox', 'nox', 'rox', 'tox', 'vox', 'zox', 'yox'],
+                'u': ['bug', 'hug', 'jug', 'mug', 'rug', 'tug', 'dug', 'lug', 'pug', 'sug', 'but', 'cut', 'gut', 'hut', 'jut', 'nut', 'put', 'rut', 'tut', 'bun', 'fun', 'gun', 'nun', 'pun', 'run', 'sun', 'tun', 'cub', 'hub', 'pub', 'rub', 'tub']
+            },
+            videos: [
+                'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                'https://www.youtube.com/embed/9bZkp7q19f0',
+                'https://www.youtube.com/embed/kJQP7kiw5Fk'
+            ]
+        };
+
+        // 게임 상태
+        let gameState = {
+            currentSet: 1,
+            currentRound: 1,
+            currentScore: 0,
+            selectedAnswer: null,
+            correctAnswer: null,
+            usedWords: [],
+            completedSets: []
+        };
+
+        // 음성 합성 설정
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', function() {
+            // 세션 체크
+            if (sessionStorage.getItem('authenticated') !== 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            initializeGame();
+        });
+
+        // 게임 초기화
+        function initializeGame() {
+            loadGameState();
+            updateDisplay();
+            generateQuestion();
+        }
+
+        // 게임 상태 로드
+        function loadGameState() {
+            const savedState = localStorage.getItem('phonicsGameState');
+            if (savedState) {
+                gameState = JSON.parse(savedState);
+            }
+        }
+
+        // 게임 상태 저장
+        function saveGameState() {
+            localStorage.setItem('phonicsGameState', JSON.stringify(gameState));
+        }
+
+        // 화면 업데이트
+        function updateDisplay() {
+            document.getElementById('currentScore').textContent = gameState.currentScore;
+            document.getElementById('currentRound').textContent = gameState.currentRound;
+            document.getElementById('currentSet').textContent = gameState.currentSet;
+        }
+
+        // 문제 생성
+        function generateQuestion() {
+            const vowels = ['a', 'e', 'i', 'o', 'u'];
+            const randomVowel = vowels[Math.floor(Math.random() * vowels.length)];
+            const words = gameData.words[randomVowel];
+            
+            // 사용하지 않은 단어 중에서 선택
+            const availableWords = words.filter(word => !gameState.usedWords.includes(word));
+            if (availableWords.length === 0) {
+                // 모든 단어를 사용했으면 초기화
+                gameState.usedWords = [];
+            }
+            
+            const correctWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+            gameState.correctAnswer = correctWord;
+            gameState.usedWords.push(correctWord);
+            
+            // 선택지 생성
+            const options = [correctWord];
+            const allWords = Object.values(gameData.words).flat();
+            const otherWords = allWords.filter(word => word !== correctWord);
+            
+            for (let i = 0; i < 3; i++) {
+                const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+                if (!options.includes(randomWord)) {
+                    options.push(randomWord);
+                }
+            }
+            
+            // 선택지 섞기
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            // UI 업데이트
+            document.getElementById('questionText').textContent = '소리를 듣고 올바른 단어를 선택하세요!';
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('checkBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('resultMessage').style.display = 'none';
+            
+            // 선택지 버튼 생성
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            options.forEach(word => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = word;
+                button.onclick = () => selectAnswer(word);
+                optionsGrid.appendChild(button);
+            });
+            
+            gameState.selectedAnswer = null;
+            saveGameState();
+        }
+
+        // 소리 재생
+        function playSound() {
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+            }
+            
+            currentUtterance = new SpeechSynthesisUtterance(gameState.correctAnswer);
+            currentUtterance.lang = 'en-US';
+            currentUtterance.rate = 0.8;
+            currentUtterance.pitch = 1.2;
+            
+            // 고급 음성 선택
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.lang === 'en-US' && 
+                (voice.name.includes('Google') || voice.name.includes('Premium'))
+            );
+            if (preferredVoice) {
+                currentUtterance.voice = preferredVoice;
+            }
+            
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        // 답변 선택
+        function selectAnswer(word) {
+            // 기존 선택 해제
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 새로운 선택
+            if (gameState.selectedAnswer === word) {
+                // 같은 단어를 다시 클릭하면 선택 취소
+                gameState.selectedAnswer = null;
+                document.getElementById('checkBtn').disabled = true;
+            } else {
+                gameState.selectedAnswer = word;
+                event.target.classList.add('selected');
+                document.getElementById('checkBtn').disabled = false;
+            }
+        }
+
+        // 정답 확인
+        function checkAnswer() {
+            if (!gameState.selectedAnswer) return;
+            
+            const isCorrect = gameState.selectedAnswer === gameState.correctAnswer;
+            const resultMessage = document.getElementById('resultMessage');
+            
+            // 버튼 상태 업데이트
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.onclick = null; // 클릭 비활성화
+                if (btn.textContent === gameState.correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === gameState.selectedAnswer && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            // 결과 메시지
+            if (isCorrect) {
+                gameState.currentScore += 20;
+                resultMessage.textContent = '✅ 정답입니다! +20점';
+                resultMessage.className = 'result-message result-correct';
+                createParticles();
+            } else {
+                resultMessage.textContent = `❌ 틀렸습니다. 정답: ${gameState.correctAnswer}`;
+                resultMessage.className = 'result-message result-incorrect';
+            }
+            
+            resultMessage.style.display = 'block';
+            document.getElementById('checkBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = false;
+            
+            updateDisplay();
+            saveGameState();
+        }
+
+        // 다음 라운드
+        function nextRound() {
+            gameState.currentRound++;
+            
+            if (gameState.currentRound > 5) {
+                // 세트 완료
+                completeSet();
+            } else {
+                // 다음 라운드
+                generateQuestion();
+            }
+        }
+
+        // 세트 완료
+        function completeSet() {
+            const setScore = gameState.currentScore;
+            gameState.completedSets.push({
+                set: gameState.currentSet,
+                score: setScore
+            });
+            
+            if (setScore >= 100) {
+                // 100점 이상이면 완료 영상 재생
+                showCompletionPopup(setScore);
+            } else {
+                // 다음 세트로
+                gameState.currentSet++;
+                gameState.currentRound = 1;
+                gameState.currentScore = 0;
+                gameState.usedWords = [];
+                
+                if (gameState.currentSet > 3) {
+                    // 모든 세트 완료
+                    alert('모든 세트를 완료했습니다!');
+                    resetGame();
+                } else {
+                    generateQuestion();
+                }
+            }
+            
+            updateDisplay();
+            saveGameState();
+        }
+
+        // 완료 팝업 표시
+        function showCompletionPopup(score) {
+            const popup = document.getElementById('completionPopup');
+            const finalScore = document.getElementById('finalScore');
+            const video = document.getElementById('completionVideo');
+            
+            finalScore.textContent = score;
+            
+            // 랜덤 영상 선택
+            const randomVideo = gameData.videos[Math.floor(Math.random() * gameData.videos.length)];
+            video.src = randomVideo;
+            
+            popup.style.display = 'flex';
+        }
+
+        // 완료 팝업 닫기
+        function closeCompletionPopup() {
+            const popup = document.getElementById('completionPopup');
+            const video = document.getElementById('completionVideo');
+            
+            popup.style.display = 'none';
+            video.src = '';
+            
+            // 다음 세트로
+            gameState.currentSet++;
+            gameState.currentRound = 1;
+            gameState.currentScore = 0;
+            gameState.usedWords = [];
+            
+            if (gameState.currentSet > 3) {
+                // 모든 세트 완료
+                alert('모든 세트를 완료했습니다!');
+                resetGame();
+            } else {
+                generateQuestion();
+            }
+            
+            updateDisplay();
+            saveGameState();
+        }
+
+        // 게임 초기화
+        function resetGame() {
+            gameState = {
+                currentSet: 1,
+                currentRound: 1,
+                currentScore: 0,
+                selectedAnswer: null,
+                correctAnswer: null,
+                usedWords: [],
+                completedSets: []
+            };
+            
+            localStorage.removeItem('phonicsGameState');
+            generateQuestion();
+        }
+
+        // 파티클 효과 생성
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = '';
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 0.5 + 's';
+                particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                particlesContainer.appendChild(particle);
+            }
+            
+            setTimeout(() => {
+                particlesContainer.innerHTML = '';
+            }, 2000);
+        }
+
+        // 뒤로가기
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // 음성 초기화
+        speechSynthesis.onvoiceschanged = function() {
+            // 음성 목록이 로드되면 사용 가능
+        };
+    </script>
+</body>
+</html> 

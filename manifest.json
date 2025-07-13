@@ -1,0 +1,49 @@
+{
+  "name": "새봄이 영어 공부",
+  "short_name": "영어공부",
+  "description": "재미있고 효과적인 영어 학습을 위한 게임",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ko",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxwYXRoIGQ9Ik05NiA0OEM3My45MDg2IDQ4IDU2IDY1LjkwODYgNTYgODhWMTQ0QzU2IDE2Ni4wOTEgNzMuOTA4NiAxODQgOTYgMTg0QzExOC4wOTEgMTg0IDEzNiAxNjYuMDkxIDEzNiAxNDRWODhDMTM2IDY1LjkwODYgMTE4LjA5MSA0OCA5NiA0OFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik04OCA3MkgxMDRWMTM2SDg4VjcyWiIgZmlsbD0iIzY2N0VBQSIvPgo8cGF0aCBkPSJNODggMTQ0SDEwNFYxNjBIOThDOTYuODk1NCAxNjAgOTYgMTU5LjEwNSA5NiAxNThWMTQ0SDg4WiIgZmlsbD0iIzY2N0VBQSIvPgo8cGF0aCBkPSJNMTE2IDg4QzExNiA3MC4zMjY5IDEwMS42NzMgNTYgODQgNTZDNjYuMzI2OSA1NiA1MiA3MC4zMjY5IDUyIDg4QzUyIDEwNS42NzMgNjYuMzI2OSAxMjAgODQgMTIwQzEwMS42NzMgMTIwIDExNiAxMDUuNjczIDExNiA4OFoiIGZpbGw9IndoaXRlIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM2NjdFRUE7c3RvcC1vcGFjaXR5OjEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNzY0QkEyO3N0b3Atb3BhY2l0eToxIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxwYXRoIGQ9Ik0yNTYgMTI4QzE5Ny4wNDMgMTI4IDE0NCAxODEuMDQzIDE0NCAyNDBWMzg0QzE0NCA0NDIuOTU3IDE5Ny4wNDMgNDk2IDI1NiA0OTZDMzE0Ljk1NyA0OTYgMzY4IDQ0Mi45NTcgMzY4IDM4NFYyNDBDMzY4IDE4MS4wNDMgMzE0Ljk1NyAxMjggMjU2IDEyOFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9IjIzNCAxOTJIMjc4VjM2OEgyMzRWMjAwWiIgZmlsbD0iIzY2N0VBQSIvPgo8cGF0aCBkPSJNMjM0IDM4NEgyNzhWNDI2SDI2MkMyNTguNjg2IDQyNiAyNTYgNDIzLjMxNCAyNTYgNDIwVjM4NEgyMzRaIiBmaWxsPSIjNjY3RUFBIi8+CjxwYXRoIGQ9IjMwOSAzMzMuMzMzQzMwOSAzMTAuMjM5IDI5MC4xNDMgMjkxLjMzMyAyNjcgMjkxLjMzM0MyNDMuODU3IDI5MS4zMzMgMjI1IDMxMC4yMzkgMjI1IDMzMy4zMzNDMjI1IDM1Ni40MjcgMjQzLjg1NyAzNzUuMzMzIDI2NyAzNzUuMzMzQzI5MC4xNDMgMzc1LjMzMyAzMDkgMzU2LjQyNyAzMDkgMzMzLjMzM1oiIGZpbGw9IndoaXRlIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM2NjdFRUE7c3RvcC1vcGFjaXR5OjEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNzY0QkEyO3N0b3Atb3BhY2l0eToxIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzc1IiBoZWlnaHQ9IjgxMiIgdmlld0JveD0iMCAwIDM3NSA4MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzNzUiIGhlaWdodD0iODEyIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzMzUiIGhlaWdodD0iNzcyIiByeD0iMjAiIGZpbGw9IndoaXRlIi8+Cjx0ZXh0IHg9IjE4Ny41IiB5PSI4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7snbTsoJXsnYwg7J247ZmU7ZmU7J2AIOyCrO2VmO2VmDwvdGV4dD4KPHJlY3QgeD0iNDAiIHk9IjEyMCIgd2lkdGg9IjI5NSIgaGVpZ2h0PSI2MCIgcng9IjEwIiBmaWxsPSIjRjVGNUY1Ii8+Cjx0ZXh0IHg9IjE4Ny41IiB5PSIxNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzU1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+67O07ZmU7J2AIOyCrO2VmO2VmPC90ZXh0Pgo8cmVjdCB4PSI0MCIgeT0iMjAwIiB3aWR0aD0iMjk1IiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzY2N0VBQSIvPgo8dGV4dCB4PSIxODcuNSIgeT0iMjI1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7snbTsoJXsnYwg7J247ZmU7ZmU7J2AIOyCrO2VmO2VmPC90ZXh0Pgo8L3N2Zz4=",
+      "sizes": "375x812",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "파닉스 게임",
+      "short_name": "파닉스",
+      "description": "파닉스 게임 바로 시작",
+      "url": "/phonics.html",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMTIiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxwYXRoIGQ9Ik00OCAyNEMzNC43NDUyIDI0IDI0IDM0Ljc0NTIgMjQgNDhWMzZDMjQgMjIuNzQ1MiAzNC43NDUyIDEyIDQ4IDEyQzYxLjI1NDggMTIgNzIgMjIuNzQ1MiA3MiAzNlY0OEM3MiA2MS4yNTQ4IDYxLjI1NDggNzIgNDggNzJDMzQuNzQ1MiA3MiAyNCA2MS4yNTQ4IDI0IDQ4VjM2QzI0IDIyLjc0NTIgMzQuNzQ1MiAxMiA0OCAxMloiIGZpbGw9IndoaXRlIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM2NjdFRUE7c3RvcC1vcGFjaXR5OjEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNzY0QkEyO3N0b3Atb3BhY2l0eToxIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+} 
