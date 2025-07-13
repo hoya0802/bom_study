@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>그림 보고 단어 찾기</title>
+  <style>
+    body { font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin:0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px #0001; padding: 32px 18px; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 2rem; color: #333; }
+    .back-btn { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: #333; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .game-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #f8f9fa; padding: 16px; border-radius: 12px; }
+    .score, .round { background: #fff; padding: 8px 18px; border-radius: 8px; box-shadow: 0 2px 8px #0001; font-weight: bold; }
+    .score { color: #28a745; } .round { color: #007bff; }
+    .question-area { background: #f8f9fa; padding: 24px; border-radius: 12px; margin-bottom: 18px; text-align: center; }
+    .question-img { width: 120px; height: 120px; object-fit: contain; margin-bottom: 18px; border-radius: 12px; background: #fff; border: 1.5px solid #eee; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .option-btn { background: #fff; border: 2.5px solid #e9ecef; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; min-height: 60px; }
+    .option-btn.selected { border-color: #667eea; background: #667eea; color: #fff; }
+    .option-btn.correct { border-color: #28a745; background: #28a745; color: #fff; }
+    .option-btn.incorrect { border-color: #dc3545; background: #dc3545; color: #fff; }
+    .action-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 10px; }
+    .btn { padding: 10px 22px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #007bff; color: #fff; }
+    .btn-primary:disabled { background: #6c757d; cursor: not-allowed; }
+    .btn-success { background: #28a745; color: #fff; }
+    .result-message { font-size: 1.1rem; font-weight: bold; margin: 16px 0; padding: 10px; border-radius: 8px; }
+    .result-correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .result-incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    @media (max-width: 600px) { .container { padding: 12px 2vw; } .header h1 { font-size: 1.2rem; } .options-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="back-btn" onclick="goBack()">← 홈으로</button>
+    <div class="header"><h1>그림 보고 단어 찾기</h1></div>
+    <div class="game-info">
+      <div class="score">점수: <span id="score">0</span></div>
+      <div class="round">라운드: <span id="round">1</span>/5</div>
+    </div>
+    <div class="question-area">
+      <img id="questionImg" class="question-img" src="" alt="문제 이미지">
+      <div class="options-grid" id="optionsGrid"></div>
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()" disabled>정답 확인</button>
+        <button class="btn btn-success" id="nextBtn" onclick="nextRound()" disabled>다음</button>
+      </div>
+      <div class="result-message" id="resultMessage" style="display:none;"></div>
+    </div>
+  </div>
+  <script>
+    // 샘플 데이터 (이미지:단어)
+    const questions = [
+      { img: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=facearea&w=256&q=80', word: 'dog', options: ['cat', 'dog', 'bat', 'rat'] },
+      { img: 'https://images.unsplash.com/photo-1518715308788-3005759c61d4?auto=format&fit=facearea&w=256&q=80', word: 'cat', options: ['mat', 'hat', 'cat', 'map'] },
+      { img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=256&q=80', word: 'bed', options: ['bed', 'red', 'fed', 'led'] },
+      { img: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=facearea&w=256&q=80', word: 'fish', options: ['dish', 'fish', 'wish', 'cash'] },
+      { img: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=256&q=80', word: 'hat', options: ['dog', 'fog', 'hat', 'log'] }
+    ];
+    let current = 0, score = 0, selected = null;
+    function renderQuestion() {
+      document.getElementById('round').textContent = current+1;
+      document.getElementById('score').textContent = score;
+      document.getElementById('questionImg').src = questions[current].img;
+      const grid = document.getElementById('optionsGrid');
+      grid.innerHTML = '';
+      questions[current].options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => selectOption(btn, opt);
+        grid.appendChild(btn);
+      });
+      selected = null;
+      document.getElementById('checkBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('resultMessage').style.display = 'none';
+    }
+    function selectOption(btn, opt) {
+      document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selected = opt;
+      document.getElementById('checkBtn').disabled = false;
+    }
+    function checkAnswer() {
+      if (!selected) return;
+      const correct = questions[current].word;
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.onclick = null;
+        if (btn.textContent === correct) btn.classList.add('correct');
+        else if (btn.textContent === selected) btn.classList.add('incorrect');
+      });
+      if (selected === correct) {
+        score += 20;
+        showResult('정답입니다! +20점', true);
+      } else {
+        showResult(`틀렸습니다. 정답: ${correct}`, false);
+      }
+      document.getElementById('checkBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = false;
+      document.getElementById('score').textContent = score;
+    }
+    function showResult(msg, isCorrect) {
+      const el = document.getElementById('resultMessage');
+      el.textContent = msg;
+      el.className = 'result-message ' + (isCorrect ? 'result-correct' : 'result-incorrect');
+      el.style.display = 'block';
+    }
+    function nextRound() {
+      current++;
+      if (current >= questions.length) {
+        alert(`게임 종료! 최종 점수: ${score}`);
+        current = 0; score = 0;
+      }
+      renderQuestion();
+    }
+    function goBack() { window.location.href = 'index.html'; }
+    window.onload = renderQuestion;
+  </script>
+</body>
+</html> 
