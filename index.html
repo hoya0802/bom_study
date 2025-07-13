@@ -10,11 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="새봄이 영어 공부">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -39,70 +35,30 @@
             margin-bottom: 30px;
             font-weight: bold;
         }
-        .auth-form {
-            display: block;
-        }
-        .menu {
-            display: none;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-        }
+        .auth-form { display: block; }
+        .menu { display: none; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
         input[type="password"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            width: 100%; padding: 15px; border: 2px solid #e1e5e9; border-radius: 10px;
+            font-size: 16px; transition: border-color 0.3s;
         }
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        input[type="password"]:focus { outline: none; border-color: #667eea; }
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            width: 100%;
-            margin-bottom: 15px;
+            color: white; border: none; padding: 15px 30px; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; width: 100%; margin-bottom: 15px;
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        .btn-secondary {
-            background: #6c757d;
-        }
-        .btn-secondary:hover {
-            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
-        }
-        .error-message {
-            color: #dc3545;
-            margin-top: 10px;
-            font-size: 14px;
-            display: none;
-        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3); }
+        .error-message { color: #dc3545; margin-top: 10px; font-size: 14px; display: none; }
         .menu-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
             margin-top: 30px;
         }
         .menu-btn {
@@ -111,7 +67,7 @@
             border: none;
             padding: 28px 0;
             border-radius: 15px;
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -126,28 +82,13 @@
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
         }
-        .logout-btn {
-            background: #dc3545;
-            margin-top: 20px;
-        }
-        .logout-btn:hover {
-            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.3);
-        }
+        .logout-btn { background: #dc3545; margin-top: 20px; }
+        .logout-btn:hover { box-shadow: 0 15px 30px rgba(220, 53, 69, 0.3); }
         @media (max-width: 600px) {
-            .container {
-                padding: 30px 10px;
-            }
-            .logo {
-                font-size: 2rem;
-            }
-            .menu-grid {
-                gap: 14px;
-            }
-            .menu-btn {
-                font-size: 1.1rem;
-                padding: 18px 0;
-                min-height: 60px;
-            }
+            .container { padding: 30px 10px; }
+            .logo { font-size: 2rem; }
+            .menu-grid { gap: 10px; grid-template-columns: 1fr; }
+            .menu-btn { font-size: 1rem; padding: 18px 0; min-height: 60px; }
         }
     </style>
 </head>
@@ -168,9 +109,18 @@
         <div class="menu" id="mainMenu">
             <div class="menu-grid">
                 <button class="menu-btn" onclick="location.href='phonics.html'">
-                    🎵 파닉스 게임
+                    🎵 발음 듣고 단어 찾기
                 </button>
-                <button class="menu-btn" onclick="location.href='text_upload.html'">
+                <button class="menu-btn" onclick="location.href='meaning_game.html'">
+                    💡 뜻 보고 단어 찾기
+                </button>
+                <button class="menu-btn" onclick="location.href='image_game.html'">
+                    🖼️ 그림 보고 단어 찾기
+                </button>
+                <button class="menu-btn" onclick="location.href='spelling_game.html'">
+                    ✏️ 소리 듣고 단어 완성하기
+                </button>
+                <button class="menu-btn" style="grid-column: span 2;" onclick="location.href='text_upload.html'">
                     📝 텍스트 업로드/출력
                 </button>
             </div>
@@ -178,16 +128,13 @@
         </div>
     </div>
     <script>
-        // 비밀번호 설정 (실제 사용 시 더 복잡한 비밀번호로 변경)
-        const CORRECT_PASSWORD = '새봄이123';
-        // 세션 체크
+        const CORRECT_PASSWORD = 'delia0802';
         function checkSession() {
             const isAuthenticated = sessionStorage.getItem('authenticated');
             if (isAuthenticated === 'true') {
                 showMenu();
             }
         }
-        // 인증 함수
         function authenticate() {
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
@@ -201,29 +148,24 @@
                 document.getElementById('password').focus();
             }
         }
-        // 메뉴 표시
         function showMenu() {
             document.getElementById('authForm').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'block';
         }
-        // 인증 폼 표시
         function showAuthForm() {
             document.getElementById('authForm').style.display = 'block';
             document.getElementById('mainMenu').style.display = 'none';
         }
-        // 로그아웃
         function logout() {
             sessionStorage.removeItem('authenticated');
             showAuthForm();
             document.getElementById('password').value = '';
         }
-        // Enter 키로 로그인
         document.getElementById('password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 authenticate();
             }
         });
-        // 페이지 로드 시 세션 체크
         window.addEventListener('load', checkSession);
     </script>
 </body>
