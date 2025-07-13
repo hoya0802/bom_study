@@ -5,23 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>텍스트 업로드 및 출력 - 새봄이 영어 공부</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="config.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #f5f5f5;
       min-height: 100vh;
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
     }
     .container {
       background: #fff;
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.12);
       padding: 40px 24px 32px 24px;
-      max-width: 480px;
+      max-width: 600px;
       width: 100%;
       margin: 32px 0;
     }
@@ -68,65 +69,149 @@
       border-top: 1.5px solid #eee;
       margin: 24px 0;
     }
-    .list-title {
-      font-size: 1.1rem;
-      color: #555;
-      margin-bottom: 10px;
-      font-weight: 600;
+    .card-container {
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+      margin-bottom: 2rem;
     }
-    ul {
-      list-style: none;
-      padding: 0;
+    .card-header {
+      background: #f8f9fa;
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
       margin: 0;
     }
-    li {
-      background: #f8f9fa;
-      margin-bottom: 10px;
-      padding: 14px 12px 8px 12px;
-      border-radius: 10px;
-      font-size: 1rem;
-      color: #222;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      word-break: break-all;
+    .back-btn {
+      background: #6c757d;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
     }
-    .date {
-      color: #888;
-      font-size: 12px;
-      margin-top: 6px;
-      text-align: right;
+    .back-btn:hover {
+      background: #5a6268;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .dates-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .date-item {
+      display: block;
+      padding: 1rem 1.2rem;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 0.7rem;
+      text-decoration: none;
+      color: #495057;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      text-align: center;
+      cursor: pointer;
+    }
+    .date-item:hover {
+      background: #e3f0ff;
+      border-color: #1976d2;
+      color: #1976d2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+    }
+    .date-item.selected {
+      background: #1976d2;
+      color: #fff;
+      border-color: #1976d2;
+    }
+    .texts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .text-link {
+      display: block;
+      padding: 1rem 1.2rem;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 0.7rem;
+      text-decoration: none;
+      color: #495057;
+      font-size: 1rem;
+      transition: all 0.2s;
+      word-break: break-all;
+      white-space: normal;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+    .text-link:hover {
+      background: #e3f0ff;
+      border-color: #1976d2;
+      color: #1976d2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+    }
+    .empty-message {
+      text-align: center;
+      color: #6c757d;
+      font-size: 1.1rem;
+      padding: 2rem;
     }
     @media (max-width: 600px) {
-      .container {
-        padding: 24px 8px 18px 8px;
-        max-width: 98vw;
-      }
-      h2 {
-        font-size: 1.3rem;
-      }
+      .container { padding: 24px 8px 18px 8px; max-width: 98vw; }
+      h2 { font-size: 1.3rem; }
+      .card-header { padding: 1rem; }
+      .card-body { padding: 1rem; }
+      .date-item, .text-link { font-size: 1rem; padding: 0.8rem 1rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>텍스트 업로드 및 출력</h2>
-    <textarea id="textInput" rows="3" placeholder="텍스트를 입력하세요"></textarea>
+    <h2>텍스트 업로드</h2>
+    <textarea id="textInput" rows="3" placeholder="여기에 복사한 문서(이모지 포함)를 붙여넣으세요"></textarea>
     <input type="text" id="authorInput" placeholder="작성자(선택)">
-    <button onclick="uploadText()">업로드</button>
+    <button onclick="uploadText()">저장</button>
     <hr>
-    <div class="list-title">업로드된 텍스트 목록</div>
-    <ul id="textList"></ul>
+    <div id="datesCard" class="card-container">
+      <div class="card-header">
+        <h3 class="card-title">📅 날짜별 목록</h3>
+      </div>
+      <div class="card-body">
+        <div id="datesList" class="dates-list"></div>
+      </div>
+    </div>
+    <div id="textsCard" class="card-container" style="display:none;">
+      <div class="card-header">
+        <h3 class="card-title" id="textsCardTitle">📝 텍스트 목록</h3>
+        <button class="back-btn" onclick="showDates()">← 날짜목록</button>
+      </div>
+      <div class="card-body">
+        <div id="textsList" class="texts-list"></div>
+      </div>
+    </div>
   </div>
-
   <script>
-    // [필수] 아래 두 값을 본인 Supabase 프로젝트 정보로 변경하세요!
-    // 예시: https://xxxx.supabase.co, eyJhbGciOi... (anon public key)
-    const SUPABASE_URL = 'https://qcubdynkiawpcmsflxfu.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjdWJkeW5raWF3cGNtc2ZseGZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MDgxNzUsImV4cCI6MjA2Nzk4NDE3NX0.c2dFWAcMq62druoosEYY2JaT5FOL--7V9qjCTtPUzi0';
+    // 공통 설정 파일에서 Supabase 클라이언트 사용
+    const client = supabase;
 
-    // 변수명을 client로 변경
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let allTexts = [];
+    let groupedByDate = {};
+    let selectedDate = null;
 
-    // 텍스트 업로드 함수
     async function uploadText() {
       const content = document.getElementById('textInput').value.trim();
       const author = document.getElementById('authorInput').value.trim();
@@ -142,31 +227,82 @@
       } else {
         document.getElementById('textInput').value = '';
         document.getElementById('authorInput').value = '';
-        loadTexts();
+        await loadTexts();
+        showDates();
       }
     }
 
-    // 텍스트 목록 불러오기
     async function loadTexts() {
       const { data, error } = await client
         .from('bom_eng')
         .select('*')
         .order('created_at', { ascending: false });
-      const list = document.getElementById('textList');
-      list.innerHTML = '';
       if (error) {
-        list.innerHTML = '<li>불러오기 실패: ' + error.message + '</li>';
+        document.getElementById('datesList').innerHTML = '<div class="empty-message">불러오기 실패: ' + error.message + '</div>';
         return;
       }
+      allTexts = data;
+      groupedByDate = {};
       data.forEach(row => {
-        const li = document.createElement('li');
-        li.innerHTML = `<div>${row.content}</div>
-          <div class="date">${row.author ? row.author + ' · ' : ''}${new Date(row.created_at).toLocaleString()}</div>`;
-        list.appendChild(li);
+        const date = row.created_at.substr(0, 10);
+        if (!groupedByDate[date]) groupedByDate[date] = [];
+        groupedByDate[date].push(row);
+      });
+      renderDates();
+    }
+
+    function renderDates() {
+      const datesList = document.getElementById('datesList');
+      const dates = Object.keys(groupedByDate).sort((a, b) => b.localeCompare(a));
+      if (dates.length === 0) {
+        datesList.innerHTML = '<div class="empty-message">📝 아직 업로드된 텍스트가 없습니다.<br>위에서 텍스트를 입력하고 저장해보세요!</div>';
+        return;
+      }
+      datesList.innerHTML = '';
+      dates.forEach(date => {
+        const a = document.createElement('a');
+        a.className = 'date-item' + (selectedDate === date ? ' selected' : '');
+        a.textContent = '📄 ' + date;
+        a.onclick = () => showTexts(date);
+        datesList.appendChild(a);
       });
     }
 
-    // 페이지 로드 시 목록 불러오기
+    function showTexts(date) {
+      selectedDate = date;
+      document.getElementById('datesCard').style.display = 'none';
+      document.getElementById('textsCard').style.display = 'block';
+      document.getElementById('textsCardTitle').textContent = `📝 ${date} 텍스트 목록`;
+      renderTexts(date);
+    }
+
+    function showDates() {
+      selectedDate = null;
+      document.getElementById('datesCard').style.display = 'block';
+      document.getElementById('textsCard').style.display = 'none';
+      renderDates();
+    }
+
+    function renderTexts(date) {
+      const textsList = document.getElementById('textsList');
+      const texts = groupedByDate[date] || [];
+      if (texts.length === 0) {
+        textsList.innerHTML = '<div class="empty-message">해당 날짜에 업로드된 텍스트가 없습니다.</div>';
+        return;
+      }
+      textsList.innerHTML = '';
+      texts.forEach(row => {
+        const a = document.createElement('a');
+        a.className = 'text-link';
+        a.textContent = '📄 ' + (row.content.length > 30 ? row.content.substr(0, 30) + '...' : row.content);
+        a.title = row.content;
+        a.onclick = () => {
+          window.location.href = `text_view.html?id=${row.id}`;
+        };
+        textsList.appendChild(a);
+      });
+    }
+
     window.onload = loadTexts;
   </script>
 </body>
