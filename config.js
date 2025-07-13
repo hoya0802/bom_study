@@ -5,9 +5,9 @@ const SUPABASE_CONFIG = {
 };
 
 // Supabase 클라이언트 생성
-const supabase = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
 // 설정을 외부에서 사용할 수 있도록 export
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { SUPABASE_CONFIG, supabase };
+    module.exports = { SUPABASE_CONFIG, supabaseClient };
 } 
