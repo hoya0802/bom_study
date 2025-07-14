@@ -55,6 +55,14 @@
         .btn-secondary { background: #6c757d; }
         .btn-secondary:hover { box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3); }
         .error-message { color: #dc3545; margin-top: 10px; font-size: 14px; display: none; }
+        .user-info {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -107,43 +115,61 @@
         </div>
         <!-- 메뉴 -->
         <div class="menu" id="mainMenu">
-            <div class="menu-grid">
-                <button class="menu-btn" onclick="location.href='phonics.html'">
-                    🎵 발음 듣고 단어 찾기
-                </button>
-                <button class="menu-btn" onclick="location.href='meaning_game.html'">
-                    💡 뜻 보고 단어 찾기
-                </button>
-                <button class="menu-btn" onclick="location.href='image_game.html'">
-                    🖼️ 그림 보고 단어 찾기
-                </button>
-                <button class="menu-btn" onclick="location.href='spelling_game.html'">
-                    ✏️ 소리 듣고 단어 완성하기
-                </button>
-                <button class="menu-btn" onclick="location.href='text_upload.html'">
-                    📝 텍스트 업로드/출력
-                </button>
-                <button class="menu-btn" onclick="location.href='stamp_pages.html'">
-                    🏆 칭찬스티커
-                </button>
+            <div class="user-info" id="userInfo">
+                👤 사용자 정보
+            </div>
+            <div class="menu-grid" id="menuGrid">
+                <!-- 메뉴 버튼들이 동적으로 생성됩니다 -->
             </div>
             <button class="btn logout-btn" onclick="logout()">로그아웃</button>
         </div>
     </div>
     <script>
-        const CORRECT_PASSWORD = 'delia0802';
+        // 사용자별 비밀번호 및 정보 정의
+        const USERS = {
+            'delia0802': {
+                id: 'user_001',
+                name: '기존 계정',
+                color: '#667eea',
+                emoji: '👤',
+                role: 'adult' // 어른 역할
+            },
+            'chan0802': {
+                id: 'user_002',
+                name: '아빠', 
+                color: '#2196f3',
+                emoji: '👨',
+                role: 'adult' // 어른 역할
+            },
+            'bom0802': {
+                id: 'user_003',
+                name: '새봄이',
+                color: '#ff6b6b',
+                emoji: '👧',
+                role: 'child' // 아이 역할
+            }
+        };
+
         function checkSession() {
             const isAuthenticated = sessionStorage.getItem('authenticated');
-            if (isAuthenticated === 'true') {
+            const currentUser = sessionStorage.getItem('currentUser');
+            
+            if (isAuthenticated === 'true' && currentUser) {
                 showMenu();
+                updateUserInfo();
             }
         }
+
         function authenticate() {
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
-            if (password === CORRECT_PASSWORD) {
+            
+            if (USERS[password]) {
+                const user = USERS[password];
                 sessionStorage.setItem('authenticated', 'true');
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
                 showMenu();
+                updateUserInfo();
                 errorMessage.style.display = 'none';
             } else {
                 errorMessage.style.display = 'block';
@@ -151,24 +177,138 @@
                 document.getElementById('password').focus();
             }
         }
+
+        function updateUserInfo() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (currentUser) {
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `${currentUser.emoji} ${currentUser.name}님 환영합니다!`;
+                userInfo.style.background = `linear-gradient(135deg, ${currentUser.color} 0%, ${adjustBrightness(currentUser.color, -20)} 100%)`;
+                
+                // 사용자 역할에 따른 메뉴 생성
+                renderMenu(currentUser);
+            }
+        }
+
+        function renderMenu(user) {
+            const menuGrid = document.getElementById('menuGrid');
+            menuGrid.innerHTML = '';
+            
+            // 메뉴 항목 정의
+            const menuItems = [
+                {
+                    id: 'phonics',
+                    title: '🎵 발음 듣고 단어 찾기',
+                    url: 'phonics.html',
+                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                },
+                {
+                    id: 'meaning',
+                    title: '💡 뜻 보고 단어 찾기',
+                    url: 'meaning_game.html',
+                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                },
+                {
+                    id: 'image',
+                    title: '🖼️ 그림 보고 단어 찾기',
+                    url: 'image_game.html',
+                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                },
+                {
+                    id: 'spelling',
+                    title: '✏️ 소리 듣고 단어 완성하기',
+                    url: 'spelling_game.html',
+                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                },
+                {
+                    id: 'text',
+                    title: '📝 텍스트 업로드/출력',
+                    url: 'text_upload.html',
+                    roles: ['adult'] // 어른만 접근 가능
+                },
+                {
+                    id: 'stamp',
+                    title: '🏆 칭찬스티커',
+                    url: 'stamp_pages.html',
+                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                }
+            ];
+            
+            // 사용자 역할에 맞는 메뉴만 표시
+            const availableMenus = menuItems.filter(item => 
+                item.roles.includes(user.role)
+            );
+            
+            availableMenus.forEach(item => {
+                const menuBtn = document.createElement('button');
+                menuBtn.className = 'menu-btn';
+                menuBtn.textContent = item.title;
+                menuBtn.onclick = () => location.href = item.url;
+                menuGrid.appendChild(menuBtn);
+            });
+            
+            // 새봄이인 경우 특별한 메시지 표시
+            if (user.role === 'child') {
+                const childMessage = document.createElement('div');
+                childMessage.style.cssText = `
+                    text-align: center;
+                    color: #667eea;
+                    font-size: 0.9rem;
+                    margin-top: 15px;
+                    padding: 10px;
+                    background: rgba(102, 126, 234, 0.1);
+                    border-radius: 8px;
+                    border: 1px solid rgba(102, 126, 234, 0.2);
+                `;
+                childMessage.innerHTML = '🎯 <strong>새봄이</strong>는 모든 학습 게임을 즐길 수 있어요!';
+                menuGrid.appendChild(childMessage);
+            }
+        }
+
+        function adjustBrightness(hex, percent) {
+            // 색상 밝기 조정 함수
+            const num = parseInt(hex.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
         function showMenu() {
             document.getElementById('authForm').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'block';
         }
+
         function showAuthForm() {
             document.getElementById('authForm').style.display = 'block';
             document.getElementById('mainMenu').style.display = 'none';
         }
+
         function logout() {
             sessionStorage.removeItem('authenticated');
+            sessionStorage.removeItem('currentUser');
             showAuthForm();
             document.getElementById('password').value = '';
         }
+
+        // 현재 사용자 정보를 가져오는 함수 (다른 페이지에서 사용)
+        function getCurrentUser() {
+            const userStr = sessionStorage.getItem('currentUser');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+
+        // 전역 함수로 등록 (다른 페이지에서 사용 가능)
+        window.getCurrentUser = getCurrentUser;
+
         document.getElementById('password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 authenticate();
             }
         });
+
         window.addEventListener('load', checkSession);
     </script>
 </body>

@@ -205,6 +205,24 @@
     </div>
   </div>
   <script>
+    // 권한 확인
+    function checkPermission() {
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+            alert('로그인이 필요합니다.');
+            location.href = 'index.html';
+            return false;
+        }
+        
+        if (currentUser.role === 'child') {
+            alert('새봄이는 이 기능을 사용할 수 없어요. 파닉스 게임이나 칭찬스티커를 이용해주세요!');
+            location.href = 'index.html';
+            return false;
+        }
+        
+        return true;
+    }
+    
     // 공통 설정 파일에서 Supabase 클라이언트 사용
     const client = supabaseClient;
 
@@ -303,7 +321,11 @@
       });
     }
 
-    window.onload = loadTexts;
+    window.onload = function() {
+        if (checkPermission()) {
+            loadTexts();
+        }
+    };
   </script>
 </body>
 </html> 

@@ -53,6 +53,18 @@
     </div>
   </div>
   <script>
+    // 권한 확인
+    function checkPermission() {
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+            alert('로그인이 필요합니다.');
+            location.href = 'index.html';
+            return false;
+        }
+        
+        return true;
+    }
+    
     // 샘플 데이터 (단어)
     const questions = [
       { word: 'cat' },
@@ -159,7 +171,11 @@
       return arr;
     }
     function goBack() { window.location.href = 'index.html'; }
-    window.onload = renderQuestion;
+    window.onload = function() {
+        if (checkPermission()) {
+            renderQuestion();
+        }
+    };
   </script>
 </body>
 </html> 

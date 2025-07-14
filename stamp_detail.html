@@ -420,13 +420,22 @@
         
         async function loadPageData() {
             try {
-                console.log('페이지 데이터 로드 시작, pageId:', pageId);
+                // 현재 사용자 정보 확인
+                const currentUser = getCurrentUser();
+                if (!currentUser) {
+                    alert('로그인이 필요합니다.');
+                    location.href = 'index.html';
+                    return;
+                }
+
+                console.log('페이지 데이터 로드 시작, pageId:', pageId, '사용자:', currentUser);
                 
-                // 페이지 정보 로드
+                // 페이지 정보 로드 (사용자별 필터링)
                 const { data: pageDataResult, error: pageError } = await client
                     .from('stamp_pages')
                     .select('*')
                     .eq('id', pageId)
+                    .eq('user_id', currentUser.id)
                     .single();
                 
                 console.log('페이지 데이터 결과:', { data: pageDataResult, error: pageError });
@@ -438,11 +447,12 @@
                 pageData = pageDataResult;
                 console.log('페이지 데이터:', pageData);
                 
-                // 스탬프 정보 로드
+                // 스탬프 정보 로드 (사용자별 필터링)
                 const { data: stampsData, error: stampsError } = await client
                     .from('stamps')
                     .select('*')
                     .eq('page_id', pageId)
+                    .eq('user_id', currentUser.id)
                     .order('position');
                 
                 console.log('스탬프 데이터 결과:', { data: stampsData, error: stampsError });

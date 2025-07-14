@@ -204,6 +204,14 @@
         document.getElementById('createForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            // 현재 사용자 정보 확인
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                location.href = 'index.html';
+                return;
+            }
+            
             const title = document.getElementById('title').value.trim();
             const stampCount = parseInt(document.getElementById('stampCount').value);
             const reward = document.getElementById('reward').value.trim();
@@ -240,13 +248,14 @@
             createBtn.textContent = '만드는 중...';
             
             try {
-                // 페이지 생성
+                // 페이지 생성 (사용자 정보 포함)
                 const { data: pageData, error: pageError } = await client
                     .from('stamp_pages')
                     .insert([{
                         title: title,
                         stamp_count: stampCount,
-                        reward: reward
+                        reward: reward,
+                        user_id: currentUser.id
                     }])
                     .select();
                 
@@ -256,13 +265,14 @@
                 
                 const pageId = pageData[0].id;
                 
-                // 빈 스탬프 위치들 생성
+                // 빈 스탬프 위치들 생성 (사용자 정보 포함)
                 const stampPositions = [];
                 for (let i = 1; i <= stampCount; i++) {
                     stampPositions.push({
                         page_id: pageId,
                         position: i,
-                        stamp_type: null
+                        stamp_type: null,
+                        user_id: currentUser.id
                     });
                 }
                 

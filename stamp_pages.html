@@ -197,10 +197,21 @@
         let stamps = [];
 
         async function loadData() {
-            // 페이지 데이터 로드
+            // 현재 사용자 정보 확인
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                location.href = 'index.html';
+                return;
+            }
+
+            console.log('현재 사용자:', currentUser);
+
+            // 페이지 데이터 로드 (사용자별 필터링)
             const { data: pagesData, error: pagesError } = await client
                 .from('stamp_pages')
                 .select('*')
+                .eq('user_id', currentUser.id)
                 .order('created_at', { ascending: false });
             
             if (pagesError) {
@@ -210,10 +221,11 @@
             
             pages = pagesData;
 
-            // 스탬프 데이터 로드
+            // 스탬프 데이터 로드 (사용자별 필터링)
             const { data: stampsData, error: stampsError } = await client
                 .from('stamps')
-                .select('*');
+                .select('*')
+                .eq('user_id', currentUser.id);
             
             if (stampsError) {
                 console.error('스탬프 로드 실패:', stampsError);
