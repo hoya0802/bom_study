@@ -631,11 +631,12 @@
                 console.log('스탬프 삭제 시작:', { pageId, position: deleteStampPosition });
                 
                 // 스탬프 삭제 (stamp_type을 null로 설정)
+                const updateData = {};
+                updateData.stamp_type = null;
+                
                 const { data, error } = await client
                     .from('stamps')
-                    .update({ 
-                        stamp_type: null
-                    })
+                    .update(updateData)
                     .eq('page_id', pageId)
                     .eq('position', deleteStampPosition)
                     .select();
