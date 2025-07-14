@@ -260,15 +260,16 @@
 
         function renderPageCard(page) {
             const pageStamps = stamps.filter(stamp => stamp.page_id === page.id);
-            const progress = pageStamps.length / page.stamp_count * 100;
-            const isCompleted = pageStamps.length >= page.stamp_count;
+            const completedStamps = pageStamps.filter(stamp => stamp.stamp_type !== null).length;
+            const progress = completedStamps / page.stamp_count * 100;
+            const isCompleted = completedStamps >= page.stamp_count;
             
             return `
                 <div class="page-card" onclick="location.href='stamp_detail.html?id=${page.id}'">
                     <div class="page-title">${page.title}</div>
                     <div class="page-info">
                         <div class="stamp-progress">
-                            <span>${pageStamps.length}/${page.stamp_count}</span>
+                            <span>${completedStamps}/${page.stamp_count}</span>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${progress}%"></div>
                             </div>
