@@ -137,9 +137,12 @@
             opacity: 1;
         }
         .stamp-image {
-            width: 60%;
-            height: 60%;
-            object-fit: contain;
+            width: 50px;
+            height: 50px;
+            background-image: url('stamp.png');
+            background-size: 150px 100px; /* 3×2 그리드: 50px × 3 = 150px, 50px × 2 = 100px */
+            background-repeat: no-repeat;
+            border-radius: 8px;
         }
         .stamp-number {
             position: absolute;
@@ -488,10 +491,32 @@
                 stampItem.appendChild(stampNumber);
                 
                 if (isFilled) {
-                    const stampImage = document.createElement('img');
+                    const stampImage = document.createElement('div');
                     stampImage.className = 'stamp-image';
-                    stampImage.src = `stamp.png`;
-                    stampImage.style.objectPosition = `0 -${(stamp.stamp_type - 1) * 100}px`;
+                    
+                    // 3×2 그리드 위치 계산
+                    const positions = [
+                        // 첫 번째 행 (0, 0), (1, 0), (2, 0)
+                        {x: 0, y: 0},      // 스탬프 1
+                        {x: 1, y: 0},      // 스탬프 2  
+                        {x: 2, y: 0},      // 스탬프 3
+                        // 두 번째 행 (0, 1), (1, 1), (2, 1)
+                        {x: 0, y: 1},      // 스탬프 4
+                        {x: 1, y: 1},      // 스탬프 5
+                        {x: 2, y: 1}       // 스탬프 6
+                    ];
+                    
+                    const stampType = stamp.stamp_type - 1; // 0-based index
+                    const pos = positions[stampType];
+                    
+                    console.log(`스탬프 이미지 설정:`, {
+                        stampType: stamp.stamp_type,
+                        gridPosition: pos,
+                        backgroundPosition: `-${pos.x * 50}px -${pos.y * 50}px`
+                    });
+                    
+                    stampImage.style.backgroundPosition = `-${pos.x * 50}px -${pos.y * 50}px`;
+                    
                     stampItem.appendChild(stampImage);
                 } else {
                     const emptyText = document.createElement('div');
