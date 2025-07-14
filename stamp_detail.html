@@ -463,15 +463,23 @@
                 const stamp = stamps.find(s => s.position === i);
                 const isFilled = stamp && stamp.stamp_type !== null;
                 
+                console.log(`스탬프 ${i} 렌더링:`, { stamp, isFilled });
+                
                 const stampItem = document.createElement('div');
                 stampItem.className = `stamp-item ${isFilled ? 'filled' : ''}`;
                 
                 if (isFilled) {
                     // 이미 찍힌 스탬프는 삭제 모드
-                    stampItem.onclick = () => handleStampDelete(i);
+                    stampItem.onclick = () => {
+                        console.log(`삭제 모드 스탬프 ${i} 클릭`);
+                        handleStampDelete(i);
+                    };
                 } else {
                     // 빈 스탬프는 등록 모드
-                    stampItem.onclick = () => handleStampClick(i);
+                    stampItem.onclick = () => {
+                        console.log(`등록 모드 스탬프 ${i} 클릭`);
+                        handleStampClick(i);
+                    };
                 }
                 
                 const stampNumber = document.createElement('div');
@@ -497,12 +505,18 @@
         }
         
         function handleStampClick(position) {
+            console.log('스탬프 클릭:', position);
+            
             const stamp = stamps.find(s => s.position === position);
+            console.log('찾은 스탬프:', stamp);
+            
             if (stamp && stamp.stamp_type !== null) {
+                console.log('이미 찍힌 스탬프입니다.');
                 return; // 이미 찍힌 스탬프는 클릭 불가
             }
             
             selectedStampPosition = position;
+            console.log('선택된 스탬프 위치:', selectedStampPosition);
             document.getElementById('stampPopup').style.display = 'flex';
         }
         
@@ -525,7 +539,13 @@
         }
         
         async function confirmStamp() {
-            if (!selectedStampPosition) return;
+            console.log('confirmStamp 호출됨, selectedStampPosition:', selectedStampPosition);
+            
+            if (!selectedStampPosition) {
+                console.error('selectedStampPosition이 설정되지 않았습니다.');
+                alert('스탬프 위치가 선택되지 않았습니다.');
+                return;
+            }
             
             closeStampPopup();
             
@@ -540,7 +560,11 @@
                 const currentStamp = stamps.find(s => s.position === selectedStampPosition);
                 console.log('현재 스탬프 데이터:', currentStamp);
                 
-                // 스탬프 업데이트 (updated_at 컬럼이 없을 경우를 대비)
+                if (!currentStamp) {
+                    throw new Error(`위치 ${selectedStampPosition}의 스탬프를 찾을 수 없습니다.`);
+                }
+                
+                // 스탬프 업데이트
                 const { data, error } = await client
                     .from('stamps')
                     .update({ 
@@ -631,12 +655,13 @@
                 console.log('스탬프 삭제 시작:', { pageId, position: deleteStampPosition });
                 
                 // 스탬프 삭제 (stamp_type을 null로 설정)
-                const updateData = {};
-                updateData.stamp_type = null;
+                console.log('삭제할 스탬프 정보:', { pageId, position: deleteStampPosition });
                 
                 const { data, error } = await client
                     .from('stamps')
-                    .update(updateData)
+                    .update({ 
+                        stamp_type: null 
+                    })
                     .eq('page_id', pageId)
                     .eq('position', deleteStampPosition)
                     .select();
