@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>칭찬스티커 - 새봄이 영어 공부</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .add-page-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 30px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .add-page-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab:hover {
+            color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .page-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .page-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .page-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .stamp-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+        .reward-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .empty-message {
+            text-align: center;
+            color: #666;
+            padding: 50px 20px;
+            font-size: 1.1rem;
+        }
+        @media (max-width: 600px) {
+            .container { margin: 10px; border-radius: 15px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.5rem; }
+            .content { padding: 20px; }
+            .tabs { padding: 0 10px; }
+            .tab { padding: 12px 15px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="location.href='index.html'">← 뒤로</button>
+            <h1>🏆 칭찬스티커</h1>
+            <p>목표를 달성하고 스티커를 모아보세요!</p>
+        </div>
+        <div class="content">
+            <button class="add-page-btn" onclick="location.href='stamp_create.html'">
+                ✨ 새 스티커 페이지 만들기
+            </button>
+            
+            <div class="tabs" id="tabs">
+                <!-- 탭들이 동적으로 생성됩니다 -->
+            </div>
+            
+            <div id="tabContents">
+                <!-- 탭 내용들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const client = supabaseClient;
+        let pages = [];
+        let stamps = [];
+
+        async function loadData() {
+            // 페이지 데이터 로드
+            const { data: pagesData, error: pagesError } = await client
+                .from('stamp_pages')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (pagesError) {
+                console.error('페이지 로드 실패:', pagesError);
+                return;
+            }
+            
+            pages = pagesData;
+
+            // 스탬프 데이터 로드
+            const { data: stampsData, error: stampsError } = await client
+                .from('stamps')
+                .select('*');
+            
+            if (stampsError) {
+                console.error('스탬프 로드 실패:', stampsError);
+                return;
+            }
+            
+            stamps = stampsData;
+            
+            renderTabs();
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs');
+            const tabContentsContainer = document.getElementById('tabContents');
+            
+            tabsContainer.innerHTML = '';
+            tabContentsContainer.innerHTML = '';
+            
+            if (pages.length === 0) {
+                tabContentsContainer.innerHTML = `
+                    <div class="empty-message">
+                        📝 아직 스티커 페이지가 없습니다.<br>
+                        "새 스티커 페이지 만들기" 버튼을 눌러서 첫 번째 페이지를 만들어보세요!
+                    </div>
+                `;
+                return;
+            }
+            
+            pages.forEach((page, index) => {
+                // 탭 생성
+                const tab = document.createElement('button');
+                tab.className = `tab ${index === 0 ? 'active' : ''}`;
+                tab.textContent = page.title;
+                tab.onclick = () => switchTab(index);
+                tabsContainer.appendChild(tab);
+                
+                // 탭 내용 생성
+                const tabContent = document.createElement('div');
+                tabContent.className = `tab-content ${index === 0 ? 'active' : ''}`;
+                tabContent.innerHTML = renderPageCard(page);
+                tabContentsContainer.appendChild(tabContent);
+            });
+        }
+
+        function renderPageCard(page) {
+            const pageStamps = stamps.filter(stamp => stamp.page_id === page.id);
+            const progress = pageStamps.length / page.stamp_count * 100;
+            const isCompleted = pageStamps.length >= page.stamp_count;
+            
+            return `
+                <div class="page-card" onclick="location.href='stamp_detail.html?id=${page.id}'">
+                    <div class="page-title">${page.title}</div>
+                    <div class="page-info">
+                        <div class="stamp-progress">
+                            <span>${pageStamps.length}/${page.stamp_count}</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                        <div class="reward-text">${isCompleted ? '🎉 완료!' : page.reward}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchTab(index) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            document.querySelectorAll('.tab')[index].classList.add('active');
+            document.querySelectorAll('.tab-content')[index].classList.add('active');
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html> 

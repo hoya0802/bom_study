@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스티커 페이지 - 새봄이 영어 공부</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .page-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .page-reward {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .progress-info {
+            margin-top: 15px;
+            color: #666;
+        }
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stamp-item {
+            aspect-ratio: 1;
+            border: 3px dashed #e1e5e9;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            position: relative;
+        }
+        .stamp-item:hover {
+            border-color: #667eea;
+            background: #e3f0ff;
+            transform: scale(1.05);
+        }
+        .stamp-item.filled {
+            border-style: solid;
+            border-color: #667eea;
+            background: white;
+        }
+        .stamp-item.filled:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+        .stamp-image {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+        .stamp-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .empty-stamp-text {
+            color: #999;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        /* 팝업 스타일 */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .popup {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: popupSlideIn 0.3s ease-out;
+        }
+        @keyframes popupSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .popup h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .popup p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .popup-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .popup-btn:hover {
+            transform: translateY(-2px);
+        }
+        .popup-btn.cancel {
+            background: #6c757d;
+            color: white;
+        }
+        .popup-btn.confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        /* 축하 팝업 */
+        .celebration-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .celebration-content {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            animation: celebrationBounce 0.6s ease-out;
+        }
+        @keyframes celebrationBounce {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) rotate(-10deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: celebrationSpin 2s ease-in-out infinite;
+        }
+        @keyframes celebrationSpin {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        .celebration-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .celebration-message {
+            font-size: 1.2rem;
+            color: #667eea;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        .celebration-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .celebration-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 600px) {
+            .container { margin: 10px; border-radius: 15px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.5rem; }
+            .content { padding: 20px; }
+            .stamps-grid { gap: 15px; }
+            .popup { padding: 20px; }
+            .celebration-content { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="location.href='stamp_pages.html'">← 뒤로</button>
+            <h1 id="pageTitle">스티커 페이지</h1>
+            <p id="pageReward">목표를 달성하고 스티커를 모아보세요!</p>
+        </div>
+        <div class="content">
+            <div class="page-info">
+                <div class="page-title" id="infoTitle">페이지 제목</div>
+                <div class="page-reward" id="infoReward">달성 보상</div>
+                <div class="progress-info" id="progressInfo">진행 상황</div>
+            </div>
+            
+            <div class="stamps-grid" id="stampsGrid">
+                <!-- 스탬프들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 스탬프 찍기 확인 팝업 -->
+    <div class="popup-overlay" id="stampPopup">
+        <div class="popup">
+            <h3>🎯 도장을 찍을까요?</h3>
+            <p>이 목표를 달성하셨나요?<br>도장을 찍으면 완료됩니다!</p>
+            <div class="popup-buttons">
+                <button class="popup-btn cancel" onclick="closeStampPopup()">취소</button>
+                <button class="popup-btn confirm" onclick="confirmStamp()">확인</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 축하 팝업 -->
+    <div class="celebration-popup" id="celebrationPopup">
+        <div class="celebration-content">
+            <div class="celebration-icon">🎉</div>
+            <div class="celebration-title">축하합니다!</div>
+            <div class="celebration-message" id="celebrationMessage">
+                모든 스티커를 모았습니다!<br>
+                정말 대단해요! 👏
+            </div>
+            <button class="celebration-btn" onclick="closeCelebrationPopup()">확인</button>
+        </div>
+    </div>
+
+    <script>
+        const client = supabaseClient;
+        let pageData = null;
+        let stamps = [];
+        let selectedStampPosition = null;
+        
+        // URL에서 페이지 ID 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageId = urlParams.get('id');
+        
+        if (!pageId) {
+            alert('페이지 ID가 없습니다.');
+            location.href = 'stamp_pages.html';
+        }
+        
+        async function loadPageData() {
+            try {
+                // 페이지 정보 로드
+                const { data: pageDataResult, error: pageError } = await client
+                    .from('stamp_pages')
+                    .select('*')
+                    .eq('id', pageId)
+                    .single();
+                
+                if (pageError) {
+                    throw pageError;
+                }
+                
+                pageData = pageDataResult;
+                
+                // 스탬프 정보 로드
+                const { data: stampsData, error: stampsError } = await client
+                    .from('stamps')
+                    .select('*')
+                    .eq('page_id', pageId)
+                    .order('position');
+                
+                if (stampsError) {
+                    throw stampsError;
+                }
+                
+                stamps = stampsData;
+                
+                renderPage();
+                
+            } catch (error) {
+                console.error('데이터 로드 실패:', error);
+                alert('페이지를 불러오는데 실패했습니다.');
+                location.href = 'stamp_pages.html';
+            }
+        }
+        
+        function renderPage() {
+            // 헤더 정보 업데이트
+            document.getElementById('pageTitle').textContent = pageData.title;
+            document.getElementById('infoTitle').textContent = pageData.title;
+            document.getElementById('infoReward').textContent = pageData.reward;
+            
+            // 진행 상황 업데이트
+            const completedStamps = stamps.filter(s => s.stamp_type !== null).length;
+            const progressText = `${completedStamps}/${pageData.stamp_count} 완료`;
+            document.getElementById('progressInfo').textContent = progressText;
+            
+            // 스탬프 그리드 렌더링
+            const stampsGrid = document.getElementById('stampsGrid');
+            stampsGrid.innerHTML = '';
+            
+            for (let i = 1; i <= pageData.stamp_count; i++) {
+                const stamp = stamps.find(s => s.position === i);
+                const isFilled = stamp && stamp.stamp_type !== null;
+                
+                const stampItem = document.createElement('div');
+                stampItem.className = `stamp-item ${isFilled ? 'filled' : ''}`;
+                stampItem.onclick = () => handleStampClick(i);
+                
+                const stampNumber = document.createElement('div');
+                stampNumber.className = 'stamp-number';
+                stampNumber.textContent = i;
+                stampItem.appendChild(stampNumber);
+                
+                if (isFilled) {
+                    const stampImage = document.createElement('img');
+                    stampImage.className = 'stamp-image';
+                    stampImage.src = `stamp.png`;
+                    stampImage.style.objectPosition = `0 -${(stamp.stamp_type - 1) * 100}px`;
+                    stampItem.appendChild(stampImage);
+                } else {
+                    const emptyText = document.createElement('div');
+                    emptyText.className = 'empty-stamp-text';
+                    emptyText.textContent = '터치하여\n도장 찍기';
+                    stampItem.appendChild(emptyText);
+                }
+                
+                stampsGrid.appendChild(stampItem);
+            }
+        }
+        
+        function handleStampClick(position) {
+            const stamp = stamps.find(s => s.position === position);
+            if (stamp && stamp.stamp_type !== null) {
+                return; // 이미 찍힌 스탬프는 클릭 불가
+            }
+            
+            selectedStampPosition = position;
+            document.getElementById('stampPopup').style.display = 'flex';
+        }
+        
+        function closeStampPopup() {
+            document.getElementById('stampPopup').style.display = 'none';
+            selectedStampPosition = null;
+        }
+        
+        async function confirmStamp() {
+            if (!selectedStampPosition) return;
+            
+            closeStampPopup();
+            
+            try {
+                // 랜덤 스탬프 타입 선택 (1~6)
+                const randomStampType = Math.floor(Math.random() * 6) + 1;
+                
+                // 스탬프 업데이트
+                const { error } = await client
+                    .from('stamps')
+                    .update({ stamp_type: randomStampType })
+                    .eq('page_id', pageId)
+                    .eq('position', selectedStampPosition);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // 로컬 데이터 업데이트
+                const stampIndex = stamps.findIndex(s => s.position === selectedStampPosition);
+                if (stampIndex !== -1) {
+                    stamps[stampIndex].stamp_type = randomStampType;
+                }
+                
+                // 페이지 다시 렌더링
+                renderPage();
+                
+                // 완료 여부 확인
+                const completedStamps = stamps.filter(s => s.stamp_type !== null).length;
+                if (completedStamps >= pageData.stamp_count) {
+                    setTimeout(() => {
+                        showCelebrationPopup();
+                    }, 500);
+                }
+                
+            } catch (error) {
+                console.error('스탬프 업데이트 실패:', error);
+                alert('스탬프를 찍는데 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+        
+        function showCelebrationPopup() {
+            const message = `🎉 ${pageData.title} 완료! 🎉\n\n${pageData.reward}\n\n정말 대단해요! 👏`;
+            document.getElementById('celebrationMessage').innerHTML = message.replace(/\n/g, '<br>');
+            document.getElementById('celebrationPopup').style.display = 'flex';
+        }
+        
+        function closeCelebrationPopup() {
+            document.getElementById('celebrationPopup').style.display = 'none';
+        }
+        
+        // ESC 키로 팝업 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeStampPopup();
+                closeCelebrationPopup();
+            }
+        });
+        
+        // 팝업 외부 클릭으로 닫기
+        document.getElementById('stampPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStampPopup();
+            }
+        });
+        
+        document.getElementById('celebrationPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCelebrationPopup();
+            }
+        });
+        
+        window.onload = loadPageData;
+    </script>
+</body>
+</html> 

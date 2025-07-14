@@ -35,6 +35,17 @@ GitHub Pages에서 호스팅되는 정적 웹 기반 영어 학습 게임입니�
 study_test/
 ├── index.html              # 메인 페이지 (비밀번호 인증)
 ├── phonics.html            # 파닉스 게임
+├── meaning_game.html       # 뜻 보기 게임
+├── image_game.html         # 그림 보기 게임
+├── spelling_game.html      # 스펠링 게임
+├── text_upload.html        # 텍스트 업로드/출력
+├── stamp_pages.html        # 칭찬스티커 페이지 목록
+├── stamp_create.html       # 새 스탬프 페이지 생성
+├── stamp_detail.html       # 스탬프 페이지 상세
+├── config.js               # Supabase 설정
+├── manifest.json           # PWA 매니페스트
+├── stamp.png               # 스탬프 이미지
+├── database_setup.sql      # 데이터베이스 설정 스크립트
 ├── README.md               # 프로젝트 설명서
 └── assets/                 # (향후 추가 예정)
     ├── css/
@@ -132,6 +143,14 @@ CSS 변수를 사용하여 테마 색상 쉽게 변경 가능
 - ✏️ 스펠링 게임
 - 📱 PWA 지원
 - 🎨 테마 커스터마이징
+
+### 🏆 칭찬스티커 시스템 (v1.1.0)
+- ✅ 스탬프 페이지 생성 및 관리
+- ✅ 탭 기반 페이지 전환
+- ✅ 스탬프 찍기 기능 (랜덤 이미지)
+- ✅ 완료 시 축하 팝업
+- ✅ Supabase 데이터베이스 연동
+- ✅ 반응형 디자인
 
 ## 💡 사용 팁
 

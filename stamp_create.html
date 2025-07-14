@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 스티커 페이지 만들기 - 새봄이 영어 공부</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: #f8f9fa;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .create-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .create-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .example-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .example-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .example-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .example-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .example-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .container { margin: 10px; border-radius: 15px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.5rem; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="location.href='stamp_pages.html'">← 뒤로</button>
+            <h1>✨ 새 스티커 페이지</h1>
+            <p>목표를 설정하고 스티커를 모아보세요!</p>
+        </div>
+        <div class="content">
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="title">페이지 제목</label>
+                    <input type="text" id="title" placeholder="예: 영어 단어 10개 외우기" required>
+                    <div class="error-message" id="titleError">제목을 입력해주세요.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stampCount">스티커 개수</label>
+                    <input type="number" id="stampCount" min="1" max="20" value="5" required>
+                    <div class="error-message" id="countError">1~20개 사이로 입력해주세요.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reward">달성 보상</label>
+                    <textarea id="reward" placeholder="예: 아이스크림 먹기, 게임 30분 하기, 선물 받기 등" required></textarea>
+                    <div class="error-message" id="rewardError">보상을 입력해주세요.</div>
+                </div>
+                
+                <button type="submit" class="create-btn" id="createBtn">
+                    🎯 스티커 페이지 만들기
+                </button>
+            </form>
+            
+            <div class="example-section">
+                <h3>💡 예시 아이디어</h3>
+                <div class="example-item">
+                    <div class="example-title">📚 영어 공부</div>
+                    <div class="example-desc">단어 10개 외우기 → 아이스크림 먹기</div>
+                </div>
+                <div class="example-item">
+                    <div class="example-title">🧹 집안일</div>
+                    <div class="example-desc">방 정리 5일 연속하기 → 게임 1시간 하기</div>
+                </div>
+                <div class="example-item">
+                    <div class="example-title">🏃‍♂️ 운동</div>
+                    <div class="example-desc">매일 30분 걷기 → 원하는 장난감 사기</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const client = supabaseClient;
+        
+        document.getElementById('createForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const stampCount = parseInt(document.getElementById('stampCount').value);
+            const reward = document.getElementById('reward').value.trim();
+            
+            // 유효성 검사
+            let isValid = true;
+            
+            if (!title) {
+                showError('titleError', '제목을 입력해주세요.');
+                isValid = false;
+            } else {
+                hideError('titleError');
+            }
+            
+            if (stampCount < 1 || stampCount > 20) {
+                showError('countError', '1~20개 사이로 입력해주세요.');
+                isValid = false;
+            } else {
+                hideError('countError');
+            }
+            
+            if (!reward) {
+                showError('rewardError', '보상을 입력해주세요.');
+                isValid = false;
+            } else {
+                hideError('rewardError');
+            }
+            
+            if (!isValid) return;
+            
+            // 버튼 비활성화
+            const createBtn = document.getElementById('createBtn');
+            createBtn.disabled = true;
+            createBtn.textContent = '만드는 중...';
+            
+            try {
+                // 페이지 생성
+                const { data: pageData, error: pageError } = await client
+                    .from('stamp_pages')
+                    .insert([{
+                        title: title,
+                        stamp_count: stampCount,
+                        reward: reward
+                    }])
+                    .select();
+                
+                if (pageError) {
+                    throw pageError;
+                }
+                
+                const pageId = pageData[0].id;
+                
+                // 빈 스탬프 위치들 생성
+                const stampPositions = [];
+                for (let i = 1; i <= stampCount; i++) {
+                    stampPositions.push({
+                        page_id: pageId,
+                        position: i,
+                        stamp_type: null
+                    });
+                }
+                
+                const { error: stampsError } = await client
+                    .from('stamps')
+                    .insert(stampPositions);
+                
+                if (stampsError) {
+                    throw stampsError;
+                }
+                
+                // 성공 메시지
+                alert('🎉 스티커 페이지가 성공적으로 만들어졌습니다!');
+                location.href = `stamp_detail.html?id=${pageId}`;
+                
+            } catch (error) {
+                console.error('페이지 생성 실패:', error);
+                alert('페이지 생성에 실패했습니다. 다시 시도해주세요.');
+                
+                // 버튼 다시 활성화
+                createBtn.disabled = false;
+                createBtn.textContent = '🎯 스티커 페이지 만들기';
+            }
+        });
+        
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        function hideError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.style.display = 'none';
+        }
+    </script>
+</body>
+</html> 
