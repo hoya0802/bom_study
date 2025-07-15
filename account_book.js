@@ -61,15 +61,11 @@ const TRANSACTION_ICONS = {
 
 // 카테고리 API 함수들
 const CategoryAPI = {
-    // 카테고리 목록 조회
+    // 카테고리 목록 조회 (모든 사용자 데이터)
     async getCategories(type = null) {
-        const currentUser = getCurrentUser();
-        if (!currentUser) return [];
-
         let query = supabaseClient
             .from('categories')
-            .select('*')
-            .eq('user_password_hash', currentUser.password_hash);
+            .select('*');
 
         if (type) {
             query = query.eq('type', type);
@@ -94,7 +90,8 @@ const CategoryAPI = {
             .from('categories')
             .insert([{
                 ...categoryData,
-                user_password_hash: currentUser.password_hash
+                user_password_hash: currentUser.password_hash,
+                created_by: currentUser.password_hash
             }])
             .select()
             .single();
@@ -139,7 +136,7 @@ const CategoryAPI = {
             .from('categories')
             .delete()
             .eq('id', id)
-            .eq('user_password_hash', currentUser.password_hash);
+            .eq('created_by', currentUser.password_hash);
 
         if (error) {
             console.error('카테고리 삭제 오류:', error);
@@ -150,11 +147,8 @@ const CategoryAPI = {
 
 // 거래 API 함수들
 const TransactionAPI = {
-    // 거래 목록 조회
+    // 거래 목록 조회 (모든 사용자 데이터)
     async getTransactions(filters = {}) {
-        const currentUser = getCurrentUser();
-        if (!currentUser) return [];
-
         let query = supabaseClient
             .from('transactions')
             .select(`
@@ -165,8 +159,7 @@ const TransactionAPI = {
                     color,
                     icon
                 )
-            `)
-            .eq('user_password_hash', currentUser.password_hash);
+            `);
 
         // 날짜 필터
         if (filters.startDate && filters.endDate) {
@@ -205,7 +198,8 @@ const TransactionAPI = {
             .from('transactions')
             .insert([{
                 ...transactionData,
-                user_password_hash: currentUser.password_hash
+                user_password_hash: currentUser.password_hash,
+                created_by: currentUser.password_hash
             }])
             .select(`
                 *,
@@ -266,7 +260,7 @@ const TransactionAPI = {
             .from('transactions')
             .delete()
             .eq('id', id)
-            .eq('user_password_hash', currentUser.password_hash);
+            .eq('created_by', currentUser.password_hash);
 
         if (error) {
             console.error('거래 삭제 오류:', error);

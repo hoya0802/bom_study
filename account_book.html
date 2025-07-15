@@ -429,6 +429,13 @@
                 <button class="tab active" onclick="switchTab('daily')">📅 일별</button>
                 <button class="tab" onclick="switchTab('monthly')">📊 월별</button>
             </div>
+            
+            <!-- 사용자 필터 탭 -->
+            <div class="tab-container" style="margin-top: 15px;">
+                <button class="tab active" onclick="switchUserFilter('all')">👥 전체</button>
+                <button class="tab" onclick="switchUserFilter('dad')">👨 아빠</button>
+                <button class="tab" onclick="switchUserFilter('mom')">👩 엄마</button>
+            </div>
 
             <!-- 필터 및 등록 버튼 -->
             <div class="filter-controls">
@@ -578,15 +585,17 @@
 
     <script>
         let currentTab = 'daily';
+        let currentUserFilter = 'all';
         let currentFilters = {};
         let categories = [];
+        let allUsers = []; // 모든 사용자 목록
 
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', async function() {
             await initializePage();
         });
 
-        // 페이지 초기화
+                // 페이지 초기화
         async function initializePage() {
             const currentUser = getCurrentUser();
             if (!currentUser) {
@@ -605,19 +614,22 @@
             document.getElementById('startDate').value = monthRange.start;
             document.getElementById('endDate').value = formatDateForInput(today);
 
+            // 모든 사용자 목록 로드
+            await loadAllUsers();
+
             // 카테고리 로드
             await loadCategories();
 
             // 거래 목록 로드
             await loadTransactions();
 
-                    // 모달 설정
-        ModalManager.setupModalClose('transactionModal');
-        ModalManager.setupModalClose('categoryModal');
-        ModalManager.setupModalClose('categoryFormModal');
+            // 모달 설정
+            ModalManager.setupModalClose('transactionModal');
+            ModalManager.setupModalClose('categoryModal');
+            ModalManager.setupModalClose('categoryFormModal');
 
-        // 이벤트 리스너 설정
-        setupEventListeners();
+            // 이벤트 리스너 설정
+            setupEventListeners();
         }
 
         // 이벤트 리스너 설정
@@ -645,8 +657,22 @@
         function switchTab(tab) {
             currentTab = tab;
             
-            // 탭 버튼 활성화 상태 변경
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // 탭 버튼 활성화 상태 변경 (첫 번째 탭 컨테이너만)
+            const tabContainers = document.querySelectorAll('.tab-container');
+            tabContainers[0].querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 거래 목록 다시 로드
+            loadTransactions();
+        }
+
+        // 사용자 필터 전환
+        function switchUserFilter(userType) {
+            currentUserFilter = userType;
+            
+            // 사용자 필터 탭 버튼 활성화 상태 변경 (두 번째 탭 컨테이너만)
+            const tabContainers = document.querySelectorAll('.tab-container');
+            tabContainers[1].querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
             // 거래 목록 다시 로드
@@ -697,6 +723,23 @@
             }
         }
 
+        // 모든 사용자 목록 로드
+        async function loadAllUsers() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .order('name');
+                if (error) {
+                    console.error('사용자 목록 로드 오류:', error);
+                    return;
+                }
+                allUsers = data;
+            } catch (error) {
+                console.error('사용자 목록 로드 오류:', error);
+            }
+        }
+
         // 거래 목록 로드
         async function loadTransactions() {
             try {
@@ -711,11 +754,20 @@
                 currentFilters = filters;
 
                 // 거래 데이터 로드
-                const transactions = await TransactionAPI.getTransactions(filters);
-                
+                let transactions = await TransactionAPI.getTransactions(filters);
+
+                // 사용자 필터 적용
+                if (currentUserFilter !== 'all') {
+                    let filterName = currentUserFilter === 'dad' ? '아빠' : '엄마';
+                    const user = allUsers.find(u => u.name === filterName);
+                    if (user) {
+                        transactions = transactions.filter(t => t.created_by === user.password_hash);
+                    } else {
+                        transactions = [];
+                    }
+                }
                 // 통계 업데이트
-                await updateStatistics(filters);
-                
+                await updateStatistics(filters, transactions);
                 // 거래 목록 렌더링
                 renderTransactions(transactions);
             } catch (error) {
@@ -724,10 +776,27 @@
         }
 
         // 통계 업데이트
-        async function updateStatistics(filters) {
+        async function updateStatistics(filters, filteredTransactions = null) {
             try {
-                const stats = await TransactionAPI.getStatistics(filters);
-                
+                let stats;
+                if (filteredTransactions) {
+                    // 필터링된 거래로 통계 계산
+                    stats = {
+                        totalExpense: 0,
+                        totalIncome: 0,
+                        totalTransfer: 0
+                    };
+                    filteredTransactions.forEach(transaction => {
+                        const amount = parseFloat(transaction.amount);
+                        switch (transaction.type) {
+                            case '지출': stats.totalExpense += amount; break;
+                            case '수입': stats.totalIncome += amount; break;
+                            case '이체': stats.totalTransfer += amount; break;
+                        }
+                    });
+                } else {
+                    stats = await TransactionAPI.getStatistics(filters);
+                }
                 const statsGrid = document.getElementById('statsGrid');
                 statsGrid.innerHTML = `
                     <div class="stat-card">
@@ -755,6 +824,7 @@
         // 거래 목록 렌더링
         function renderTransactions(transactions) {
             const transactionList = document.getElementById('transactionList');
+            const currentUser = getCurrentUser();
             
             if (transactions.length === 0) {
                 transactionList.innerHTML = `
@@ -774,12 +844,18 @@
                         ${category.icon} ${category.name}
                     </div>` : '';
 
+                // 등록자에 따른 배경색 설정
+                const isOwnTransaction = transaction.created_by === currentUser.password_hash;
+                const backgroundColor = isOwnTransaction ? 'rgba(102, 126, 234, 0.1)' : 'rgba(108, 117, 125, 0.1)';
+                const borderColor = isOwnTransaction ? currentUser.color : '#6c757d';
+
                 return `
-                    <div class="transaction-item" style="border-left-color: ${TRANSACTION_COLORS[transaction.type]}">
+                    <div class="transaction-item" style="border-left-color: ${TRANSACTION_COLORS[transaction.type]}; background-color: ${backgroundColor}; border-left-width: 6px;">
                         <div class="transaction-info">
                             <div class="transaction-title">${transaction.description || transaction.source || '제목 없음'}</div>
                             <div class="transaction-meta">
                                 ${formatDate(transaction.transaction_date)} • ${transaction.source || ''}
+                                <span style="color: ${borderColor}; font-weight: 600;"> • ${isOwnTransaction ? '내가 등록' : '다른 사용자'}</span>
                             </div>
                         </div>
                         <div class="transaction-amount" style="color: ${TRANSACTION_COLORS[transaction.type]}">
@@ -787,8 +863,12 @@
                         </div>
                         ${categoryDisplay}
                         <div class="transaction-actions">
-                            <button class="action-btn" onclick="editTransaction('${transaction.id}')" title="수정">✏️</button>
-                            <button class="action-btn" onclick="deleteTransaction('${transaction.id}')" title="삭제">🗑️</button>
+                            ${isOwnTransaction ? `
+                                <button class="action-btn" onclick="editTransaction('${transaction.id}')" title="수정">✏️</button>
+                                <button class="action-btn" onclick="deleteTransaction('${transaction.id}')" title="삭제">🗑️</button>
+                            ` : `
+                                <span style="color: #6c757d; font-size: 0.8rem;">읽기 전용</span>
+                            `}
                         </div>
                     </div>
                 `;
@@ -935,6 +1015,7 @@
         // 카테고리 목록 렌더링
         function renderCategoryList() {
             const categoryList = document.getElementById('categoryList');
+            const currentUser = getCurrentUser();
             
             if (categories.length === 0) {
                 categoryList.innerHTML = `
@@ -947,21 +1028,31 @@
                 return;
             }
 
-            categoryList.innerHTML = categories.map(category => `
-                <div class="category-item" style="border-left-color: ${category.color}">
-                    <div class="category-info">
-                        <div class="category-icon">${category.icon}</div>
-                        <div class="category-details">
-                            <h4>${category.name}</h4>
-                            <p>${category.type}</p>
+            categoryList.innerHTML = categories.map(category => {
+                const isOwnCategory = category.created_by === currentUser.password_hash;
+                const backgroundColor = isOwnCategory ? 'rgba(102, 126, 234, 0.1)' : 'rgba(108, 117, 125, 0.1)';
+                const borderColor = isOwnCategory ? currentUser.color : '#6c757d';
+
+                return `
+                    <div class="category-item" style="border-left-color: ${category.color}; background-color: ${backgroundColor}; border-left-width: 6px;">
+                        <div class="category-info">
+                            <div class="category-icon">${category.icon}</div>
+                            <div class="category-details">
+                                <h4>${category.name}</h4>
+                                <p>${category.type} <span style="color: ${borderColor}; font-weight: 600;">• ${isOwnCategory ? '내가 등록' : '다른 사용자'}</span></p>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            ${isOwnCategory ? `
+                                <button onclick="editCategory('${category.id}')" title="수정">✏️</button>
+                                <button onclick="deleteCategory('${category.id}')" title="삭제">🗑️</button>
+                            ` : `
+                                <span style="color: #6c757d; font-size: 0.8rem;">읽기 전용</span>
+                            `}
                         </div>
                     </div>
-                    <div class="category-actions">
-                        <button onclick="editCategory('${category.id}')" title="수정">✏️</button>
-                        <button onclick="deleteCategory('${category.id}')" title="삭제">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // 카테고리 등록 모달 표시
