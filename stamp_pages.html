@@ -153,6 +153,12 @@
             color: #667eea;
             font-weight: 600;
         }
+        .creator-info {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
         .empty-message {
             text-align: center;
             color: #666;
@@ -207,11 +213,10 @@
 
             console.log('현재 사용자:', currentUser);
 
-            // 페이지 데이터 로드 (사용자별 필터링)
+            // 페이지 데이터 로드 (모든 사용자가 공유)
             const { data: pagesData, error: pagesError } = await client
                 .from('stamp_pages')
                 .select('*')
-                .eq('user_id', currentUser.id)
                 .order('created_at', { ascending: false });
             
             if (pagesError) {
@@ -220,12 +225,12 @@
             }
             
             pages = pagesData;
+            console.log('로드된 페이지 데이터:', pages);
 
-            // 스탬프 데이터 로드 (사용자별 필터링)
+            // 스탬프 데이터 로드 (공통 관리 - 모든 사용자가 같은 스탬프 기록 공유)
             const { data: stampsData, error: stampsError } = await client
                 .from('stamps')
-                .select('*')
-                .eq('user_id', currentUser.id);
+                .select('*');
             
             if (stampsError) {
                 console.error('스탬프 로드 실패:', stampsError);
@@ -241,6 +246,8 @@
             const tabsContainer = document.getElementById('tabs');
             const tabContentsContainer = document.getElementById('tabContents');
             
+            console.log('탭 렌더링 시작, 페이지 수:', pages.length);
+            
             tabsContainer.innerHTML = '';
             tabContentsContainer.innerHTML = '';
             
@@ -255,6 +262,8 @@
             }
             
             pages.forEach((page, index) => {
+                console.log(`페이지 ${index + 1}:`, page);
+                
                 // 탭 생성
                 const tab = document.createElement('button');
                 tab.className = `tab ${index === 0 ? 'active' : ''}`;
@@ -276,8 +285,11 @@
             const progress = completedStamps / page.stamp_count * 100;
             const isCompleted = completedStamps >= page.stamp_count;
             
+            // 페이지 생성자 정보 표시
+            const creatorInfo = page.user_id ? getCreatorName(page.user_id) : '알 수 없음';
+            
             return `
-                <div class="page-card" onclick="location.href='stamp_detail.html?id=${page.id}'">
+                <div class="page-card" onclick="goToDetailPage('${page.id}')">
                     <div class="page-title">${page.title}</div>
                     <div class="page-info">
                         <div class="stamp-progress">
@@ -288,8 +300,37 @@
                         </div>
                         <div class="reward-text">${isCompleted ? '🎉 완료!' : page.reward}</div>
                     </div>
+                    <div class="creator-info">👤 ${creatorInfo}님이 만든 페이지</div>
                 </div>
             `;
+        }
+
+        function getCreatorName(userId) {
+            // 사용자 ID에 따른 이름 매핑
+            const userNames = {
+                'user_001': '엄마',
+                'user_002': '아빠', 
+                'user_003': '새봄이'
+            };
+            return userNames[userId] || '알 수 없음';
+        }
+
+        function goToDetailPage(pageId) {
+            console.log('상세 페이지로 이동:', pageId);
+            if (!pageId) {
+                console.error('페이지 ID가 없습니다.');
+                alert('페이지 정보를 찾을 수 없습니다.');
+                return;
+            }
+            
+            try {
+                const url = `stamp_detail.html?id=${encodeURIComponent(pageId)}`;
+                console.log('이동할 URL:', url);
+                window.location.href = url;
+            } catch (error) {
+                console.error('페이지 이동 중 오류:', error);
+                alert('페이지 이동 중 오류가 발생했습니다.');
+            }
         }
 
         function switchTab(index) {

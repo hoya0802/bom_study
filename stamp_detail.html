@@ -81,7 +81,7 @@
         }
         .stamps-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -143,11 +143,37 @@
         .stamp-item.filled:hover::after {
             opacity: 1;
         }
+        
+        /* 랜덤 배경색 클래스들 */
+        .stamp-bg-pink {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important;
+        }
+        .stamp-bg-blue {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+        }
+        .stamp-bg-purple {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%) !important;
+        }
+        .stamp-bg-green {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%) !important;
+        }
+        .stamp-bg-orange {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
+        }
+        .stamp-bg-yellow {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important;
+        }
+        .stamp-bg-cyan {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+        }
+        .stamp-bg-mint {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%) !important;
+        }
         .stamp-image {
-            width: 45px;
-            height: 45px;
+            width: 70px;
+            height: 70px;
             background-image: url('stamp.png');
-            background-size: 135px 90px; /* 3×2 그리드: 45px × 3 = 135px, 45px × 2 = 90px */
+            background-size: 210px 140px; /* 3×2 그리드: 70px × 3 = 210px, 70px × 2 = 140px */
             background-repeat: no-repeat;
             border-radius: 50%;
             background-color: transparent;
@@ -334,7 +360,27 @@
             .header { padding: 20px; }
             .header h1 { font-size: 1.5rem; }
             .content { padding: 20px; }
-            .stamps-grid { gap: 15px; }
+            .stamps-grid { 
+                gap: 15px; 
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            }
+            .stamp-item {
+                min-width: 70px;
+                min-height: 70px;
+            }
+            .stamp-image {
+                width: 60px;
+                height: 60px;
+                background-size: 180px 120px;
+            }
+            .stamp-number {
+                width: 18px;
+                height: 18px;
+                font-size: 0.7rem;
+            }
+            .empty-stamp-text {
+                font-size: 0.8rem;
+            }
             .popup { padding: 20px; }
             .celebration-content { padding: 30px; }
         }
@@ -430,12 +476,11 @@
 
                 console.log('페이지 데이터 로드 시작, pageId:', pageId, '사용자:', currentUser);
                 
-                // 페이지 정보 로드 (사용자별 필터링)
+                // 페이지 정보 로드 (모든 사용자가 공유)
                 const { data: pageDataResult, error: pageError } = await client
                     .from('stamp_pages')
                     .select('*')
                     .eq('id', pageId)
-                    .eq('user_id', currentUser.id)
                     .single();
                 
                 console.log('페이지 데이터 결과:', { data: pageDataResult, error: pageError });
@@ -447,12 +492,11 @@
                 pageData = pageDataResult;
                 console.log('페이지 데이터:', pageData);
                 
-                // 스탬프 정보 로드 (사용자별 필터링)
+                // 스탬프 정보 로드 (공통 관리 - 모든 사용자가 같은 스탬프 기록 공유)
                 const { data: stampsData, error: stampsError } = await client
                     .from('stamps')
                     .select('*')
                     .eq('page_id', pageId)
-                    .eq('user_id', currentUser.id)
                     .order('position');
                 
                 console.log('스탬프 데이터 결과:', { data: stampsData, error: stampsError });
@@ -501,7 +545,10 @@
                 console.log(`스탬프 ${i} 렌더링:`, { stamp, isFilled });
                 
                 const stampItem = document.createElement('div');
-                stampItem.className = `stamp-item ${isFilled ? 'filled' : ''}`;
+                const bgClasses = ['stamp-bg-pink', 'stamp-bg-blue', 'stamp-bg-purple', 'stamp-bg-green', 'stamp-bg-orange', 'stamp-bg-yellow', 'stamp-bg-cyan', 'stamp-bg-mint'];
+                // 위치 기반으로 고정된 배경색 할당 (같은 위치는 항상 같은 색상)
+                const fixedBgClass = bgClasses[(i - 1) % bgClasses.length];
+                stampItem.className = `stamp-item ${isFilled ? 'filled' : ''} ${isFilled ? fixedBgClass : ''}`;
                 
                 if (isFilled) {
                     // 이미 찍힌 스탬프는 삭제 모드
@@ -544,10 +591,10 @@
                     console.log(`스탬프 이미지 설정:`, {
                         stampType: stamp.stamp_type,
                         gridPosition: pos,
-                        backgroundPosition: `-${pos.x * 45}px -${pos.y * 45}px`
+                        backgroundPosition: `-${pos.x * 70}px -${pos.y * 70}px`
                     });
                     
-                    stampImage.style.backgroundPosition = `-${pos.x * 45}px -${pos.y * 45}px`;
+                    stampImage.style.backgroundPosition = `-${pos.x * 70}px -${pos.y * 70}px`;
                     
                     stampItem.appendChild(stampImage);
                 } else {
