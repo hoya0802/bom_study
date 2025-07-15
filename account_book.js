@@ -135,8 +135,7 @@ const CategoryAPI = {
         const { error } = await supabaseClient
             .from('categories')
             .delete()
-            .eq('id', id)
-            .eq('created_by', currentUser.password_hash);
+            .eq('id', id);
 
         if (error) {
             console.error('카테고리 삭제 오류:', error);
@@ -259,8 +258,7 @@ const TransactionAPI = {
         const { error } = await supabaseClient
             .from('transactions')
             .delete()
-            .eq('id', id)
-            .eq('created_by', currentUser.password_hash);
+            .eq('id', id);
 
         if (error) {
             console.error('거래 삭제 오류:', error);
