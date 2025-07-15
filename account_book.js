@@ -109,9 +109,15 @@ const CategoryAPI = {
 
     // 카테고리 수정
     async updateCategory(id, categoryData) {
+        const currentUser = getCurrentUser();
+        if (!currentUser) throw new Error('사용자 정보가 없습니다.');
+
         const { data, error } = await supabaseClient
             .from('categories')
-            .update(categoryData)
+            .update({
+                ...categoryData,
+                user_password_hash: currentUser.password_hash
+            })
             .eq('id', id)
             .select()
             .single();
@@ -126,10 +132,14 @@ const CategoryAPI = {
 
     // 카테고리 삭제
     async deleteCategory(id) {
+        const currentUser = getCurrentUser();
+        if (!currentUser) throw new Error('사용자 정보가 없습니다.');
+
         const { error } = await supabaseClient
             .from('categories')
             .delete()
-            .eq('id', id);
+            .eq('id', id)
+            .eq('user_password_hash', currentUser.password_hash);
 
         if (error) {
             console.error('카테고리 삭제 오류:', error);
@@ -218,9 +228,15 @@ const TransactionAPI = {
 
     // 거래 수정
     async updateTransaction(id, transactionData) {
+        const currentUser = getCurrentUser();
+        if (!currentUser) throw new Error('사용자 정보가 없습니다.');
+
         const { data, error } = await supabaseClient
             .from('transactions')
-            .update(transactionData)
+            .update({
+                ...transactionData,
+                user_password_hash: currentUser.password_hash
+            })
             .eq('id', id)
             .select(`
                 *,
@@ -243,10 +259,14 @@ const TransactionAPI = {
 
     // 거래 삭제
     async deleteTransaction(id) {
+        const currentUser = getCurrentUser();
+        if (!currentUser) throw new Error('사용자 정보가 없습니다.');
+
         const { error } = await supabaseClient
             .from('transactions')
             .delete()
-            .eq('id', id);
+            .eq('id', id)
+            .eq('user_password_hash', currentUser.password_hash);
 
         if (error) {
             console.error('거래 삭제 오류:', error);
