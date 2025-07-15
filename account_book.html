@@ -713,11 +713,20 @@
             categorySelect.innerHTML = '<option value="">선택하세요</option>';
             
             if (type) {
+                // 선택된 유형에 맞는 카테고리만 표시
                 const filteredCategories = categories.filter(cat => cat.type === type);
                 filteredCategories.forEach(category => {
                     const option = document.createElement('option');
                     option.value = category.id;
                     option.textContent = `${category.icon} ${category.name}`;
+                    categorySelect.appendChild(option);
+                });
+            } else {
+                // 유형이 선택되지 않았으면 모든 카테고리 표시
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = `${category.icon} ${category.name} (${category.type})`;
                     categorySelect.appendChild(option);
                 });
             }
@@ -881,6 +890,10 @@
             document.getElementById('transactionForm').reset();
             document.getElementById('transactionId').value = '';
             document.getElementById('transactionDate').value = formatDateForInput(new Date());
+            
+            // 카테고리 옵션 초기화 (모든 카테고리 표시)
+            filterCategoriesByType();
+            
             ModalManager.showModal('transactionModal');
         }
 
