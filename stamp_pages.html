@@ -6,11 +6,12 @@
     <title>칭찬스티커 - 새봄이 영어 공부</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="config.js"></script>
+    <script src="user-theme.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             min-height: 100vh;
             padding: 20px;
         }
@@ -23,7 +24,7 @@
             overflow: hidden;
         }
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             padding: 30px;
             text-align: center;
@@ -58,7 +59,7 @@
             padding: 30px;
         }
         .add-page-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             border: none;
             padding: 15px 30px;
@@ -93,11 +94,11 @@
             white-space: nowrap;
         }
         .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            color: var(--user-primary-color, #667eea);
+            border-bottom-color: var(--user-primary-color, #667eea);
         }
         .tab:hover {
-            color: #667eea;
+            color: var(--user-primary-color, #667eea);
         }
         .tab-content {
             display: none;
@@ -115,9 +116,9 @@
             transition: all 0.3s;
         }
         .page-card:hover {
-            border-color: #667eea;
+            border-color: var(--user-primary-color, #667eea);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 8px 20px var(--user-primary-color, rgba(102, 126, 234, 0.15));
         }
         .page-title {
             font-size: 1.3rem;
@@ -146,11 +147,11 @@
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             transition: width 0.3s;
         }
         .reward-text {
-            color: #667eea;
+            color: var(--user-primary-color, #667eea);
             font-weight: 600;
         }
         .creator-info {

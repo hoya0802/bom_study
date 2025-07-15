@@ -11,11 +11,12 @@
     <meta name="apple-mobile-web-app-title" content="새봄이 영어 공부">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="config.js"></script>
+    <script src="user-theme.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -47,7 +48,7 @@
         }
         input[type="password"]:focus { outline: none; border-color: #667eea; }
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white; border: none; padding: 15px 30px; border-radius: 10px;
             font-size: 16px; font-weight: 600; cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s; width: 100%; margin-bottom: 15px;
@@ -58,7 +59,7 @@
         .btn-secondary:hover { box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3); }
         .error-message { color: #dc3545; margin-top: 10px; font-size: 14px; display: none; }
         .user-info {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #28a745 0%, #20c997 100%));
             color: white;
             padding: 15px;
             border-radius: 10px;
@@ -72,7 +73,7 @@
             margin-top: 30px;
         }
         .menu-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             border: none;
             padding: 28px 0;
@@ -90,7 +91,7 @@
         }
         .menu-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 15px 30px var(--user-primary-color, rgba(102, 126, 234, 0.3));
         }
         .logout-btn { background: #dc3545; margin-top: 20px; }
         .logout-btn:hover { box-shadow: 0 15px 30px rgba(220, 53, 69, 0.3); }
@@ -166,9 +167,8 @@
         function updateUserInfo() {
             const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
             if (currentUser) {
-                const userInfo = document.getElementById('userInfo');
-                userInfo.innerHTML = `${currentUser.emoji} ${currentUser.name}님 환영합니다!`;
-                userInfo.style.background = `linear-gradient(135deg, ${currentUser.color} 0%, ${adjustBrightness(currentUser.color, -20)} 100%)`;
+                // 공통 테마 적용
+                userTheme.refresh();
                 
                 // 사용자 역할에 따른 메뉴 생성
                 renderMenu(currentUser);

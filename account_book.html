@@ -11,12 +11,13 @@
     <meta name="apple-mobile-web-app-title" content="가계부">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="config.js"></script>
+    <script src="user-theme.js"></script>
     <script src="account_book.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,7 +30,7 @@
             overflow: hidden;
         }
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             padding: 20px;
             text-align: center;
@@ -68,7 +69,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .stats-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             padding: 12px;
             text-align: center;
@@ -137,7 +138,7 @@
             font-size: 0.9rem;
         }
         .add-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             border: none;
             padding: 10px 20px;
@@ -172,7 +173,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
         }
 
@@ -451,7 +452,7 @@
             transition: transform 0.2s;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
         }
         .btn-secondary {
@@ -512,7 +513,7 @@
             transition: border-color 0.2s;
         }
         .icon-option.selected {
-            border-color: #667eea;
+            border-color: var(--user-primary-color, #667eea);
             background-color: #f8f9fa;
         }
         .category-item {
@@ -523,7 +524,7 @@
             background: #f8f9fa;
             border-radius: 10px;
             margin-bottom: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--user-primary-color, #667eea);
         }
         .category-info {
             display: flex;
@@ -766,8 +767,8 @@
                 return;
             }
 
-            // 사용자 정보 표시
-            document.getElementById('userInfo').textContent = `${currentUser.emoji} ${currentUser.name}님`;
+            // 사용자 정보 표시 및 테마 적용
+            userTheme.refresh();
 
             // 기본 날짜 설정
             const today = new Date();
