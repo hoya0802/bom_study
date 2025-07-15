@@ -150,58 +150,203 @@
             flex-direction: column;
             gap: 10px;
         }
-        .transaction-item {
-            display: grid;
-            grid-template-columns: 1fr auto auto auto auto;
-            gap: 15px;
+        /* 모바일 친화적인 거래 리스트 스타일 */
+        .date-group {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .date-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-            transition: transform 0.2s;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
-        .transaction-item:hover {
-            transform: translateX(5px);
+
+        .date-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .transaction-info {
+
+        .date-day {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .date-details {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .daily-summary {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            align-items: flex-end;
+            gap: 2px;
         }
+
+        .daily-income {
+            font-size: 0.8rem;
+            color: #48dbfb;
+        }
+
+        .daily-expense {
+            font-size: 0.8rem;
+            color: #ff6b6b;
+        }
+
+        .transactions-container {
+            padding: 0;
+        }
+
+        .transaction-card {
+            display: flex;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: white;
+            transition: background-color 0.2s;
+        }
+
+        .transaction-card:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-card:hover {
+            background-color: #f8f9fa;
+        }
+
+        .transaction-card.own-transaction {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .transaction-card.other-transaction {
+            background-color: rgba(108, 117, 125, 0.05);
+        }
+
+        .transaction-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .transaction-left {
+            flex: 1;
+            min-width: 0;
+        }
+
         .transaction-title {
             font-weight: 600;
             color: #495057;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            word-break: break-word;
         }
-        .transaction-meta {
-            font-size: 0.85rem;
+
+        .transaction-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        .transaction-time {
+            font-size: 0.8rem;
             color: #6c757d;
         }
+
+        .transaction-source {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .transaction-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            min-width: fit-content;
+        }
+
         .transaction-amount {
             font-weight: bold;
             font-size: 1.1rem;
+            text-align: right;
         }
-        .transaction-category {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            color: white;
-        }
+
         .transaction-actions {
             display: flex;
             gap: 5px;
         }
+
         .action-btn {
             background: none;
             border: none;
             padding: 5px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.2s;
+            border-radius: 4px;
+            transition: background-color 0.2s;
         }
+
+        .action-btn:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .read-only {
+            color: #6c757d;
+            font-size: 0.7rem;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .date-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .daily-summary {
+                align-items: flex-start;
+            }
+
+            .transaction-main {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .transaction-right {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .transaction-amount {
+                text-align: left;
+            }
+
+            .transaction-actions {
+                justify-content: flex-start;
+            }
+        }
+
         .action-btn:hover {
             background: rgba(0,0,0,0.1);
         }
@@ -830,7 +975,7 @@
             }
         }
 
-        // 거래 목록 렌더링
+        // 거래 목록 렌더링 (모바일 친화적)
         function renderTransactions(transactions) {
             const transactionList = document.getElementById('transactionList');
             const currentUser = getCurrentUser();
@@ -846,42 +991,103 @@
                 return;
             }
 
-            transactionList.innerHTML = transactions.map(transaction => {
-                const category = transaction.categories;
-                const categoryDisplay = category ? 
-                    `<div class="transaction-category" style="background-color: ${category.color}">
-                        ${category.icon} ${category.name}
-                    </div>` : '';
+            // 날짜별로 거래 그룹화
+            const groupedTransactions = {};
+            transactions.forEach(transaction => {
+                const date = transaction.transaction_date;
+                if (!groupedTransactions[date]) {
+                    groupedTransactions[date] = [];
+                }
+                groupedTransactions[date].push(transaction);
+            });
 
-                // 등록자에 따른 배경색 설정
-                const isOwnTransaction = transaction.created_by === currentUser.password_hash;
-                const backgroundColor = isOwnTransaction ? 'rgba(102, 126, 234, 0.1)' : 'rgba(108, 117, 125, 0.1)';
-                const borderColor = isOwnTransaction ? currentUser.color : '#6c757d';
+            // 날짜별로 정렬
+            const sortedDates = Object.keys(groupedTransactions).sort((a, b) => new Date(b) - new Date(a));
 
-                return `
-                    <div class="transaction-item" style="border-left-color: ${TRANSACTION_COLORS[transaction.type]}; background-color: ${backgroundColor}; border-left-width: 6px;">
-                        <div class="transaction-info">
-                            <div class="transaction-title">${transaction.description || transaction.source || '제목 없음'}</div>
-                            <div class="transaction-meta">
-                                ${formatDate(transaction.transaction_date)} • ${transaction.source || ''}
-                                <span style="color: ${borderColor}; font-weight: 600;"> • ${isOwnTransaction ? '내가 등록' : '다른 사용자'}</span>
+            let html = '';
+            sortedDates.forEach(date => {
+                const dayTransactions = groupedTransactions[date];
+                
+                // 일일 요약 계산
+                const dailyStats = {
+                    income: 0,
+                    expense: 0
+                };
+                dayTransactions.forEach(t => {
+                    const amount = parseFloat(t.amount);
+                    if (t.type === '수입') {
+                        dailyStats.income += amount;
+                    } else if (t.type === '지출') {
+                        dailyStats.expense += amount;
+                    }
+                });
+
+                // 날짜 포맷팅
+                const dateObj = new Date(date);
+                const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()];
+                const month = dateObj.getMonth() + 1;
+                const day = dateObj.getDate();
+                const year = dateObj.getFullYear();
+
+                html += `
+                    <div class="date-group">
+                        <div class="date-header">
+                            <div class="date-info">
+                                <span class="date-day">${day}</span>
+                                <span class="date-details">${dayOfWeek}요일 (${year}.${month.toString().padStart(2, '0')})</span>
+                            </div>
+                            <div class="daily-summary">
+                                <span class="daily-income">수입 ${formatCurrency(dailyStats.income)}</span>
+                                <span class="daily-expense">지출 ${formatCurrency(dailyStats.expense)}</span>
                             </div>
                         </div>
-                        <div class="transaction-amount" style="color: ${TRANSACTION_COLORS[transaction.type]}">
-                            ${TRANSACTION_ICONS[transaction.type]} ${formatCurrency(transaction.amount)}
-                        </div>
-                        ${categoryDisplay}
-                        <div class="transaction-actions">
-                            ${isOwnTransaction ? `
-                                <button class="action-btn" onclick="editTransaction('${transaction.id}')" title="수정">✏️</button>
-                                <button class="action-btn" onclick="deleteTransaction('${transaction.id}')" title="삭제">🗑️</button>
-                            ` : `
-                                <span style="color: #6c757d; font-size: 0.8rem;">읽기 전용</span>
-                            `}
+                        <div class="transactions-container">
+                            ${dayTransactions.map(transaction => {
+                                const category = transaction.categories;
+                                const isOwnTransaction = transaction.created_by === currentUser.password_hash;
+                                
+                                // 시간 포맷팅
+                                const time = new Date(transaction.created_at).toLocaleTimeString('ko-KR', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true
+                                });
+
+                                return `
+                                    <div class="transaction-card ${isOwnTransaction ? 'own-transaction' : 'other-transaction'}" 
+                                         style="border-left: 4px solid ${TRANSACTION_COLORS[transaction.type]}">
+                                        <div class="transaction-main">
+                                            <div class="transaction-left">
+                                                <div class="transaction-title">${transaction.description || transaction.source || '제목 없음'}</div>
+                                                <div class="transaction-details">
+                                                    ${category ? `<span class="category-badge" style="background-color: ${category.color}">${category.icon} ${category.name}</span>` : ''}
+                                                    <span class="transaction-time">${time}</span>
+                                                    <span class="transaction-source">${transaction.source || ''}</span>
+                                                </div>
+                                            </div>
+                                            <div class="transaction-right">
+                                                <div class="transaction-amount" style="color: ${TRANSACTION_COLORS[transaction.type]}">
+                                                    ${TRANSACTION_ICONS[transaction.type]} ${formatCurrency(transaction.amount)}
+                                                </div>
+                                                <div class="transaction-actions">
+                                                    ${isOwnTransaction ? `
+                                                        <button class="action-btn" onclick="editTransaction('${transaction.id}')" title="수정">✏️</button>
+                                                        <button class="action-btn" onclick="deleteTransaction('${transaction.id}')" title="삭제">🗑️</button>
+                                                    ` : `
+                                                        <span class="read-only">읽기 전용</span>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            transactionList.innerHTML = html;
         }
 
         // 거래 등록 모달 표시
