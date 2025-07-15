@@ -55,42 +55,50 @@
             font-size: 1rem;
         }
         .stats-section {
-            padding: 20px;
-            background: #f8f9fa;
+            padding: 15px 20px;
+            background: white;
             border-bottom: 1px solid #e9ecef;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
             background: white;
-            padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stats-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .stat-amount {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .stat-label {
+            font-weight: 600;
             font-size: 0.9rem;
-            color: #6c757d;
         }
+        .stats-table td {
+            padding: 15px 12px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+        .income { color: #48dbfb; }
+        .expense { color: #ff6b6b; }
+        .net-income { color: #28a745; }
+        .net-expense { color: #dc3545; }
         .expense { color: #ff6b6b; }
         .income { color: #48dbfb; }
         .transfer { color: #5f27cd; }
         .controls-section {
-            padding: 20px;
+            padding: 15px 20px;
             border-bottom: 1px solid #e9ecef;
         }
         .tab-container {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #e9ecef;
         }
         .tab {
@@ -143,7 +151,7 @@
             transform: translateY(-2px);
         }
         .transactions-section {
-            padding: 20px;
+            padding: 15px 20px;
         }
         .transaction-list {
             display: flex;
@@ -562,9 +570,18 @@
 
         <!-- 통계 섹션 -->
         <div class="stats-section">
-            <div class="stats-grid" id="statsGrid">
-                <!-- 통계 카드들이 동적으로 생성됩니다 -->
-            </div>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>수입</th>
+                        <th>지출</th>
+                        <th>순수익</th>
+                    </tr>
+                </thead>
+                <tbody id="statsGrid">
+                    <!-- 통계 데이터가 동적으로 생성됩니다 -->
+                </tbody>
+            </table>
         </div>
 
         <!-- 컨트롤 섹션 -->
@@ -951,24 +968,16 @@
                 } else {
                     stats = await TransactionAPI.getStatistics(filters);
                 }
+                const netAmount = stats.totalIncome - stats.totalExpense;
+                const netClass = netAmount >= 0 ? 'net-income' : 'net-expense';
+                
                 const statsGrid = document.getElementById('statsGrid');
                 statsGrid.innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-amount expense">${formatCurrency(stats.totalExpense)}</div>
-                        <div class="stat-label">총 지출</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-amount income">${formatCurrency(stats.totalIncome)}</div>
-                        <div class="stat-label">총 수입</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-amount transfer">${formatCurrency(stats.totalTransfer)}</div>
-                        <div class="stat-label">총 이체</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-amount" style="color: #28a745;">${formatCurrency(stats.totalIncome - stats.totalExpense)}</div>
-                        <div class="stat-label">순수익</div>
-                    </div>
+                    <tr>
+                        <td class="income">${formatCurrency(stats.totalIncome)}</td>
+                        <td class="expense">${formatCurrency(stats.totalExpense)}</td>
+                        <td class="${netClass}">${formatCurrency(netAmount)}</td>
+                    </tr>
                 `;
             } catch (error) {
                 console.error('통계 업데이트 오류:', error);
