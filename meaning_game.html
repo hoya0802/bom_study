@@ -37,6 +37,7 @@
   <div class="container">
     <button class="back-btn" onclick="goBack()">← 홈으로</button>
     <div class="header"><h1>뜻 보고 단어 찾기</h1></div>
+    <div id="setSelectArea" style="margin-bottom:24px; text-align:center;"></div>
     <div class="game-info">
       <div class="score">점수: <span id="score">0</span></div>
       <div class="round">라운드: <span id="round">1</span>/5</div>
@@ -49,6 +50,14 @@
         <button class="btn btn-success" id="nextBtn" onclick="nextRound()" disabled>다음</button>
       </div>
       <div class="result-message" id="resultMessage" style="display:none;"></div>
+    </div>
+    <div id="successPopup" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
+      <div style="background:white; border-radius:20px; padding:40px; max-width:350px; margin:auto; text-align:center;">
+        <h2>🎉 축하합니다!</h2>
+        <div style="margin:18px 0; font-size:1.1rem;">평균 80점 이상으로 모든 세트를 완료했어요!</div>
+        <button class="btn btn-success" onclick="closeSuccessPopup()">확인</button>
+        <div id="videoArea" style="margin-top:20px; display:none;"></div>
+      </div>
     </div>
   </div>
   <script>
@@ -196,7 +205,8 @@
         const vowel = getCurrentVowel(round);
         return phonicsData[vowel];
     }
-    let current = 0, score = 0, selected = null;
+    let selected = null;
+    const TOTAL_ROUNDS = 5;
     function renderQuestion() {
       document.getElementById('round').textContent = current+1;
       document.getElementById('score').textContent = score;
@@ -284,17 +294,125 @@
     }
     function nextRound() {
       current++;
-      if (current >= questions.length) {
+      if (current >= TOTAL_ROUNDS) {
         alert(`게임 종료! 최종 점수: ${score}`);
         current = 0; score = 0;
       }
       renderQuestion();
     }
     function goBack() { window.location.href = 'index.html'; }
-    window.onload = function() {
-        if (checkPermission()) {
-            renderQuestion();
+    let currentSet = null;
+    let currentRound = 0;
+    let score = 0;
+    const ROUNDS_PER_SET = 5;
+    const TOTAL_SETS = 3;
+    let setScores = JSON.parse(localStorage.getItem('meaningSetScores') || '[0,0,0]');
+    let clearedSets = JSON.parse(localStorage.getItem('meaningClearedSets') || '[false,false,false]');
+
+    function renderSetSelect() {
+      const area = document.getElementById('setSelectArea');
+      let html = '<div style="margin-bottom:10px; font-weight:600;">세트를 선택하세요</div>';
+      for(let i=1;i<=TOTAL_SETS;i++) {
+        html += `<button class="btn" style="margin:0 8px 8px 0; min-width:80px;${clearedSets[i-1] ? 'background:#ccc;cursor:not-allowed;' : ''}" onclick="startSet(${i})" ${clearedSets[i-1] ? 'disabled' : ''}>${i}세트${clearedSets[i-1] ? ' (완료)' : ''}</button>`;
+      }
+      html += '<button class="btn btn-secondary" style="margin-left:10px;" onclick="resetSets()">세트 초기화</button>';
+      area.innerHTML = html;
+      document.querySelector('.game-info').style.display = 'none';
+      document.querySelector('.question-area').style.display = 'none';
+    }
+    function startSet(setNum) {
+      currentSet = setNum;
+      currentRound = 0;
+      score = 0;
+      document.getElementById('score').textContent = score;
+      document.getElementById('round').textContent = currentRound+1;
+      document.querySelector('.game-info').style.display = '';
+      document.querySelector('.question-area').style.display = '';
+      document.getElementById('setSelectArea').innerHTML = '';
+      renderQuestion();
+    }
+    function resetSets() {
+      if(confirm('정말 모든 세트 기록을 초기화할까요?')) {
+        setScores = [0,0,0];
+        clearedSets = [false,false,false];
+        localStorage.setItem('meaningSetScores', JSON.stringify(setScores));
+        localStorage.setItem('meaningClearedSets', JSON.stringify(clearedSets));
+        renderSetSelect();
+      }
+    }
+    function renderQuestion() {
+      document.getElementById('round').textContent = currentRound+1;
+      document.getElementById('score').textContent = score;
+      // 현재 라운드에 맞는 모음과 단어 선택
+      const currentVowel = getCurrentVowel(currentRound + 1);
+      const currentWords = getCurrentWords(currentRound + 1);
+      const randomWordData = currentWords[Math.floor(Math.random() * currentWords.length)];
+      document.getElementById('questionText').textContent = `뜻: ${randomWordData.meaning}`;
+      // 현재 학습 중인 모음 표시
+      console.log(`세트${currentSet} 라운드${currentRound + 1}: 모음 '${currentVowel}' 학습 중 - 단어: ${randomWordData.word} (${randomWordData.meaning})`);
+      const grid = document.getElementById('optionsGrid');
+      grid.innerHTML = '';
+      // 선택지 생성 (정답 + 다른 단어들)
+      const options = [randomWordData.word];
+      const allWords = Object.values(phonicsData).flat().map(item => item.word);
+      const otherWords = allWords.filter(word => word !== randomWordData.word);
+      for (let i = 0; i < 3; i++) {
+        const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+        if (!options.includes(randomWord)) {
+          options.push(randomWord);
         }
+      }
+      // 선택지 섞기
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => selectOption(btn, opt);
+        grid.appendChild(btn);
+      });
+      selected = null;
+      document.getElementById('checkBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('resultMessage').style.display = 'none';
+    }
+    function nextRound() {
+      currentRound++;
+      if (currentRound >= ROUNDS_PER_SET) {
+        setScores[currentSet-1] = score;
+        clearedSets[currentSet-1] = true;
+        localStorage.setItem('meaningSetScores', JSON.stringify(setScores));
+        localStorage.setItem('meaningClearedSets', JSON.stringify(clearedSets));
+        // 평균 점수 계산
+        const clearedCount = clearedSets.filter(Boolean).length;
+        const avg = setScores.reduce((a,b)=>a+b,0) / clearedCount;
+        if (clearedCount === TOTAL_SETS && avg >= 80) {
+          showSuccessPopup(avg);
+        } else {
+          alert(`세트 완료! 점수: ${score}`);
+          renderSetSelect();
+        }
+        return;
+      }
+      renderQuestion();
+    }
+    function showSuccessPopup(avg) {
+      document.getElementById('successPopup').style.display = 'flex';
+      document.getElementById('videoArea').style.display = 'block';
+      document.getElementById('videoArea').innerHTML = '<iframe width="300" height="170" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>';
+    }
+    function closeSuccessPopup() {
+      document.getElementById('successPopup').style.display = 'none';
+      renderSetSelect();
+    }
+    // 최초 진입 시 세트 선택
+    window.onload = function() {
+      if (checkPermission()) {
+        renderSetSelect();
+      }
     };
   </script>
 </body>

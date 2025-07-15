@@ -39,6 +39,7 @@
   <div class="container">
     <button class="back-btn" onclick="goBack()">← 홈으로</button>
     <div class="header"><h1>소리 듣고 단어 완성하기</h1></div>
+    <div id="setSelectArea" style="margin-bottom:24px; text-align:center;"></div>
     <div class="game-info">
       <div class="score">점수: <span id="score">0</span></div>
       <div class="round">라운드: <span id="round">1</span>/5</div>
@@ -52,6 +53,14 @@
         <button class="btn btn-success" id="nextBtn" onclick="nextRound()" disabled>다음</button>
       </div>
       <div class="result-message" id="resultMessage" style="display:none;"></div>
+    </div>
+    <div id="successPopup" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
+      <div style="background:white; border-radius:20px; padding:40px; max-width:350px; margin:auto; text-align:center;">
+        <h2>🎉 축하합니다!</h2>
+        <div style="margin:18px 0; font-size:1.1rem;">평균 80점 이상으로 모든 세트를 완료했어요!</div>
+        <button class="btn btn-success" onclick="closeSuccessPopup()">확인</button>
+        <div id="videoArea" style="margin-top:20px; display:none;"></div>
+      </div>
     </div>
   </div>
   <script>
@@ -87,21 +96,21 @@
         const vowel = getCurrentVowel(round);
         return phonicsData[vowel];
     }
-    let current = 0, score = 0, answer = [], selected = [], alphaPool = [];
+    let answer = [], selected = [], alphaPool = [];
     function renderQuestion() {
-      document.getElementById('round').textContent = current+1;
+      document.getElementById('round').textContent = currentRound+1;
       document.getElementById('score').textContent = score;
       
       // 현재 라운드에 맞는 모음과 단어 선택
-      const currentVowel = getCurrentVowel(current + 1);
-      const currentWords = getCurrentWords(current + 1);
+      const currentVowel = getCurrentVowel(currentRound + 1);
+      const currentWords = getCurrentWords(currentRound + 1);
       const randomWord = currentWords[Math.floor(Math.random() * currentWords.length)];
       
       answer = randomWord.split('');
       selected = [];
       
       // 현재 학습 중인 모음 표시
-      console.log(`라운드 ${current + 1}: 모음 '${currentVowel}' 학습 중 - 단어: ${randomWord}`);
+      console.log(`세트${currentSet} 라운드${currentRound + 1}: 모음 '${currentVowel}' 학습 중 - 단어: ${randomWord}`);
       // 스펠링 박스
       const area = document.getElementById('spellingArea');
       area.innerHTML = '';
@@ -163,10 +172,22 @@
       el.style.display = 'block';
     }
     function nextRound() {
-      current++;
-      if (current >= questions.length) {
-        alert(`게임 종료! 최종 점수: ${score}`);
-        current = 0; score = 0;
+      currentRound++;
+      if (currentRound >= ROUNDS_PER_SET) {
+        setScores[currentSet-1] = score;
+        clearedSets[currentSet-1] = true;
+        localStorage.setItem('spellingSetScores', JSON.stringify(setScores));
+        localStorage.setItem('spellingClearedSets', JSON.stringify(clearedSets));
+        // 평균 점수 계산
+        const clearedCount = clearedSets.filter(Boolean).length;
+        const avg = setScores.reduce((a,b)=>a+b,0) / clearedCount;
+        if (clearedCount === TOTAL_SETS && avg >= 80) {
+          showSuccessPopup(avg);
+        } else {
+          alert(`세트 완료! 점수: ${score}`);
+          renderSetSelect();
+        }
+        return;
       }
       renderQuestion();
     }
@@ -195,10 +216,59 @@
       return arr;
     }
     function goBack() { window.location.href = 'index.html'; }
+    let currentSet = null;
+    let currentRound = 0;
+    let score = 0;
+    const ROUNDS_PER_SET = 5;
+    const TOTAL_SETS = 3;
+    let setScores = JSON.parse(localStorage.getItem('spellingSetScores') || '[0,0,0]');
+    let clearedSets = JSON.parse(localStorage.getItem('spellingClearedSets') || '[false,false,false]');
+    let selected = [];
+    function renderSetSelect() {
+      const area = document.getElementById('setSelectArea');
+      let html = '<div style="margin-bottom:10px; font-weight:600;">세트를 선택하세요</div>';
+      for(let i=1;i<=TOTAL_SETS;i++) {
+        html += `<button class="btn" style="margin:0 8px 8px 0; min-width:80px;${clearedSets[i-1] ? 'background:#ccc;cursor:not-allowed;' : ''}" onclick="startSet(${i})" ${clearedSets[i-1] ? 'disabled' : ''}>${i}세트${clearedSets[i-1] ? ' (완료)' : ''}</button>`;
+      }
+      html += '<button class="btn btn-secondary" style="margin-left:10px;" onclick="resetSets()">세트 초기화</button>';
+      area.innerHTML = html;
+      document.querySelector('.game-info').style.display = 'none';
+      document.querySelector('.question-area').style.display = 'none';
+    }
+    function startSet(setNum) {
+      currentSet = setNum;
+      currentRound = 0;
+      score = 0;
+      document.getElementById('score').textContent = score;
+      document.getElementById('round').textContent = currentRound+1;
+      document.querySelector('.game-info').style.display = '';
+      document.querySelector('.question-area').style.display = '';
+      document.getElementById('setSelectArea').innerHTML = '';
+      renderQuestion();
+    }
+    function resetSets() {
+      if(confirm('정말 모든 세트 기록을 초기화할까요?')) {
+        setScores = [0,0,0];
+        clearedSets = [false,false,false];
+        localStorage.setItem('spellingSetScores', JSON.stringify(setScores));
+        localStorage.setItem('spellingClearedSets', JSON.stringify(clearedSets));
+        renderSetSelect();
+      }
+    }
+    function showSuccessPopup(avg) {
+      document.getElementById('successPopup').style.display = 'flex';
+      document.getElementById('videoArea').style.display = 'block';
+      document.getElementById('videoArea').innerHTML = '<iframe width="300" height="170" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>';
+    }
+    function closeSuccessPopup() {
+      document.getElementById('successPopup').style.display = 'none';
+      renderSetSelect();
+    }
+    // 최초 진입 시 세트 선택
     window.onload = function() {
-        if (checkPermission()) {
-            renderQuestion();
-        }
+      if (checkPermission()) {
+        renderSetSelect();
+      }
     };
   </script>
 </body>
