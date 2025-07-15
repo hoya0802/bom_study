@@ -69,7 +69,7 @@ const CategoryAPI = {
         let query = supabaseClient
             .from('categories')
             .select('*')
-            .eq('user_id', currentUser.id);
+            .eq('user_password_hash', currentUser.password_hash);
 
         if (type) {
             query = query.eq('type', type);
@@ -94,7 +94,7 @@ const CategoryAPI = {
             .from('categories')
             .insert([{
                 ...categoryData,
-                user_id: currentUser.id
+                user_password_hash: currentUser.password_hash
             }])
             .select()
             .single();
@@ -156,7 +156,7 @@ const TransactionAPI = {
                     icon
                 )
             `)
-            .eq('user_id', currentUser.id);
+            .eq('user_password_hash', currentUser.password_hash);
 
         // 날짜 필터
         if (filters.startDate && filters.endDate) {
@@ -195,7 +195,7 @@ const TransactionAPI = {
             .from('transactions')
             .insert([{
                 ...transactionData,
-                user_id: currentUser.id
+                user_password_hash: currentUser.password_hash
             }])
             .select(`
                 *,
