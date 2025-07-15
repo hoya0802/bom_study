@@ -64,28 +64,204 @@
         return true;
     }
     
-    // 샘플 데이터 (이미지:단어)
-    const questions = [
-      { img: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=facearea&w=256&q=80', word: 'dog', options: ['cat', 'dog', 'bat', 'rat'] },
-      { img: 'https://images.unsplash.com/photo-1518715308788-3005759c61d4?auto=format&fit=facearea&w=256&q=80', word: 'cat', options: ['mat', 'hat', 'cat', 'map'] },
-      { img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=256&q=80', word: 'bed', options: ['bed', 'red', 'fed', 'led'] },
-      { img: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=facearea&w=256&q=80', word: 'fish', options: ['dish', 'fish', 'wish', 'cash'] },
-      { img: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=256&q=80', word: 'hat', options: ['dog', 'fog', 'hat', 'log'] }
-    ];
+    // 파닉스 학습 데이터 (이모지:단어) - 단모음 단어들과 이모지 매핑
+    const phonicsData = {
+        'a': [
+            { emoji: '🐱', word: 'cat', meaning: '고양이' },
+            { emoji: '🧢', word: 'hat', meaning: '모자' },
+            { emoji: '🦇', word: 'bat', meaning: '박쥐' },
+            { emoji: '🐀', word: 'rat', meaning: '쥐' },
+            { emoji: '🏏', word: 'bat', meaning: '방망이' },
+            { emoji: '🗺️', word: 'map', meaning: '지도' },
+            { emoji: '🧢', word: 'cap', meaning: '모자' },
+            { emoji: '👋', word: 'tap', meaning: '가볍게 치다' },
+            { emoji: '🦵', word: 'lap', meaning: '무릎' },
+            { emoji: '👜', word: 'bag', meaning: '가방' },
+            { emoji: '🏷️', word: 'tag', meaning: '꼬리표' },
+            { emoji: '🧽', word: 'rag', meaning: '걸레' },
+            { emoji: '🛏️', word: 'mat', meaning: '매트' },
+            { emoji: '🪑', word: 'sat', meaning: '앉았다' },
+            { emoji: '🐷', word: 'fat', meaning: '뚱뚱한' }
+        ],
+        'e': [
+            { emoji: '🛏️', word: 'bed', meaning: '침대' },
+            { emoji: '🔴', word: 'red', meaning: '빨간' },
+            { emoji: '🍽️', word: 'fed', meaning: '먹였다' },
+            { emoji: '💡', word: 'led', meaning: '이끌었다' },
+            { emoji: '📥', word: 'get', meaning: '얻다' },
+            { emoji: '✅', word: 'let', meaning: '허락하다' },
+            { emoji: '🤝', word: 'met', meaning: '만났다' },
+            { emoji: '🕸️', word: 'net', meaning: '그물' },
+            { emoji: '🐕', word: 'pet', meaning: '애완동물' },
+            { emoji: '📱', word: 'set', meaning: '놓다' },
+            { emoji: '💧', word: 'wet', meaning: '젖은' },
+            { emoji: '🎲', word: 'bet', meaning: '내기하다' },
+            { emoji: '✈️', word: 'jet', meaning: '제트기' },
+            { emoji: '🏥', word: 'vet', meaning: '수의사' },
+            { emoji: '🕳️', word: 'den', meaning: '굴' },
+            { emoji: '🐔', word: 'hen', meaning: '암탉' },
+            { emoji: '👨', word: 'men', meaning: '남자들' },
+            { emoji: '✏️', word: 'pen', meaning: '펜' },
+            { emoji: '🔟', word: 'ten', meaning: '열' }
+        ],
+        'i': [
+            { emoji: '🐘', word: 'big', meaning: '큰' },
+            { emoji: '⛏️', word: 'dig', meaning: '파다' },
+            { emoji: '🌳', word: 'fig', meaning: '무화과' },
+            { emoji: '🐷', word: 'pig', meaning: '돼지' },
+            { emoji: '⚙️', word: 'rig', meaning: '장비' },
+            { emoji: '👨‍🦲', word: 'wig', meaning: '가발' },
+            { emoji: '🍪', word: 'bit', meaning: '조금' },
+            { emoji: '👕', word: 'fit', meaning: '맞다' },
+            { emoji: '👊', word: 'hit', meaning: '치다' },
+            { emoji: '🧰', word: 'kit', meaning: '도구상자' },
+            { emoji: '💡', word: 'lit', meaning: '밝혔다' },
+            { emoji: '🕳️', word: 'pit', meaning: '구덩이' },
+            { emoji: '🪑', word: 'sit', meaning: '앉다' },
+            { emoji: '🧠', word: 'wit', meaning: '재치' },
+            { emoji: '🗑️', word: 'bin', meaning: '통' },
+            { emoji: '🔊', word: 'din', meaning: '소음' },
+            { emoji: '🐟', word: 'fin', meaning: '지느러미' },
+            { emoji: '📌', word: 'pin', meaning: '핀' },
+            { emoji: '😈', word: 'sin', meaning: '죄' },
+            { emoji: '🥫', word: 'tin', meaning: '주석' },
+            { emoji: '🏆', word: 'win', meaning: '이기다' }
+        ],
+        'o': [
+            { emoji: '🐕', word: 'dog', meaning: '개' },
+            { emoji: '🌫️', word: 'fog', meaning: '안개' },
+            { emoji: '🐷', word: 'hog', meaning: '돼지' },
+            { emoji: '🏃', word: 'jog', meaning: '조깅하다' },
+            { emoji: '🪵', word: 'log', meaning: '통나무' },
+            { emoji: '📦', word: 'box', meaning: '상자' },
+            { emoji: '🦊', word: 'fox', meaning: '여우' },
+            { emoji: '🧦', word: 'sox', meaning: '양말' },
+            { emoji: '🔥', word: 'hot', meaning: '뜨거운' },
+            { emoji: '🎲', word: 'lot', meaning: '많이' },
+            { emoji: '❌', word: 'not', meaning: '아니다' },
+            { emoji: '🍯', word: 'pot', meaning: '냄비' },
+            { emoji: '🍎', word: 'rot', meaning: '썩다' },
+            { emoji: '👶', word: 'tot', meaning: '아기' },
+            { emoji: '🔵', word: 'dot', meaning: '점' },
+            { emoji: '🛏️', word: 'cot', meaning: '간이침대' },
+            { emoji: '🤖', word: 'bot', meaning: '로봇' },
+            { emoji: '📥', word: 'got', meaning: '얻었다' }
+        ],
+        'u': [
+            { emoji: '🐛', word: 'bug', meaning: '벌레' },
+            { emoji: '🤗', word: 'hug', meaning: '안아주다' },
+            { emoji: '🫖', word: 'jug', meaning: '주전자' },
+            { emoji: '☕', word: 'mug', meaning: '머그컵' },
+            { emoji: '🟫', word: 'rug', meaning: '러그' },
+            { emoji: '🚢', word: 'tug', meaning: '끌다' },
+            { emoji: '⛏️', word: 'dug', meaning: '팠다' },
+            { emoji: '👜', word: 'lug', meaning: '끌다' },
+            { emoji: '🐕', word: 'pug', meaning: '퍼그' },
+            { emoji: '🍯', word: 'sug', meaning: '설탕' },
+            { emoji: '🔄', word: 'but', meaning: '하지만' },
+            { emoji: '✂️', word: 'cut', meaning: '자르다' },
+            { emoji: '🫁', word: 'gut', meaning: '창자' },
+            { emoji: '🏠', word: 'hut', meaning: '오두막' },
+            { emoji: '🗡️', word: 'jut', meaning: '튀어나오다' },
+            { emoji: '🥜', word: 'nut', meaning: '견과류' },
+            { emoji: '📦', word: 'put', meaning: '놓다' },
+            { emoji: '🛤️', word: 'rut', meaning: '고랑' },
+            { emoji: '😤', word: 'tut', meaning: '흥' },
+            { emoji: '🥖', word: 'bun', meaning: '빵' },
+            { emoji: '🎉', word: 'fun', meaning: '재미' },
+            { emoji: '🔫', word: 'gun', meaning: '총' },
+            { emoji: '👩‍🦳', word: 'nun', meaning: '수녀' },
+            { emoji: '😄', word: 'pun', meaning: '말장난' },
+            { emoji: '🏃', word: 'run', meaning: '달리다' },
+            { emoji: '☀️', word: 'sun', meaning: '태양' },
+            { emoji: '🛢️', word: 'tun', meaning: '큰 통' },
+            { emoji: '🐻', word: 'cub', meaning: '새끼' },
+            { emoji: '🎯', word: 'hub', meaning: '중심' },
+            { emoji: '🍺', word: 'pub', meaning: '술집' },
+            { emoji: '🤲', word: 'rub', meaning: '문지르다' },
+            { emoji: '🛁', word: 'tub', meaning: '욕조' }
+        ]
+    };
+    
+    // 현재 학습할 모음 선택 (라운드별로 다른 모음)
+    function getCurrentVowel(round) {
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        return vowels[(round - 1) % vowels.length];
+    }
+    
+    // 현재 라운드의 단어들 가져오기
+    function getCurrentWords(round) {
+        const vowel = getCurrentVowel(round);
+        return phonicsData[vowel];
+    }
     let current = 0, score = 0, selected = null;
     function renderQuestion() {
       document.getElementById('round').textContent = current+1;
       document.getElementById('score').textContent = score;
-      document.getElementById('questionImg').src = questions[current].img;
+      
+      // 현재 라운드에 맞는 모음과 단어 선택
+      const currentVowel = getCurrentVowel(current + 1);
+      const currentWords = getCurrentWords(current + 1);
+      const randomWordData = currentWords[Math.floor(Math.random() * currentWords.length)];
+      
+      // 이모지 표시 (이미지 대신)
+      const imgElement = document.getElementById('questionImg');
+      imgElement.style.display = 'none';
+      
+      // 이모지 컨테이너 생성 또는 업데이트
+      let emojiContainer = document.getElementById('emojiContainer');
+      if (!emojiContainer) {
+        emojiContainer = document.createElement('div');
+        emojiContainer.id = 'emojiContainer';
+        emojiContainer.style.cssText = `
+          width: 120px; 
+          height: 120px; 
+          background: #f8f9fa; 
+          border: 2px solid #dee2e6; 
+          border-radius: 12px; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          font-size: 4rem; 
+          margin: 0 auto 18px auto;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        `;
+        imgElement.parentNode.insertBefore(emojiContainer, imgElement);
+      }
+      emojiContainer.textContent = randomWordData.emoji;
+      
+      // 현재 학습 중인 모음 표시
+      console.log(`라운드 ${current + 1}: 모음 '${currentVowel}' 학습 중 - 단어: ${randomWordData.word} (${randomWordData.meaning}) - 이모지: ${randomWordData.emoji}`);
+      
       const grid = document.getElementById('optionsGrid');
       grid.innerHTML = '';
-      questions[current].options.forEach(opt => {
+      
+      // 선택지 생성 (정답 + 다른 단어들)
+      const options = [randomWordData.word];
+      const allWords = Object.values(phonicsData).flat().map(item => item.word);
+      const otherWords = allWords.filter(word => word !== randomWordData.word);
+      
+      for (let i = 0; i < 3; i++) {
+        const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+        if (!options.includes(randomWord)) {
+          options.push(randomWord);
+        }
+      }
+      
+      // 선택지 섞기
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+      
+      options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.textContent = opt;
         btn.onclick = () => selectOption(btn, opt);
         grid.appendChild(btn);
       });
+      
       selected = null;
       document.getElementById('checkBtn').disabled = true;
       document.getElementById('nextBtn').disabled = true;
@@ -99,7 +275,14 @@
     }
     function checkAnswer() {
       if (!selected) return;
-      const correct = questions[current].word;
+      
+      // 현재 라운드의 정답 단어 가져오기
+      const currentVowel = getCurrentVowel(current + 1);
+      const currentWords = getCurrentWords(current + 1);
+      const emojiContainer = document.getElementById('emojiContainer');
+      const currentEmoji = emojiContainer.textContent;
+      const correctWordData = currentWords.find(item => item.emoji === currentEmoji);
+      const correct = correctWordData ? correctWordData.word : '';
       document.querySelectorAll('.option-btn').forEach(btn => {
         btn.onclick = null;
         if (btn.textContent === correct) btn.classList.add('correct');

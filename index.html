@@ -126,29 +126,7 @@
     </div>
     <script>
         // 사용자별 비밀번호 및 정보 정의
-        const USERS = {
-            'delia0802': {
-                id: 'user_001',
-                name: '엄마',
-                color: '#667eea',
-                emoji: '👤',
-                role: 'adult' // 어른 역할
-            },
-            'chan0802': {
-                id: 'user_002',
-                name: '아빠', 
-                color: '#2196f3',
-                emoji: '👨',
-                role: 'adult' // 어른 역할
-            },
-            'bom0802': {
-                id: 'user_003',
-                name: '새봄이',
-                color: '#ff6b6b',
-                emoji: '👧',
-                role: 'child' // 아이 역할
-            }
-        };
+        // 사용자별 비밀번호 및 정보 정의
 
         function checkSession() {
             const isAuthenticated = sessionStorage.getItem('authenticated');
@@ -161,21 +139,26 @@
         }
 
         function authenticate() {
-            const password = document.getElementById('password').value;
+            const password = document.getElementById('password').value.trim();
             const errorMessage = document.getElementById('errorMessage');
-            
-            if (USERS[password]) {
-                const user = USERS[password];
+            (async () => {
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('password_hash', password)
+                    .single();
+                if (error || !data) {
+                    errorMessage.style.display = 'block';
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                    return;
+                }
                 sessionStorage.setItem('authenticated', 'true');
-                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                sessionStorage.setItem('currentUser', JSON.stringify(data));
                 showMenu();
                 updateUserInfo();
                 errorMessage.style.display = 'none';
-            } else {
-                errorMessage.style.display = 'block';
-                document.getElementById('password').value = '';
-                document.getElementById('password').focus();
-            }
+            })();
         }
 
         function updateUserInfo() {
