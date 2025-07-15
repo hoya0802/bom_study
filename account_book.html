@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가계부 - 새봄이 영어 공부</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="가계부">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <script src="account_book.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .stats-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stat-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .expense { color: #ff6b6b; }
+        .income { color: #48dbfb; }
+        .transfer { color: #5f27cd; }
+        .controls-section {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+        select, input[type="date"] {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+        .transactions-section {
+            padding: 20px;
+        }
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .transaction-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+        .transaction-item:hover {
+            transform: translateX(5px);
+        }
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .transaction-title {
+            font-weight: 600;
+            color: #495057;
+        }
+        .transaction-meta {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .transaction-category {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            color: white;
+        }
+        .transaction-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .action-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .transaction-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← 뒤로</button>
+            <h1>📊 가계부</h1>
+            <div class="user-info" id="userInfo">사용자 정보</div>
+        </div>
+
+        <!-- 통계 섹션 -->
+        <div class="stats-section">
+            <div class="stats-grid" id="statsGrid">
+                <!-- 통계 카드들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 컨트롤 섹션 -->
+        <div class="controls-section">
+            <!-- 탭 -->
+            <div class="tab-container">
+                <button class="tab active" onclick="switchTab('daily')">📅 일별</button>
+                <button class="tab" onclick="switchTab('monthly')">📊 월별</button>
+            </div>
+
+            <!-- 필터 및 등록 버튼 -->
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>기간:</label>
+                    <input type="date" id="startDate">
+                    <span>~</span>
+                    <input type="date" id="endDate">
+                </div>
+                <div class="filter-group">
+                    <label>유형:</label>
+                    <select id="typeFilter">
+                        <option value="">전체</option>
+                        <option value="지출">지출</option>
+                        <option value="수입">수입</option>
+                        <option value="이체">이체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>카테고리:</label>
+                    <select id="categoryFilter">
+                        <option value="">전체</option>
+                    </select>
+                </div>
+                <button class="add-btn" onclick="showAddModal()">➕ 거래 등록</button>
+            </div>
+        </div>
+
+        <!-- 거래 목록 섹션 -->
+        <div class="transactions-section">
+            <div class="transaction-list" id="transactionList">
+                <!-- 거래 목록이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 거래 등록/수정 모달 -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">거래 등록</h2>
+                <button class="close-btn" onclick="hideAddModal()">&times;</button>
+            </div>
+            <form id="transactionForm">
+                <input type="hidden" id="transactionId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transactionType">거래 유형 *</label>
+                        <select id="transactionType" required>
+                            <option value="">선택하세요</option>
+                            <option value="지출">지출</option>
+                            <option value="수입">수입</option>
+                            <option value="이체">이체</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionAmount">금액 *</label>
+                        <input type="text" id="transactionAmount" placeholder="0" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transactionCategory">카테고리</label>
+                        <select id="transactionCategory">
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDate">거래일 *</label>
+                        <input type="date" id="transactionDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="transactionSource">출처</label>
+                    <input type="text" id="transactionSource" placeholder="예: 홈플러스, 월급 등">
+                </div>
+                <div class="form-group">
+                    <label for="transactionDescription">항목/메모</label>
+                    <textarea id="transactionDescription" placeholder="거래에 대한 상세 설명을 입력하세요"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'daily';
+        let currentFilters = {};
+        let categories = [];
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializePage();
+        });
+
+        // 페이지 초기화
+        async function initializePage() {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 사용자 정보 표시
+            document.getElementById('userInfo').textContent = `${currentUser.emoji} ${currentUser.name}님`;
+
+            // 기본 날짜 설정
+            const today = new Date();
+            const monthRange = getCurrentMonthRange();
+            
+            document.getElementById('startDate').value = monthRange.start;
+            document.getElementById('endDate').value = formatDateForInput(today);
+
+            // 카테고리 로드
+            await loadCategories();
+
+            // 거래 목록 로드
+            await loadTransactions();
+
+            // 모달 설정
+            ModalManager.setupModalClose('transactionModal');
+
+            // 이벤트 리스너 설정
+            setupEventListeners();
+        }
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            // 필터 변경 이벤트
+            document.getElementById('startDate').addEventListener('change', loadTransactions);
+            document.getElementById('endDate').addEventListener('change', loadTransactions);
+            document.getElementById('typeFilter').addEventListener('change', loadTransactions);
+            document.getElementById('categoryFilter').addEventListener('change', loadTransactions);
+
+            // 거래 유형 변경 시 카테고리 필터링
+            document.getElementById('transactionType').addEventListener('change', filterCategoriesByType);
+
+            // 금액 입력 시 천단위 콤마
+            document.getElementById('transactionAmount').addEventListener('input', function() {
+                formatNumberInput(this);
+            });
+
+            // 폼 제출
+            document.getElementById('transactionForm').addEventListener('submit', handleTransactionSubmit);
+        }
+
+        // 탭 전환
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // 탭 버튼 활성화 상태 변경
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 거래 목록 다시 로드
+            loadTransactions();
+        }
+
+        // 카테고리 로드
+        async function loadCategories() {
+            try {
+                categories = await CategoryAPI.getCategories();
+                
+                // 카테고리 필터 옵션 업데이트
+                const categoryFilter = document.getElementById('categoryFilter');
+                const transactionCategory = document.getElementById('transactionCategory');
+                
+                const updateCategoryOptions = (select) => {
+                    select.innerHTML = '<option value="">선택하세요</option>';
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = `${category.icon} ${category.name}`;
+                        select.appendChild(option);
+                    });
+                };
+
+                updateCategoryOptions(categoryFilter);
+                updateCategoryOptions(transactionCategory);
+            } catch (error) {
+                console.error('카테고리 로드 오류:', error);
+            }
+        }
+
+        // 거래 유형에 따른 카테고리 필터링
+        function filterCategoriesByType() {
+            const type = document.getElementById('transactionType').value;
+            const categorySelect = document.getElementById('transactionCategory');
+            
+            categorySelect.innerHTML = '<option value="">선택하세요</option>';
+            
+            if (type) {
+                const filteredCategories = categories.filter(cat => cat.type === type);
+                filteredCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = `${category.icon} ${category.name}`;
+                    categorySelect.appendChild(option);
+                });
+            }
+        }
+
+        // 거래 목록 로드
+        async function loadTransactions() {
+            try {
+                // 필터 값 수집
+                const filters = {
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    type: document.getElementById('typeFilter').value,
+                    categoryId: document.getElementById('categoryFilter').value
+                };
+
+                currentFilters = filters;
+
+                // 거래 데이터 로드
+                const transactions = await TransactionAPI.getTransactions(filters);
+                
+                // 통계 업데이트
+                await updateStatistics(filters);
+                
+                // 거래 목록 렌더링
+                renderTransactions(transactions);
+            } catch (error) {
+                console.error('거래 목록 로드 오류:', error);
+            }
+        }
+
+        // 통계 업데이트
+        async function updateStatistics(filters) {
+            try {
+                const stats = await TransactionAPI.getStatistics(filters);
+                
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-amount expense">${formatCurrency(stats.totalExpense)}</div>
+                        <div class="stat-label">총 지출</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-amount income">${formatCurrency(stats.totalIncome)}</div>
+                        <div class="stat-label">총 수입</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-amount transfer">${formatCurrency(stats.totalTransfer)}</div>
+                        <div class="stat-label">총 이체</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-amount" style="color: #28a745;">${formatCurrency(stats.totalIncome - stats.totalExpense)}</div>
+                        <div class="stat-label">순수익</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('통계 업데이트 오류:', error);
+            }
+        }
+
+        // 거래 목록 렌더링
+        function renderTransactions(transactions) {
+            const transactionList = document.getElementById('transactionList');
+            
+            if (transactions.length === 0) {
+                transactionList.innerHTML = `
+                    <div class="empty-state">
+                        <div>📊</div>
+                        <h3>거래 내역이 없습니다</h3>
+                        <p>새로운 거래를 등록해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            transactionList.innerHTML = transactions.map(transaction => {
+                const category = transaction.categories;
+                const categoryDisplay = category ? 
+                    `<div class="transaction-category" style="background-color: ${category.color}">
+                        ${category.icon} ${category.name}
+                    </div>` : '';
+
+                return `
+                    <div class="transaction-item" style="border-left-color: ${TRANSACTION_COLORS[transaction.type]}">
+                        <div class="transaction-info">
+                            <div class="transaction-title">${transaction.description || transaction.source || '제목 없음'}</div>
+                            <div class="transaction-meta">
+                                ${formatDate(transaction.transaction_date)} • ${transaction.source || ''}
+                            </div>
+                        </div>
+                        <div class="transaction-amount" style="color: ${TRANSACTION_COLORS[transaction.type]}">
+                            ${TRANSACTION_ICONS[transaction.type]} ${formatCurrency(transaction.amount)}
+                        </div>
+                        ${categoryDisplay}
+                        <div class="transaction-actions">
+                            <button class="action-btn" onclick="editTransaction('${transaction.id}')" title="수정">✏️</button>
+                            <button class="action-btn" onclick="deleteTransaction('${transaction.id}')" title="삭제">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 거래 등록 모달 표시
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '거래 등록';
+            document.getElementById('transactionForm').reset();
+            document.getElementById('transactionId').value = '';
+            document.getElementById('transactionDate').value = formatDateForInput(new Date());
+            ModalManager.showModal('transactionModal');
+        }
+
+        // 거래 등록 모달 숨기기
+        function hideAddModal() {
+            ModalManager.hideModal('transactionModal');
+        }
+
+        // 거래 수정 모달 표시
+        async function editTransaction(id) {
+            try {
+                const transactions = await TransactionAPI.getTransactions();
+                const transaction = transactions.find(t => t.id === id);
+                
+                if (!transaction) {
+                    alert('거래를 찾을 수 없습니다.');
+                    return;
+                }
+
+                document.getElementById('modalTitle').textContent = '거래 수정';
+                document.getElementById('transactionId').value = transaction.id;
+                document.getElementById('transactionType').value = transaction.type;
+                document.getElementById('transactionAmount').value = new Intl.NumberFormat('ko-KR').format(transaction.amount);
+                document.getElementById('transactionCategory').value = transaction.category_id || '';
+                document.getElementById('transactionDate').value = transaction.transaction_date;
+                document.getElementById('transactionSource').value = transaction.source || '';
+                document.getElementById('transactionDescription').value = transaction.description || '';
+
+                // 카테고리 필터링
+                filterCategoriesByType();
+
+                ModalManager.showModal('transactionModal');
+            } catch (error) {
+                console.error('거래 수정 모달 오류:', error);
+                alert('거래 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 거래 삭제
+        async function deleteTransaction(id) {
+            if (!confirm('정말로 이 거래를 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                await TransactionAPI.deleteTransaction(id);
+                await loadTransactions();
+                alert('거래가 삭제되었습니다.');
+            } catch (error) {
+                console.error('거래 삭제 오류:', error);
+                alert('거래 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 거래 폼 제출 처리
+        async function handleTransactionSubmit(event) {
+            event.preventDefault();
+
+            const formData = {
+                type: document.getElementById('transactionType').value,
+                amount: parseFloat(document.getElementById('transactionAmount').value.replace(/[^\d]/g, '')),
+                category_id: document.getElementById('transactionCategory').value || null,
+                transaction_date: document.getElementById('transactionDate').value,
+                source: document.getElementById('transactionSource').value,
+                description: document.getElementById('transactionDescription').value
+            };
+
+            // 유효성 검사
+            if (!formData.type) {
+                alert('거래 유형을 선택해주세요.');
+                return;
+            }
+            if (!formData.amount || formData.amount <= 0) {
+                alert('올바른 금액을 입력해주세요.');
+                return;
+            }
+            if (!formData.transaction_date) {
+                alert('거래일을 선택해주세요.');
+                return;
+            }
+
+            try {
+                const transactionId = document.getElementById('transactionId').value;
+                
+                if (transactionId) {
+                    // 수정
+                    await TransactionAPI.updateTransaction(transactionId, formData);
+                    alert('거래가 수정되었습니다.');
+                } else {
+                    // 등록
+                    await TransactionAPI.createTransaction(formData);
+                    alert('거래가 등록되었습니다.');
+                }
+
+                hideAddModal();
+                await loadTransactions();
+            } catch (error) {
+                console.error('거래 저장 오류:', error);
+                alert('거래 저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 뒤로 가기
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html> 

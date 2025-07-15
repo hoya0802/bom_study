@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카테고리 관리 - 새봄이 영어 공부</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="카테고리 관리">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <script src="account_book.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .controls-section {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+        .categories-section {
+            padding: 20px;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .category-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        .category-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.2s;
+            font-size: 1rem;
+        }
+        .action-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        .category-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .category-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            width: fit-content;
+        }
+        .category-type.expense { background-color: #ff6b6b; }
+        .category-type.income { background-color: #48dbfb; }
+        .category-type.transfer { background-color: #5f27cd; }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .color-option.selected {
+            border-color: #333;
+        }
+        .icon-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .icon-option {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: border-color 0.2s;
+        }
+        .icon-option.selected {
+            border-color: #667eea;
+            background-color: #f8f9fa;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .controls-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← 뒤로</button>
+            <h1>🏷️ 카테고리 관리</h1>
+            <div class="user-info" id="userInfo">사용자 정보</div>
+        </div>
+
+        <!-- 컨트롤 섹션 -->
+        <div class="controls-section">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>유형:</label>
+                    <select id="typeFilter" onchange="filterCategories()">
+                        <option value="">전체</option>
+                        <option value="지출">지출</option>
+                        <option value="수입">수입</option>
+                        <option value="이체">이체</option>
+                    </select>
+                </div>
+            </div>
+            <button class="add-btn" onclick="showAddModal()">➕ 카테고리 추가</button>
+        </div>
+
+        <!-- 카테고리 목록 섹션 -->
+        <div class="categories-section">
+            <div class="category-grid" id="categoryGrid">
+                <!-- 카테고리 카드들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 카테고리 등록/수정 모달 -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">카테고리 추가</h2>
+                <button class="close-btn" onclick="hideAddModal()">&times;</button>
+            </div>
+            <form id="categoryForm">
+                <input type="hidden" id="categoryId">
+                <div class="form-group">
+                    <label for="categoryName">카테고리명 *</label>
+                    <input type="text" id="categoryName" placeholder="예: 식비, 교통비" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoryType">유형 *</label>
+                        <select id="categoryType" required>
+                            <option value="">선택하세요</option>
+                            <option value="지출">지출</option>
+                            <option value="수입">수입</option>
+                            <option value="이체">이체</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>색상 선택 *</label>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- 색상 옵션들이 동적으로 생성됩니다 -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>아이콘 선택 *</label>
+                    <div class="icon-picker" id="iconPicker">
+                        <!-- 아이콘 옵션들이 동적으로 생성됩니다 -->
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let categories = [];
+        let selectedColor = '#667eea';
+        let selectedIcon = '💰';
+
+        // 색상 옵션들
+        const colorOptions = [
+            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
+            '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3',
+            '#ff9f43', '#10ac84', '#ee5a24', '#0abde3', '#ff3838'
+        ];
+
+        // 아이콘 옵션들
+        const iconOptions = [
+            '💰', '🍽️', '🚗', '🛍️', '🏥', '📚', '💵', '📈', '💸',
+            '🏠', '🎮', '🎬', '🎵', '📱', '💻', '👕', '👟', '💄',
+            '🍕', '☕', '🍺', '🍰', '🍎', '🥗', '🍜', '🍣', '🍖'
+        ];
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializePage();
+        });
+
+        // 페이지 초기화
+        async function initializePage() {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 사용자 정보 표시
+            document.getElementById('userInfo').textContent = `${currentUser.emoji} ${currentUser.name}님`;
+
+            // 카테고리 로드
+            await loadCategories();
+
+            // 모달 설정
+            ModalManager.setupModalClose('categoryModal');
+
+            // 이벤트 리스너 설정
+            setupEventListeners();
+        }
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            // 폼 제출
+            document.getElementById('categoryForm').addEventListener('submit', handleCategorySubmit);
+        }
+
+        // 카테고리 로드
+        async function loadCategories() {
+            try {
+                categories = await CategoryAPI.getCategories();
+                renderCategories();
+            } catch (error) {
+                console.error('카테고리 로드 오류:', error);
+            }
+        }
+
+        // 카테고리 필터링
+        function filterCategories() {
+            renderCategories();
+        }
+
+        // 카테고리 목록 렌더링
+        function renderCategories() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const filteredCategories = typeFilter ? 
+                categories.filter(cat => cat.type === typeFilter) : 
+                categories;
+
+            const categoryGrid = document.getElementById('categoryGrid');
+            
+            if (filteredCategories.length === 0) {
+                categoryGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div>🏷️</div>
+                        <h3>카테고리가 없습니다</h3>
+                        <p>새로운 카테고리를 추가해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            categoryGrid.innerHTML = filteredCategories.map(category => `
+                <div class="category-card" style="border-left-color: ${category.color}">
+                    <div class="category-header">
+                        <div class="category-title">
+                            <span style="font-size: 1.5rem;">${category.icon}</span>
+                            ${category.name}
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn" onclick="editCategory('${category.id}')" title="수정">✏️</button>
+                            <button class="action-btn" onclick="deleteCategory('${category.id}')" title="삭제">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-type ${category.type === '지출' ? 'expense' : category.type === '수입' ? 'income' : 'transfer'}">
+                            ${category.type}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 카테고리 등록 모달 표시
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '카테고리 추가';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            selectedColor = '#667eea';
+            selectedIcon = '💰';
+            
+            renderColorPicker();
+            renderIconPicker();
+            
+            ModalManager.showModal('categoryModal');
+        }
+
+        // 카테고리 등록 모달 숨기기
+        function hideAddModal() {
+            ModalManager.hideModal('categoryModal');
+        }
+
+        // 색상 선택기 렌더링
+        function renderColorPicker() {
+            const colorPicker = document.getElementById('colorPicker');
+            colorPicker.innerHTML = colorOptions.map(color => `
+                <div class="color-option ${color === selectedColor ? 'selected' : ''}" 
+                     style="background-color: ${color}"
+                     onclick="selectColor('${color}')"></div>
+            `).join('');
+        }
+
+        // 아이콘 선택기 렌더링
+        function renderIconPicker() {
+            const iconPicker = document.getElementById('iconPicker');
+            iconPicker.innerHTML = iconOptions.map(icon => `
+                <div class="icon-option ${icon === selectedIcon ? 'selected' : ''}" 
+                     onclick="selectIcon('${icon}')">${icon}</div>
+            `).join('');
+        }
+
+        // 색상 선택
+        function selectColor(color) {
+            selectedColor = color;
+            renderColorPicker();
+        }
+
+        // 아이콘 선택
+        function selectIcon(icon) {
+            selectedIcon = icon;
+            renderIconPicker();
+        }
+
+        // 카테고리 수정 모달 표시
+        async function editCategory(id) {
+            try {
+                const category = categories.find(c => c.id === id);
+                
+                if (!category) {
+                    alert('카테고리를 찾을 수 없습니다.');
+                    return;
+                }
+
+                document.getElementById('modalTitle').textContent = '카테고리 수정';
+                document.getElementById('categoryId').value = category.id;
+                document.getElementById('categoryName').value = category.name;
+                document.getElementById('categoryType').value = category.type;
+                
+                selectedColor = category.color;
+                selectedIcon = category.icon;
+                
+                renderColorPicker();
+                renderIconPicker();
+
+                ModalManager.showModal('categoryModal');
+            } catch (error) {
+                console.error('카테고리 수정 모달 오류:', error);
+                alert('카테고리 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 카테고리 삭제
+        async function deleteCategory(id) {
+            if (!confirm('정말로 이 카테고리를 삭제하시겠습니까?\n이 카테고리를 사용하는 거래들은 카테고리가 해제됩니다.')) {
+                return;
+            }
+
+            try {
+                await CategoryAPI.deleteCategory(id);
+                await loadCategories();
+                alert('카테고리가 삭제되었습니다.');
+            } catch (error) {
+                console.error('카테고리 삭제 오류:', error);
+                alert('카테고리 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 카테고리 폼 제출 처리
+        async function handleCategorySubmit(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('categoryName').value.trim(),
+                type: document.getElementById('categoryType').value,
+                color: selectedColor,
+                icon: selectedIcon
+            };
+
+            // 유효성 검사
+            if (!formData.name) {
+                alert('카테고리명을 입력해주세요.');
+                return;
+            }
+            if (!formData.type) {
+                alert('유형을 선택해주세요.');
+                return;
+            }
+
+            try {
+                const categoryId = document.getElementById('categoryId').value;
+                
+                if (categoryId) {
+                    // 수정
+                    await CategoryAPI.updateCategory(categoryId, formData);
+                    alert('카테고리가 수정되었습니다.');
+                } else {
+                    // 등록
+                    await CategoryAPI.createCategory(formData);
+                    alert('카테고리가 등록되었습니다.');
+                }
+
+                hideAddModal();
+                await loadCategories();
+            } catch (error) {
+                console.error('카테고리 저장 오류:', error);
+                alert('카테고리 저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 뒤로 가기
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html> 
