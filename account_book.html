@@ -321,6 +321,89 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* 카테고리 관리 스타일 */
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .color-option.selected {
+            border-color: #333;
+        }
+        .icon-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .icon-option {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: border-color 0.2s;
+        }
+        .icon-option.selected {
+            border-color: #667eea;
+            background-color: #f8f9fa;
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .category-icon {
+            font-size: 1.5rem;
+        }
+        .category-details h4 {
+            margin: 0;
+            color: #495057;
+        }
+        .category-details p {
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .category-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .category-actions button {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .category-actions button:hover {
+            background: rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -371,6 +454,7 @@
                     </select>
                 </div>
                 <button class="add-btn" onclick="showAddModal()">➕ 거래 등록</button>
+                <button class="add-btn" onclick="showCategoryManagement()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">🏷️ 카테고리 관리</button>
             </div>
         </div>
 
@@ -434,6 +518,64 @@
         </div>
     </div>
 
+    <!-- 카테고리 관리 모달 -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🏷️ 카테고리 관리</h2>
+                <button class="close-btn" onclick="hideCategoryModal()">&times;</button>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="showAddCategoryModal()">➕ 새 카테고리 추가</button>
+            </div>
+            <div id="categoryList" style="max-height: 400px; overflow-y: auto;">
+                <!-- 카테고리 목록이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 카테고리 등록/수정 모달 -->
+    <div class="modal" id="categoryFormModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="categoryModalTitle">카테고리 추가</h2>
+                <button class="close-btn" onclick="hideCategoryFormModal()">&times;</button>
+            </div>
+            <form id="categoryForm">
+                <input type="hidden" id="categoryId">
+                <div class="form-group">
+                    <label for="categoryName">카테고리명 *</label>
+                    <input type="text" id="categoryName" placeholder="예: 식비, 교통비" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryType">유형 *</label>
+                    <select id="categoryType" required>
+                        <option value="">선택하세요</option>
+                        <option value="지출">지출</option>
+                        <option value="수입">수입</option>
+                        <option value="이체">이체</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>색상 선택 *</label>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- 색상 옵션들이 동적으로 생성됩니다 -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>아이콘 선택 *</label>
+                    <div class="icon-picker" id="iconPicker">
+                        <!-- 아이콘 옵션들이 동적으로 생성됩니다 -->
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="hideCategoryFormModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         let currentTab = 'daily';
         let currentFilters = {};
@@ -469,11 +611,13 @@
             // 거래 목록 로드
             await loadTransactions();
 
-            // 모달 설정
-            ModalManager.setupModalClose('transactionModal');
+                    // 모달 설정
+        ModalManager.setupModalClose('transactionModal');
+        ModalManager.setupModalClose('categoryModal');
+        ModalManager.setupModalClose('categoryFormModal');
 
-            // 이벤트 리스너 설정
-            setupEventListeners();
+        // 이벤트 리스너 설정
+        setupEventListeners();
         }
 
         // 이벤트 리스너 설정
@@ -494,6 +638,7 @@
 
             // 폼 제출
             document.getElementById('transactionForm').addEventListener('submit', handleTransactionSubmit);
+            document.getElementById('categoryForm').addEventListener('submit', handleCategorySubmit);
         }
 
         // 탭 전환
@@ -755,6 +900,208 @@
             } catch (error) {
                 console.error('거래 저장 오류:', error);
                 alert('거래 저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 카테고리 관리 관련 변수들
+        let selectedColor = '#667eea';
+        let selectedIcon = '💰';
+
+        // 색상 옵션들
+        const colorOptions = [
+            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
+            '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3',
+            '#ff9f43', '#10ac84', '#ee5a24', '#0abde3', '#ff3838'
+        ];
+
+        // 아이콘 옵션들
+        const iconOptions = [
+            '💰', '🍽️', '🚗', '🛍️', '🏥', '📚', '💵', '📈', '💸',
+            '🏠', '🎮', '🎬', '🎵', '📱', '💻', '👕', '👟', '💄',
+            '🍕', '☕', '🍺', '🍰', '🍎', '🥗', '🍜', '🍣', '🍖'
+        ];
+
+        // 카테고리 관리 모달 표시
+        function showCategoryManagement() {
+            ModalManager.showModal('categoryModal');
+            renderCategoryList();
+        }
+
+        // 카테고리 관리 모달 숨기기
+        function hideCategoryModal() {
+            ModalManager.hideModal('categoryModal');
+        }
+
+        // 카테고리 목록 렌더링
+        function renderCategoryList() {
+            const categoryList = document.getElementById('categoryList');
+            
+            if (categories.length === 0) {
+                categoryList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🏷️</div>
+                        <h3>카테고리가 없습니다</h3>
+                        <p>새로운 카테고리를 추가해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            categoryList.innerHTML = categories.map(category => `
+                <div class="category-item" style="border-left-color: ${category.color}">
+                    <div class="category-info">
+                        <div class="category-icon">${category.icon}</div>
+                        <div class="category-details">
+                            <h4>${category.name}</h4>
+                            <p>${category.type}</p>
+                        </div>
+                    </div>
+                    <div class="category-actions">
+                        <button onclick="editCategory('${category.id}')" title="수정">✏️</button>
+                        <button onclick="deleteCategory('${category.id}')" title="삭제">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 카테고리 등록 모달 표시
+        function showAddCategoryModal() {
+            document.getElementById('categoryModalTitle').textContent = '카테고리 추가';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            selectedColor = '#667eea';
+            selectedIcon = '💰';
+            
+            renderColorPicker();
+            renderIconPicker();
+            
+            ModalManager.hideModal('categoryModal');
+            ModalManager.showModal('categoryFormModal');
+        }
+
+        // 카테고리 등록 모달 숨기기
+        function hideCategoryFormModal() {
+            ModalManager.hideModal('categoryFormModal');
+            ModalManager.showModal('categoryModal');
+        }
+
+        // 색상 선택기 렌더링
+        function renderColorPicker() {
+            const colorPicker = document.getElementById('colorPicker');
+            colorPicker.innerHTML = colorOptions.map(color => `
+                <div class="color-option ${color === selectedColor ? 'selected' : ''}" 
+                     style="background-color: ${color}"
+                     onclick="selectColor('${color}')"></div>
+            `).join('');
+        }
+
+        // 아이콘 선택기 렌더링
+        function renderIconPicker() {
+            const iconPicker = document.getElementById('iconPicker');
+            iconPicker.innerHTML = iconOptions.map(icon => `
+                <div class="icon-option ${icon === selectedIcon ? 'selected' : ''}" 
+                     onclick="selectIcon('${icon}')">${icon}</div>
+            `).join('');
+        }
+
+        // 색상 선택
+        function selectColor(color) {
+            selectedColor = color;
+            renderColorPicker();
+        }
+
+        // 아이콘 선택
+        function selectIcon(icon) {
+            selectedIcon = icon;
+            renderIconPicker();
+        }
+
+        // 카테고리 수정
+        async function editCategory(id) {
+            try {
+                const category = categories.find(c => c.id === id);
+                
+                if (!category) {
+                    alert('카테고리를 찾을 수 없습니다.');
+                    return;
+                }
+
+                document.getElementById('categoryModalTitle').textContent = '카테고리 수정';
+                document.getElementById('categoryId').value = category.id;
+                document.getElementById('categoryName').value = category.name;
+                document.getElementById('categoryType').value = category.type;
+                
+                selectedColor = category.color;
+                selectedIcon = category.icon;
+                
+                renderColorPicker();
+                renderIconPicker();
+
+                ModalManager.hideModal('categoryModal');
+                ModalManager.showModal('categoryFormModal');
+            } catch (error) {
+                console.error('카테고리 수정 모달 오류:', error);
+                alert('카테고리 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 카테고리 삭제
+        async function deleteCategory(id) {
+            if (!confirm('정말로 이 카테고리를 삭제하시겠습니까?\n이 카테고리를 사용하는 거래들은 카테고리가 해제됩니다.')) {
+                return;
+            }
+
+            try {
+                await CategoryAPI.deleteCategory(id);
+                await loadCategories();
+                renderCategoryList();
+                alert('카테고리가 삭제되었습니다.');
+            } catch (error) {
+                console.error('카테고리 삭제 오류:', error);
+                alert('카테고리 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 카테고리 폼 제출 처리
+        async function handleCategorySubmit(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('categoryName').value.trim(),
+                type: document.getElementById('categoryType').value,
+                color: selectedColor,
+                icon: selectedIcon
+            };
+
+            // 유효성 검사
+            if (!formData.name) {
+                alert('카테고리명을 입력해주세요.');
+                return;
+            }
+            if (!formData.type) {
+                alert('유형을 선택해주세요.');
+                return;
+            }
+
+            try {
+                const categoryId = document.getElementById('categoryId').value;
+                
+                if (categoryId) {
+                    // 수정
+                    await CategoryAPI.updateCategory(categoryId, formData);
+                    alert('카테고리가 수정되었습니다.');
+                } else {
+                    // 등록
+                    await CategoryAPI.createCategory(formData);
+                    alert('카테고리가 등록되었습니다.');
+                }
+
+                hideCategoryFormModal();
+                await loadCategories();
+                renderCategoryList();
+            } catch (error) {
+                console.error('카테고리 저장 오류:', error);
+                alert('카테고리 저장 중 오류가 발생했습니다.');
             }
         }
 
