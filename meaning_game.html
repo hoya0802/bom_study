@@ -64,28 +64,182 @@
         return true;
     }
     
-    // 샘플 데이터 (뜻:단어)
-    const questions = [
-      { meaning: '고양이', word: 'cat', options: ['cat', 'dog', 'bat', 'rat'] },
-      { meaning: '모자', word: 'hat', options: ['mat', 'hat', 'cap', 'map'] },
-      { meaning: '침대', word: 'bed', options: ['bed', 'red', 'fed', 'led'] },
-      { meaning: '물고기', word: 'fish', options: ['dish', 'fish', 'wish', 'cash'] },
-      { meaning: '개', word: 'dog', options: ['dog', 'fog', 'hog', 'log'] }
-    ];
+    // 파닉스 학습 데이터 (단모음 단어들과 뜻)
+    const phonicsData = {
+        'a': [
+            { word: 'cat', meaning: '고양이' },
+            { word: 'hat', meaning: '모자' },
+            { word: 'bat', meaning: '박쥐' },
+            { word: 'rat', meaning: '쥐' },
+            { word: 'mat', meaning: '매트' },
+            { word: 'sat', meaning: '앉았다' },
+            { word: 'fat', meaning: '뚱뚱한' },
+            { word: 'pat', meaning: '가볍게 치다' },
+            { word: 'map', meaning: '지도' },
+            { word: 'cap', meaning: '모자' },
+            { word: 'tap', meaning: '가볍게 치다' },
+            { word: 'lap', meaning: '무릎' },
+            { word: 'bag', meaning: '가방' },
+            { word: 'tag', meaning: '꼬리표' },
+            { word: 'rag', meaning: '걸레' }
+        ],
+        'e': [
+            { word: 'bed', meaning: '침대' },
+            { word: 'red', meaning: '빨간' },
+            { word: 'fed', meaning: '먹였다' },
+            { word: 'led', meaning: '이끌었다' },
+            { word: 'get', meaning: '얻다' },
+            { word: 'let', meaning: '허락하다' },
+            { word: 'met', meaning: '만났다' },
+            { word: 'net', meaning: '그물' },
+            { word: 'pet', meaning: '애완동물' },
+            { word: 'set', meaning: '놓다' },
+            { word: 'wet', meaning: '젖은' },
+            { word: 'bet', meaning: '내기하다' },
+            { word: 'jet', meaning: '제트기' },
+            { word: 'vet', meaning: '수의사' },
+            { word: 'den', meaning: '굴' },
+            { word: 'hen', meaning: '암탉' },
+            { word: 'men', meaning: '남자들' },
+            { word: 'pen', meaning: '펜' },
+            { word: 'ten', meaning: '열' }
+        ],
+        'i': [
+            { word: 'big', meaning: '큰' },
+            { word: 'dig', meaning: '파다' },
+            { word: 'fig', meaning: '무화과' },
+            { word: 'pig', meaning: '돼지' },
+            { word: 'rig', meaning: '장비' },
+            { word: 'wig', meaning: '가발' },
+            { word: 'bit', meaning: '조금' },
+            { word: 'fit', meaning: '맞다' },
+            { word: 'hit', meaning: '치다' },
+            { word: 'kit', meaning: '도구상자' },
+            { word: 'lit', meaning: '밝혔다' },
+            { word: 'pit', meaning: '구덩이' },
+            { word: 'sit', meaning: '앉다' },
+            { word: 'wit', meaning: '재치' },
+            { word: 'bin', meaning: '통' },
+            { word: 'din', meaning: '소음' },
+            { word: 'fin', meaning: '지느러미' },
+            { word: 'pin', meaning: '핀' },
+            { word: 'sin', meaning: '죄' },
+            { word: 'tin', meaning: '주석' },
+            { word: 'win', meaning: '이기다' }
+        ],
+        'o': [
+            { word: 'dog', meaning: '개' },
+            { word: 'fog', meaning: '안개' },
+            { word: 'hog', meaning: '돼지' },
+            { word: 'jog', meaning: '조깅하다' },
+            { word: 'log', meaning: '통나무' },
+            { word: 'got', meaning: '얻었다' },
+            { word: 'hot', meaning: '뜨거운' },
+            { word: 'lot', meaning: '많이' },
+            { word: 'not', meaning: '아니다' },
+            { word: 'pot', meaning: '냄비' },
+            { word: 'rot', meaning: '썩다' },
+            { word: 'tot', meaning: '아기' },
+            { word: 'dot', meaning: '점' },
+            { word: 'cot', meaning: '간이침대' },
+            { word: 'bot', meaning: '로봇' },
+            { word: 'box', meaning: '상자' },
+            { word: 'fox', meaning: '여우' },
+            { word: 'pox', meaning: '천연두' },
+            { word: 'sox', meaning: '양말' },
+            { word: 'cox', meaning: '조타수' }
+        ],
+        'u': [
+            { word: 'bug', meaning: '벌레' },
+            { word: 'hug', meaning: '안아주다' },
+            { word: 'jug', meaning: '주전자' },
+            { word: 'mug', meaning: '머그컵' },
+            { word: 'rug', meaning: '러그' },
+            { word: 'tug', meaning: '끌다' },
+            { word: 'dug', meaning: '팠다' },
+            { word: 'lug', meaning: '끌다' },
+            { word: 'pug', meaning: '퍼그' },
+            { word: 'sug', meaning: '설탕' },
+            { word: 'but', meaning: '하지만' },
+            { word: 'cut', meaning: '자르다' },
+            { word: 'gut', meaning: '창자' },
+            { word: 'hut', meaning: '오두막' },
+            { word: 'jut', meaning: '튀어나오다' },
+            { word: 'nut', meaning: '견과류' },
+            { word: 'put', meaning: '놓다' },
+            { word: 'rut', meaning: '고랑' },
+            { word: 'tut', meaning: '흥' },
+            { word: 'bun', meaning: '빵' },
+            { word: 'fun', meaning: '재미' },
+            { word: 'gun', meaning: '총' },
+            { word: 'nun', meaning: '수녀' },
+            { word: 'pun', meaning: '말장난' },
+            { word: 'run', meaning: '달리다' },
+            { word: 'sun', meaning: '태양' },
+            { word: 'tun', meaning: '큰 통' },
+            { word: 'cub', meaning: '새끼' },
+            { word: 'hub', meaning: '중심' },
+            { word: 'pub', meaning: '술집' },
+            { word: 'rub', meaning: '문지르다' },
+            { word: 'tub', meaning: '욕조' }
+        ]
+    };
+    
+    // 현재 학습할 모음 선택 (라운드별로 다른 모음)
+    function getCurrentVowel(round) {
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        return vowels[(round - 1) % vowels.length];
+    }
+    
+    // 현재 라운드의 단어들 가져오기
+    function getCurrentWords(round) {
+        const vowel = getCurrentVowel(round);
+        return phonicsData[vowel];
+    }
     let current = 0, score = 0, selected = null;
     function renderQuestion() {
       document.getElementById('round').textContent = current+1;
       document.getElementById('score').textContent = score;
-      document.getElementById('questionText').textContent = `뜻: ${questions[current].meaning}`;
+      
+      // 현재 라운드에 맞는 모음과 단어 선택
+      const currentVowel = getCurrentVowel(current + 1);
+      const currentWords = getCurrentWords(current + 1);
+      const randomWordData = currentWords[Math.floor(Math.random() * currentWords.length)];
+      
+      document.getElementById('questionText').textContent = `뜻: ${randomWordData.meaning}`;
+      
+      // 현재 학습 중인 모음 표시
+      console.log(`라운드 ${current + 1}: 모음 '${currentVowel}' 학습 중 - 단어: ${randomWordData.word} (${randomWordData.meaning})`);
+      
       const grid = document.getElementById('optionsGrid');
       grid.innerHTML = '';
-      questions[current].options.forEach(opt => {
+      
+      // 선택지 생성 (정답 + 다른 단어들)
+      const options = [randomWordData.word];
+      const allWords = Object.values(phonicsData).flat().map(item => item.word);
+      const otherWords = allWords.filter(word => word !== randomWordData.word);
+      
+      for (let i = 0; i < 3; i++) {
+        const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+        if (!options.includes(randomWord)) {
+          options.push(randomWord);
+        }
+      }
+      
+      // 선택지 섞기
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+      
+      options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.textContent = opt;
         btn.onclick = () => selectOption(btn, opt);
         grid.appendChild(btn);
       });
+      
       selected = null;
       document.getElementById('checkBtn').disabled = true;
       document.getElementById('nextBtn').disabled = true;
@@ -99,7 +253,14 @@
     }
     function checkAnswer() {
       if (!selected) return;
-      const correct = questions[current].word;
+      
+      // 현재 라운드의 정답 단어 가져오기
+      const currentVowel = getCurrentVowel(current + 1);
+      const currentWords = getCurrentWords(current + 1);
+      const questionText = document.getElementById('questionText').textContent;
+      const meaning = questionText.replace('뜻: ', '');
+      const correctWordData = currentWords.find(item => item.meaning === meaning);
+      const correct = correctWordData ? correctWordData.word : '';
       document.querySelectorAll('.option-btn').forEach(btn => {
         btn.onclick = null;
         if (btn.textContent === correct) btn.classList.add('correct');

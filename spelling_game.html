@@ -67,20 +67,41 @@
         return true;
     }
     
-    // 샘플 데이터 (단어)
-    const questions = [
-      { word: 'cat' },
-      { word: 'dog' },
-      { word: 'bed' },
-      { word: 'fish' },
-      { word: 'hat' }
-    ];
+    // 파닉스 학습 데이터 (단모음 단어들)
+    const phonicsData = {
+        'a': ['cat', 'hat', 'bat', 'rat', 'mat', 'sat', 'fat', 'pat', 'map', 'cap', 'tap', 'lap', 'gap', 'nap', 'rap', 'sap', 'bag', 'tag', 'rag', 'wag', 'jag', 'lag', 'mag', 'nag', 'sag', 'tag', 'wag', 'zag', 'dag', 'fag', 'gag', 'hag'],
+        'e': ['bed', 'red', 'fed', 'led', 'wed', 'get', 'let', 'met', 'net', 'pet', 'set', 'wet', 'bet', 'jet', 'vet', 'yet', 'den', 'hen', 'men', 'pen', 'ten', 'zen', 'ben', 'ken', 'len', 'ren', 'sen', 'wen', 'yen', 'zen', 'fen', 'gen'],
+        'i': ['big', 'dig', 'fig', 'jig', 'pig', 'rig', 'wig', 'zig', 'bit', 'fit', 'hit', 'kit', 'lit', 'pit', 'sit', 'wit', 'bin', 'din', 'fin', 'gin', 'kin', 'pin', 'sin', 'tin', 'win', 'yin', 'zin', 'bin', 'din', 'fin', 'gin', 'kin'],
+        'o': ['dog', 'fog', 'hog', 'jog', 'log', 'cog', 'bog', 'tog', 'got', 'hot', 'lot', 'not', 'pot', 'rot', 'tot', 'dot', 'cot', 'bot', 'box', 'fox', 'pox', 'sox', 'cox', 'dox', 'lox', 'mox', 'nox', 'rox', 'tox', 'vox', 'zox', 'yox'],
+        'u': ['bug', 'hug', 'jug', 'mug', 'rug', 'tug', 'dug', 'lug', 'pug', 'sug', 'but', 'cut', 'gut', 'hut', 'jut', 'nut', 'put', 'rut', 'tut', 'bun', 'fun', 'gun', 'nun', 'pun', 'run', 'sun', 'tun', 'cub', 'hub', 'pub', 'rub', 'tub']
+    };
+    
+    // 현재 학습할 모음 선택 (라운드별로 다른 모음)
+    function getCurrentVowel(round) {
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        return vowels[(round - 1) % vowels.length];
+    }
+    
+    // 현재 라운드의 단어들 가져오기
+    function getCurrentWords(round) {
+        const vowel = getCurrentVowel(round);
+        return phonicsData[vowel];
+    }
     let current = 0, score = 0, answer = [], selected = [], alphaPool = [];
     function renderQuestion() {
       document.getElementById('round').textContent = current+1;
       document.getElementById('score').textContent = score;
-      answer = questions[current].word.split('');
+      
+      // 현재 라운드에 맞는 모음과 단어 선택
+      const currentVowel = getCurrentVowel(current + 1);
+      const currentWords = getCurrentWords(current + 1);
+      const randomWord = currentWords[Math.floor(Math.random() * currentWords.length)];
+      
+      answer = randomWord.split('');
       selected = [];
+      
+      // 현재 학습 중인 모음 표시
+      console.log(`라운드 ${current + 1}: 모음 '${currentVowel}' 학습 중 - 단어: ${randomWord}`);
       // 스펠링 박스
       const area = document.getElementById('spellingArea');
       area.innerHTML = '';
@@ -150,7 +171,8 @@
       renderQuestion();
     }
     function playSound() {
-      const utter = new SpeechSynthesisUtterance(questions[current].word);
+      const currentWord = answer.join('');
+      const utter = new SpeechSynthesisUtterance(currentWord);
       utter.lang = 'en-US';
       utter.rate = 0.8;
       utter.pitch = 1.1;
