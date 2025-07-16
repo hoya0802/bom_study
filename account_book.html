@@ -759,10 +759,24 @@
                     </div>
                 </div>
 
+                <!-- 카테고리 섹션 -->
+                <div class="collapsible-section" id="categorySection">
+                    <div class="section-header" onclick="toggleSection('categorySection')">
+                        <h3>🏷️ 카테고리</h3>
+                        <span class="section-toggle" id="categoryToggle">▼</span>
+                    </div>
+                    <div class="section-content" id="categoryContent">
+                        <div class="button-group" id="categoryGroup">
+                            <div class="category-placeholder">거래 유형을 먼저 선택해주세요</div>
+                        </div>
+                        <input type="hidden" id="transactionCategory">
+                    </div>
+                </div>
+
                 <!-- 기본 정보 섹션 -->
                 <div class="collapsible-section" id="basicSection">
                     <div class="section-header" onclick="toggleSection('basicSection')">
-                        <h3>📝 기본 정보</h3>
+                        <h3>📝 기본 정보 *</h3>
                         <span class="section-toggle" id="basicToggle">▼</span>
                     </div>
                     <div class="section-content" id="basicContent">
@@ -783,24 +797,10 @@
                     </div>
                 </div>
 
-                <!-- 카테고리 섹션 -->
-                <div class="collapsible-section" id="categorySection">
-                    <div class="section-header" onclick="toggleSection('categorySection')">
-                        <h3>🏷️ 카테고리</h3>
-                        <span class="section-toggle" id="categoryToggle">▼</span>
-                    </div>
-                    <div class="section-content" id="categoryContent">
-                        <div class="button-group" id="categoryGroup">
-                            <div class="category-placeholder">거래 유형을 먼저 선택해주세요</div>
-                        </div>
-                        <input type="hidden" id="transactionCategory">
-                    </div>
-                </div>
-
                 <!-- 메모 섹션 -->
                 <div class="collapsible-section" id="memoSection">
                     <div class="section-header" onclick="toggleSection('memoSection')">
-                        <h3>📋 메모</h3>
+                        <h3>📋 메모 (선택사항)</h3>
                         <span class="section-toggle" id="memoToggle">▼</span>
                     </div>
                     <div class="section-content" id="memoContent">
@@ -1350,11 +1350,16 @@
                 return;
             }
             
-            categoryGroup.innerHTML = filteredCategories.map(category => `
-                <button type="button" class="category-btn" data-category-id="${category.id}" onclick="selectCategory('${category.id}')">
-                    ${category.icon} ${category.name}
+            categoryGroup.innerHTML = `
+                ${filteredCategories.map(category => `
+                    <button type="button" class="category-btn" data-category-id="${category.id}" onclick="selectCategory('${category.id}')">
+                        ${category.icon} ${category.name}
+                    </button>
+                `).join('')}
+                <button type="button" class="category-btn skip-btn" onclick="skipCategory()" style="border-color: #6c757d; color: #6c757d;">
+                    ⏭️ 카테고리 건너뛰기
                 </button>
-            `).join('');
+            `;
         }
 
         // 카테고리 버튼 클릭 이벤트
@@ -1368,6 +1373,23 @@
             });
             
             document.getElementById('transactionCategory').value = categoryId;
+            
+            // 카테고리 섹션 접고, 기본 정보 섹션 펼치기
+            toggleSection('categorySection');
+            setTimeout(() => {
+                toggleSection('basicSection');
+            }, 300);
+        }
+
+        // 카테고리 건너뛰기
+        function skipCategory() {
+            document.getElementById('transactionCategory').value = '';
+            
+            // 카테고리 섹션 접고, 기본 정보 섹션 펼치기
+            toggleSection('categorySection');
+            setTimeout(() => {
+                toggleSection('basicSection');
+            }, 300);
         }
 
         // 섹션 토글 함수
@@ -1405,10 +1427,10 @@
             // 카테고리 버튼 업데이트
             updateCategoryButtons(type);
             
-            // 거래 유형 섹션 접고, 기본 정보 섹션 펼치기
+            // 거래 유형 섹션 접고, 카테고리 섹션 펼치기
             toggleSection('typeSection');
             setTimeout(() => {
-                toggleSection('basicSection');
+                toggleSection('categorySection');
             }, 300);
         }
 
