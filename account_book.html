@@ -907,6 +907,7 @@
                     return;
                 }
                 allUsers = data;
+                console.log('로드된 사용자 목록:', allUsers);
             } catch (error) {
                 console.error('사용자 목록 로드 오류:', error);
             }
@@ -1065,21 +1066,44 @@
 
                                 // 사용자별 색상 결정
                                 let userColor;
+                                let userName = '';
+                                
                                 if (isOwnTransaction) {
                                     userColor = currentUser.color || '#667eea';
+                                    userName = currentUser.name;
                                 } else {
-                                    // 다른 사용자의 거래는 회색 계열
-                                    const otherUsers = allUsers.filter(u => u.password_hash !== currentUser.password_hash);
-                                    const otherUser = otherUsers.find(u => u.password_hash === transaction.created_by);
-                                    userColor = otherUser ? otherUser.color || '#6c757d' : '#6c757d';
+                                    // 다른 사용자의 거래 찾기
+                                    const otherUser = allUsers.find(u => u.password_hash === transaction.created_by);
+                                    if (otherUser) {
+                                        userColor = otherUser.color || '#6c757d';
+                                        userName = otherUser.name;
+                                    } else {
+                                        userColor = '#6c757d';
+                                        userName = '알 수 없음';
+                                    }
                                 }
+                                
+                                // 디버깅용 콘솔 로그
+                                console.log('거래 정보:', {
+                                    id: transaction.id,
+                                    description: transaction.description,
+                                    created_by: transaction.created_by,
+                                    isOwn: isOwnTransaction,
+                                    userName: userName,
+                                    userColor: userColor
+                                });
 
                                 return `
                                     <div class="transaction-card ${isOwnTransaction ? 'own-transaction' : 'other-transaction'}" 
                                          style="border-left: 4px solid ${userColor}">
                                         <div class="transaction-main">
                                             <div class="transaction-left">
-                                                <div class="transaction-title">${transaction.description || transaction.source || '제목 없음'}</div>
+                                                <div class="transaction-title">
+                                                    ${transaction.description || transaction.source || '제목 없음'}
+                                                    <span style="font-size: 0.8rem; color: ${userColor}; font-weight: 600; margin-left: 8px;">
+                                                        👤 ${userName}
+                                                    </span>
+                                                </div>
                                                 <div class="transaction-details">
                                                     ${category ? `<span class="category-badge" style="background-color: ${category.color}">${category.icon} ${category.name}</span>` : ''}
                                                     <span class="transaction-time">${time}</span>
