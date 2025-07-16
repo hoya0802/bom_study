@@ -623,7 +623,7 @@
                         <option value="">전체</option>
                     </select>
                 </div>
-                <button class="add-btn" onclick="showAddModal()">➕ 거래 등록</button>
+                <button class="add-btn" onclick="showAddModal()">➕ 가계부쓰기</button>
                 <button class="add-btn" onclick="showCategoryManagement()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">🏷️ 카테고리 관리</button>
             </div>
         </div>
@@ -640,7 +640,7 @@
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">거래 등록</h2>
+                <h2 class="modal-title" id="modalTitle">가계부쓰기</h2>
                 <button class="close-btn" onclick="hideAddModal()">&times;</button>
             </div>
             <form id="transactionForm">
@@ -672,10 +672,10 @@
                         <input type="date" id="transactionDate" required>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="transactionSource">출처</label>
-                    <input type="text" id="transactionSource" placeholder="예: 홈플러스, 월급 등">
-                </div>
+                                    <div class="form-group">
+                        <label for="transactionSource">내용</label>
+                        <input type="text" id="transactionSource" placeholder="예: 홈플러스, 월급 등">
+                    </div>
                 <div class="form-group">
                     <label for="transactionDescription">항목/메모</label>
                     <textarea id="transactionDescription" placeholder="거래에 대한 상세 설명을 입력하세요"></textarea>
@@ -1063,9 +1063,20 @@
                                     hour12: true
                                 });
 
+                                // 사용자별 색상 결정
+                                let userColor;
+                                if (isOwnTransaction) {
+                                    userColor = currentUser.color || '#667eea';
+                                } else {
+                                    // 다른 사용자의 거래는 회색 계열
+                                    const otherUsers = allUsers.filter(u => u.password_hash !== currentUser.password_hash);
+                                    const otherUser = otherUsers.find(u => u.password_hash === transaction.created_by);
+                                    userColor = otherUser ? otherUser.color || '#6c757d' : '#6c757d';
+                                }
+
                                 return `
                                     <div class="transaction-card ${isOwnTransaction ? 'own-transaction' : 'other-transaction'}" 
-                                         style="border-left: 4px solid ${TRANSACTION_COLORS[transaction.type]}">
+                                         style="border-left: 4px solid ${userColor}">
                                         <div class="transaction-main">
                                             <div class="transaction-left">
                                                 <div class="transaction-title">${transaction.description || transaction.source || '제목 없음'}</div>
@@ -1076,7 +1087,7 @@
                                                 </div>
                                             </div>
                                             <div class="transaction-right">
-                                                <div class="transaction-amount" style="color: ${TRANSACTION_COLORS[transaction.type]}">
+                                                <div class="transaction-amount" style="color: ${userColor}">
                                                     ${TRANSACTION_ICONS[transaction.type]} ${formatCurrency(transaction.amount)}
                                                 </div>
                                                 <div class="transaction-actions">
@@ -1102,7 +1113,7 @@
 
         // 거래 등록 모달 표시
         function showAddModal() {
-            document.getElementById('modalTitle').textContent = '거래 등록';
+                            document.getElementById('modalTitle').textContent = '가계부쓰기';
             document.getElementById('transactionForm').reset();
             document.getElementById('transactionId').value = '';
             document.getElementById('transactionDate').value = formatDateForInput(new Date());
@@ -1129,7 +1140,7 @@
                     return;
                 }
 
-                document.getElementById('modalTitle').textContent = '거래 수정';
+                document.getElementById('modalTitle').textContent = '가계부 수정';
                 document.getElementById('transactionId').value = transaction.id;
                 document.getElementById('transactionType').value = transaction.type;
                 document.getElementById('transactionAmount').value = new Intl.NumberFormat('ko-KR').format(transaction.amount);
