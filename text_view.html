@@ -70,6 +70,13 @@
             font-weight: bold;
             margin-top: 0.2rem;
         }
+        .timer-remaining-below {
+            font-size: 1.8rem;
+            color: #1976d2;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
         .timer-bar-bg {
             width: 100%;
             height: 18px;
@@ -296,7 +303,7 @@
     <div class="main-content">
         <div class="timer-area">
             <form class="timer-controls" onsubmit="return false;">
-                <input type="number" id="timer-minutes" min="1" max="120" value="5"> 분
+                <input type="number" id="timer-minutes" min="1" max="120" value="20"> 분
                 <button id="timer-start">시작</button>
                 <button id="timer-stop" style="display:none;">정지</button>
                 <button id="timer-resume" style="display:none;">재시작</button>
@@ -305,6 +312,7 @@
             <div class="timer-bar-bg">
                 <div class="timer-bar" id="timer-bar" style="width:0%"></div>
             </div>
+            <div class="timer-remaining-below" id="timer-remaining-below"></div>
         </div>
         
         <div class="date-display" id="date-display"></div>
@@ -430,7 +438,9 @@
         function updateTimerDisplay() {
             const min = Math.floor(remainSec / 60);
             const sec = remainSec % 60;
-            timerRemain.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+            const timeText = `${min}:${sec.toString().padStart(2, '0')}`;
+            timerRemain.textContent = timeText;
+            document.getElementById('timer-remaining-below').textContent = timeText;
             const percent = totalSec > 0 ? (remainSec / totalSec) * 100 : 0;
             timerBar.style.width = percent + '%';
         }
@@ -719,9 +729,16 @@
                     return;
                 }
 
-                // 날짜 표시
-                const dateStr = data.created_at ? data.created_at.substr(0, 10) : '';
-                document.getElementById('date-display').textContent = formatDate(dateStr);
+                // 텍스트에서 날짜 추출
+                const dateMatch = data.content.match(/💕(\d{4}\.\s*[A-Za-z]+\s+\d{1,2}[a-z]{2}\.\s*[A-Za-z]+\.)/);
+                if (dateMatch) {
+                    // 텍스트에서 추출한 날짜 표시
+                    document.getElementById('date-display').textContent = dateMatch[1];
+                } else {
+                    // 추출할 수 없으면 created_at 날짜 사용
+                    const dateStr = data.created_at ? data.created_at.substr(0, 10) : '';
+                    document.getElementById('date-display').textContent = formatDate(dateStr);
+                }
 
                 // 텍스트 내용 처리
                 const textContent = data.content || '';

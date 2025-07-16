@@ -145,7 +145,7 @@
     }
     .text-link {
       display: block;
-      padding: 1rem 1.2rem;
+      padding: 1.2rem 1.5rem;
       background: #f8f9fa;
       border: 1px solid #e9ecef;
       border-radius: 0.7rem;
@@ -154,9 +154,10 @@
       font-size: 1rem;
       transition: all 0.2s;
       word-break: break-all;
-      white-space: normal;
-      line-height: 1.4;
+      white-space: pre-line;
+      line-height: 1.6;
       cursor: pointer;
+      min-height: 60px;
     }
     .text-link:hover {
       background: #e3f0ff;
@@ -263,7 +264,10 @@
       allTexts = data;
       groupedByDate = {};
       data.forEach(row => {
-        const date = row.created_at.substr(0, 10);
+        // UTC 시간을 한국 시간으로 변환하여 날짜 추출
+        const utcDate = new Date(row.created_at);
+        const koreaTime = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+        const date = koreaTime.toISOString().substr(0, 10);
         if (!groupedByDate[date]) groupedByDate[date] = [];
         groupedByDate[date].push(row);
       });
@@ -313,7 +317,7 @@
       texts.forEach(row => {
         const a = document.createElement('a');
         a.className = 'text-link';
-        a.textContent = '📄 ' + (row.content.length > 30 ? row.content.substr(0, 30) + '...' : row.content);
+        a.textContent = '📄 ' + (row.content.length > 50 ? row.content.substr(0, 50) + '...' : row.content);
         a.title = row.content;
         a.onclick = () => {
           window.location.href = `text_view.html?id=${row.id}`;
