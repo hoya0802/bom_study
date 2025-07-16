@@ -219,7 +219,8 @@
             padding: 15px 20px;
             border-bottom: 1px solid #f0f0f0;
             background: white;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            position: relative;
         }
 
         .transaction-card:last-child {
@@ -1093,14 +1094,17 @@
                                     userColor: userColor
                                 });
 
+                                // 사용자별 배경색 (연한 색상)
+                                const backgroundColor = userColor + '15'; // 15는 투명도 (약 10%)
+                                
                                 return `
                                     <div class="transaction-card ${isOwnTransaction ? 'own-transaction' : 'other-transaction'}" 
-                                         style="border-left: 4px solid ${userColor}">
+                                         style="border-left: 8px solid ${userColor}; background-color: ${backgroundColor}">
                                         <div class="transaction-main">
                                             <div class="transaction-left">
                                                 <div class="transaction-title">
                                                     ${transaction.description || transaction.source || '제목 없음'}
-                                                    <span style="font-size: 0.8rem; color: ${userColor}; font-weight: 600; margin-left: 8px;">
+                                                    <span style="font-size: 0.75rem; color: ${userColor}; font-weight: 700; margin-left: 10px; padding: 2px 6px; background-color: ${userColor}20; border-radius: 4px;">
                                                         👤 ${userName}
                                                     </span>
                                                 </div>
@@ -1111,7 +1115,7 @@
                                                 </div>
                                             </div>
                                             <div class="transaction-right">
-                                                <div class="transaction-amount" style="color: ${userColor}">
+                                                <div class="transaction-amount" style="color: ${TRANSACTION_COLORS[transaction.type]}">
                                                     ${TRANSACTION_ICONS[transaction.type]} ${formatCurrency(transaction.amount)}
                                                 </div>
                                                 <div class="transaction-actions">
