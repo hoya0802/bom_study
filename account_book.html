@@ -161,9 +161,9 @@
         }
         /* 모바일 친화적인 거래 리스트 스타일 */
         .date-group {
-            margin-bottom: 20px;
+            margin-bottom: 0;
             background: white;
-            border-radius: 12px;
+            border-radius: 0;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
@@ -397,6 +397,9 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            background: none;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 15px;
         }
         .modal-title {
             font-size: 1.5rem;
@@ -559,6 +562,99 @@
         .category-actions button:hover {
             background: rgba(0,0,0,0.1);
         }
+
+        /* 버튼 그룹 스타일 */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .type-btn, .category-btn {
+            padding: 10px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .type-btn:hover, .category-btn:hover {
+            border-color: var(--user-primary-color, #667eea);
+            background-color: #f8f9fa;
+        }
+
+        .type-btn.selected, .category-btn.selected {
+            border-color: var(--user-primary-color, #667eea);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            color: white;
+        }
+
+        .category-placeholder {
+            color: #6c757d;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 접을 수 있는 영역 스타일 */
+        .collapsible-section {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s;
+        }
+
+        .section-header:hover {
+            background: #e9ecef;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .section-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .section-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            padding: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            max-height: 500px;
+            overflow: hidden;
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            padding: 0 16px;
+        }
     </style>
 </head>
 <body>
@@ -644,43 +740,77 @@
                 <h2 class="modal-title" id="modalTitle">가계부쓰기</h2>
                 <button class="close-btn" onclick="hideAddModal()">&times;</button>
             </div>
-            <form id="transactionForm">
+                        <form id="transactionForm">
                 <input type="hidden" id="transactionId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="transactionType">거래 유형 *</label>
-                        <select id="transactionType" required>
-                            <option value="">선택하세요</option>
-                            <option value="지출">지출</option>
-                            <option value="수입">수입</option>
-                            <option value="이체">이체</option>
-                        </select>
+                
+                <!-- 거래 유형 섹션 -->
+                <div class="collapsible-section" id="typeSection">
+                    <div class="section-header" onclick="toggleSection('typeSection')">
+                        <h3>💳 거래 유형 *</h3>
+                        <span class="section-toggle" id="typeToggle">▼</span>
                     </div>
-                    <div class="form-group">
-                        <label for="transactionAmount">금액 *</label>
-                        <input type="text" id="transactionAmount" placeholder="0" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="transactionCategory">카테고리</label>
-                        <select id="transactionCategory">
-                            <option value="">선택하세요</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="transactionDate">거래일 *</label>
-                        <input type="date" id="transactionDate" required>
+                    <div class="section-content" id="typeContent">
+                        <div class="button-group" id="transactionTypeGroup">
+                            <button type="button" class="type-btn" data-type="지출" onclick="selectTransactionType('지출')">💸 지출</button>
+                            <button type="button" class="type-btn" data-type="수입" onclick="selectTransactionType('수입')">💰 수입</button>
+                            <button type="button" class="type-btn" data-type="이체" onclick="selectTransactionType('이체')">💸 이체</button>
+                        </div>
+                        <input type="hidden" id="transactionType" required>
                     </div>
                 </div>
-                                    <div class="form-group">
-                        <label for="transactionSource">내용</label>
-                        <input type="text" id="transactionSource" placeholder="예: 홈플러스, 월급 등">
+
+                <!-- 기본 정보 섹션 -->
+                <div class="collapsible-section" id="basicSection">
+                    <div class="section-header" onclick="toggleSection('basicSection')">
+                        <h3>📝 기본 정보</h3>
+                        <span class="section-toggle" id="basicToggle">▼</span>
                     </div>
-                <div class="form-group">
-                    <label for="transactionDescription">항목/메모</label>
-                    <textarea id="transactionDescription" placeholder="거래에 대한 상세 설명을 입력하세요"></textarea>
+                    <div class="section-content" id="basicContent">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="transactionAmount">금액 *</label>
+                                <input type="text" id="transactionAmount" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transactionDate">거래일 *</label>
+                                <input type="date" id="transactionDate" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="transactionSource">내용</label>
+                            <input type="text" id="transactionSource" placeholder="예: 홈플러스, 월급 등">
+                        </div>
+                    </div>
                 </div>
+
+                <!-- 카테고리 섹션 -->
+                <div class="collapsible-section" id="categorySection">
+                    <div class="section-header" onclick="toggleSection('categorySection')">
+                        <h3>🏷️ 카테고리</h3>
+                        <span class="section-toggle" id="categoryToggle">▼</span>
+                    </div>
+                    <div class="section-content" id="categoryContent">
+                        <div class="button-group" id="categoryGroup">
+                            <div class="category-placeholder">거래 유형을 먼저 선택해주세요</div>
+                        </div>
+                        <input type="hidden" id="transactionCategory">
+                    </div>
+                </div>
+
+                <!-- 메모 섹션 -->
+                <div class="collapsible-section" id="memoSection">
+                    <div class="section-header" onclick="toggleSection('memoSection')">
+                        <h3>📋 메모</h3>
+                        <span class="section-toggle" id="memoToggle">▼</span>
+                    </div>
+                    <div class="section-content" id="memoContent">
+                        <div class="form-group">
+                            <label for="transactionDescription">항목/메모</label>
+                            <textarea id="transactionDescription" placeholder="거래에 대한 상세 설명을 입력하세요"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="hideAddModal()">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
@@ -803,9 +933,6 @@
             document.getElementById('endDate').addEventListener('change', loadTransactions);
             document.getElementById('typeFilter').addEventListener('change', loadTransactions);
             document.getElementById('categoryFilter').addEventListener('change', loadTransactions);
-
-            // 거래 유형 변경 시 카테고리 필터링
-            document.getElementById('transactionType').addEventListener('change', filterCategoriesByType);
 
             // 금액 입력 시 천단위 콤마
             document.getElementById('transactionAmount').addEventListener('input', function() {
@@ -1139,17 +1266,150 @@
             transactionList.innerHTML = html;
         }
 
-        // 거래 등록 모달 표시
+                // 거래 등록 모달 표시
         function showAddModal() {
-                            document.getElementById('modalTitle').textContent = '가계부쓰기';
+            document.getElementById('modalTitle').textContent = '가계부쓰기';
             document.getElementById('transactionForm').reset();
             document.getElementById('transactionId').value = '';
             document.getElementById('transactionDate').value = formatDateForInput(new Date());
             
-            // 카테고리 옵션 초기화 (모든 카테고리 표시)
-            filterCategoriesByType();
+            // 버튼 초기화
+            resetTypeButtons();
+            resetCategoryButtons();
+            
+            // 섹션 초기 상태 설정 (거래 유형만 펼쳐진 상태)
+            initializeSections();
             
             ModalManager.showModal('transactionModal');
+        }
+
+        // 섹션 초기 상태 설정
+        function initializeSections() {
+            // 모든 섹션 접기
+            const sections = ['typeSection', 'basicSection', 'categorySection', 'memoSection'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                const content = section.querySelector('.section-content');
+                const toggle = section.querySelector('.section-toggle');
+                
+                content.classList.add('collapsed');
+                toggle.classList.add('collapsed');
+                toggle.textContent = '▶';
+            });
+            
+            // 거래 유형 섹션만 펼치기
+            setTimeout(() => {
+                toggleSection('typeSection');
+            }, 100);
+        }
+
+        // 거래 유형 버튼 초기화
+        function resetTypeButtons() {
+            const typeButtons = document.querySelectorAll('.type-btn');
+            typeButtons.forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('transactionType').value = '';
+        }
+
+        // 카테고리 버튼 초기화
+        function resetCategoryButtons() {
+            const categoryGroup = document.getElementById('categoryGroup');
+            categoryGroup.innerHTML = '<div class="category-placeholder">거래 유형을 먼저 선택해주세요</div>';
+            document.getElementById('transactionCategory').value = '';
+        }
+
+        // 거래 유형 버튼 클릭 이벤트
+        function selectTransactionType(type) {
+            // 버튼 상태 변경
+            const typeButtons = document.querySelectorAll('.type-btn');
+            typeButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.type === type) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('transactionType').value = type;
+            
+            // 카테고리 버튼 업데이트
+            updateCategoryButtons(type);
+        }
+
+        // 카테고리 버튼 업데이트
+        function updateCategoryButtons(type) {
+            const categoryGroup = document.getElementById('categoryGroup');
+            
+            if (!type) {
+                categoryGroup.innerHTML = '<div class="category-placeholder">거래 유형을 먼저 선택해주세요</div>';
+                return;
+            }
+            
+            const filteredCategories = categories.filter(cat => cat.type === type);
+            
+            if (filteredCategories.length === 0) {
+                categoryGroup.innerHTML = '<div class="category-placeholder">해당 유형의 카테고리가 없습니다</div>';
+                return;
+            }
+            
+            categoryGroup.innerHTML = filteredCategories.map(category => `
+                <button type="button" class="category-btn" data-category-id="${category.id}" onclick="selectCategory('${category.id}')">
+                    ${category.icon} ${category.name}
+                </button>
+            `).join('');
+        }
+
+        // 카테고리 버튼 클릭 이벤트
+        function selectCategory(categoryId) {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.categoryId === categoryId) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('transactionCategory').value = categoryId;
+        }
+
+        // 섹션 토글 함수
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const content = section.querySelector('.section-content');
+            const toggle = section.querySelector('.section-toggle');
+            
+            if (content.classList.contains('collapsed')) {
+                // 펼치기
+                content.classList.remove('collapsed');
+                toggle.classList.remove('collapsed');
+                toggle.textContent = '▼';
+            } else {
+                // 접기
+                content.classList.add('collapsed');
+                toggle.classList.add('collapsed');
+                toggle.textContent = '▶';
+            }
+        }
+
+        // 거래 유형 선택 시 다음 섹션 자동 펼치기
+        function selectTransactionType(type) {
+            // 버튼 상태 변경
+            const typeButtons = document.querySelectorAll('.type-btn');
+            typeButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.type === type) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('transactionType').value = type;
+            
+            // 카테고리 버튼 업데이트
+            updateCategoryButtons(type);
+            
+            // 거래 유형 섹션 접고, 기본 정보 섹션 펼치기
+            toggleSection('typeSection');
+            setTimeout(() => {
+                toggleSection('basicSection');
+            }, 300);
         }
 
         // 거래 등록 모달 숨기기
@@ -1170,15 +1430,32 @@
 
                 document.getElementById('modalTitle').textContent = '가계부 수정';
                 document.getElementById('transactionId').value = transaction.id;
-                document.getElementById('transactionType').value = transaction.type;
                 document.getElementById('transactionAmount').value = new Intl.NumberFormat('ko-KR').format(transaction.amount);
-                document.getElementById('transactionCategory').value = transaction.category_id || '';
                 document.getElementById('transactionDate').value = transaction.transaction_date;
                 document.getElementById('transactionSource').value = transaction.source || '';
                 document.getElementById('transactionDescription').value = transaction.description || '';
 
-                // 카테고리 필터링
-                filterCategoriesByType();
+                // 모든 섹션 펼치기 (수정 시에는 모든 정보를 볼 수 있도록)
+                const sections = ['typeSection', 'basicSection', 'categorySection', 'memoSection'];
+                sections.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    const content = section.querySelector('.section-content');
+                    const toggle = section.querySelector('.section-toggle');
+                    
+                    content.classList.remove('collapsed');
+                    toggle.classList.remove('collapsed');
+                    toggle.textContent = '▼';
+                });
+
+                // 거래 유형 버튼 설정
+                selectTransactionType(transaction.type);
+                
+                // 카테고리 버튼 설정 (약간의 지연 후)
+                setTimeout(() => {
+                    if (transaction.category_id) {
+                        selectCategory(transaction.category_id);
+                    }
+                }, 100);
 
                 ModalManager.showModal('transactionModal');
             } catch (error) {
