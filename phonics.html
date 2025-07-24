@@ -21,7 +21,7 @@
 
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             min-height: 100vh;
             padding: 20px;
         }
@@ -36,7 +36,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             padding: 20px;
             text-align: center;
@@ -117,7 +117,7 @@
         }
 
         .play-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: var(--play-btn-gradient, linear-gradient(135deg, #28a745 0%, #20c997 100%));
             color: white;
             border: none;
             padding: 15px 30px;
@@ -131,7 +131,7 @@
 
         .play-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 10px 20px var(--play-btn-shadow, rgba(40, 167, 69, 0.3));
         }
 
         .play-btn:disabled {
@@ -164,14 +164,14 @@
         }
 
         .option-btn:hover {
-            border-color: #667eea;
+            border-color: var(--user-primary-color, #667eea);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .option-btn.selected {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: var(--user-primary-color, #667eea);
+            background: var(--user-primary-color, #667eea);
             color: white;
         }
 
@@ -345,6 +345,53 @@
             transform: translateY(-2px);
         }
 
+        .alphabet-selection {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .alphabet-btn {
+            background: white;
+            border: 3px solid #e9ecef;
+            padding: 20px 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .alphabet-btn:hover {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .alphabet-info {
+            text-align: center;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
         @media (max-width: 768px) {
             .game-info {
                 flex-direction: column;
@@ -362,6 +409,15 @@
             
             .question-text {
                 font-size: 1.5rem;
+            }
+
+            .alphabet-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .alphabet-btn {
+                font-size: 16px;
+                min-height: 60px;
             }
         }
     </style>
@@ -384,8 +440,22 @@
                 <button class="btn btn-warning" onclick="resetGame()">게임 초기화</button>
             </div>
 
-            <div class="game-area">
+            <!-- 알파벳 선택 영역 -->
+            <div class="alphabet-selection" id="alphabetSelection">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #333;">학습할 알파벳을 선택하세요</h3>
+                <div class="alphabet-grid">
+                    <button class="alphabet-btn" onclick="selectAlphabet('a')">A (a)</button>
+                    <button class="alphabet-btn" onclick="selectAlphabet('e')">E (e)</button>
+                    <button class="alphabet-btn" onclick="selectAlphabet('i')">I (i)</button>
+                    <button class="alphabet-btn" onclick="selectAlphabet('o')">O (o)</button>
+                    <button class="alphabet-btn" onclick="selectAlphabet('u')">U (u)</button>
+                    <button class="alphabet-btn" onclick="selectAlphabet('random')">🎲 랜덤</button>
+                </div>
+            </div>
+
+            <div class="game-area" id="gameArea" style="display: none;">
                 <div class="question-area">
+                    <div class="alphabet-info" id="alphabetInfo" style="margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; color: #667eea;"></div>
                     <div class="question-text" id="questionText">게임을 시작하려면 아래 버튼을 클릭하세요!</div>
                     <button class="play-btn" id="playBtn" onclick="playSound()">🔊 소리 듣기</button>
                 </div>
@@ -440,7 +510,8 @@
             selectedAnswer: null,
             correctAnswer: null,
             usedWords: [],
-            completedSets: []
+            completedSets: [],
+            selectedAlphabet: null // 선택된 알파벳 추가
         };
 
         // 음성 합성 설정
@@ -462,6 +533,42 @@
         function initializeGame() {
             loadGameState();
             updateDisplay();
+            
+            // 알파벳이 선택되지 않았으면 선택 화면 표시
+            if (!gameState.selectedAlphabet) {
+                showAlphabetSelection();
+            } else {
+                showGameArea();
+                generateQuestion();
+            }
+        }
+
+        // 알파벳 선택 화면 표시
+        function showAlphabetSelection() {
+            document.getElementById('alphabetSelection').style.display = 'block';
+            document.getElementById('gameArea').style.display = 'none';
+        }
+
+        // 게임 영역 표시
+        function showGameArea() {
+            document.getElementById('alphabetSelection').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            
+            // 선택된 알파벳 정보 표시
+            const alphabetInfo = document.getElementById('alphabetInfo');
+            if (gameState.selectedAlphabet === 'random') {
+                alphabetInfo.textContent = '🎲 랜덤 모드 - 모든 알파벳에서 출제됩니다';
+            } else {
+                alphabetInfo.textContent = `📚 ${gameState.selectedAlphabet.toUpperCase()} 알파벳 학습 모드`;
+            }
+        }
+
+        // 알파벳 선택
+        function selectAlphabet(alphabet) {
+            gameState.selectedAlphabet = alphabet;
+            gameState.usedWords = []; // 사용된 단어 초기화
+            saveGameState();
+            showGameArea();
             generateQuestion();
         }
 
@@ -487,9 +594,18 @@
 
         // 문제 생성
         function generateQuestion() {
-            const vowels = ['a', 'e', 'i', 'o', 'u'];
-            const randomVowel = vowels[Math.floor(Math.random() * vowels.length)];
-            const words = gameData.words[randomVowel];
+            let selectedVowel;
+            
+            if (gameState.selectedAlphabet === 'random') {
+                // 랜덤 모드: 모든 알파벳에서 선택
+                const vowels = ['a', 'e', 'i', 'o', 'u'];
+                selectedVowel = vowels[Math.floor(Math.random() * vowels.length)];
+            } else {
+                // 특정 알파벳 모드
+                selectedVowel = gameState.selectedAlphabet;
+            }
+            
+            const words = gameData.words[selectedVowel];
             
             // 사용하지 않은 단어 중에서 선택
             const availableWords = words.filter(word => !gameState.usedWords.includes(word));
@@ -716,11 +832,12 @@
                 selectedAnswer: null,
                 correctAnswer: null,
                 usedWords: [],
-                completedSets: []
+                completedSets: [],
+                selectedAlphabet: null // 알파벳 선택도 초기화
             };
             
             localStorage.removeItem('phonicsGameState');
-            generateQuestion();
+            showAlphabetSelection(); // 알파벳 선택 화면으로 돌아가기
         }
 
         // 파티클 효과 생성

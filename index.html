@@ -93,6 +93,9 @@
             transition: transform 0.2s, box-shadow 0.2s;
             width: 100%;
             margin-bottom: 15px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         .btn:hover {
@@ -136,7 +139,6 @@
         }
 
         .menu-btn {
-            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
             border: none;
             padding: 28px 0;
@@ -151,11 +153,18 @@
             justify-content: center;
             text-align: center;
             line-height: 1.3;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         .menu-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 30px var(--user-primary-color, rgba(102, 126, 234, 0.3));
+        }
+
+        /* 메뉴 버튼 기본 스타일 - 색상은 테마 시스템에서 제어 */
+        .menu-btn {
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .logout-btn {
@@ -209,7 +218,7 @@
                 <label for="password">비밀번호</label>
                 <input type="password" id="password" placeholder="비밀번호를 입력하세요">
             </div>
-            <button class="btn" onclick="authenticate()">로그인</button>
+            <button class="btn" id="loginBtn">로그인</button>
             <div class="error-message" id="errorMessage">잘못된 비밀번호입니다.</div>
         </div>
         <!-- 메뉴 -->
@@ -220,7 +229,7 @@
             <div class="menu-grid" id="menuGrid">
                 <!-- 메뉴 버튼들이 동적으로 생성됩니다 -->
             </div>
-            <button class="btn logout-btn" onclick="logout()">로그아웃</button>
+            <button class="btn logout-btn" id="logoutBtn">로그아웃</button>
         </div>
     </div>
 
@@ -240,8 +249,33 @@
         </div>
     </div>
     <script>
-        // 사용자별 비밀번호 및 정보 정의
-        // 사용자별 비밀번호 및 정보 정의
+        // 게임 항목들 정의 (전역)
+        const gameItems = [
+            {
+                id: 'phonics',
+                title: '🎵 발음 듣고 단어 찾기',
+                url: 'phonics.html',
+                description: '소리를 듣고 올바른 단어를 찾는 게임'
+            },
+            {
+                id: 'meaning',
+                title: '💡 뜻 보고 단어 찾기',
+                url: 'meaning_game.html',
+                description: '한국어 뜻을 보고 영어 단어를 찾는 게임'
+            },
+            {
+                id: 'image',
+                title: '🖼️ 그림 보고 단어 찾기',
+                url: 'image_game.html',
+                description: '이모지를 보고 영어 단어를 찾는 게임'
+            },
+            {
+                id: 'spelling',
+                title: '✏️ 소리 듣고 단어 완성하기',
+                url: 'spelling_game.html',
+                description: '소리를 듣고 빈칸을 채워 단어를 완성하는 게임'
+            }
+        ];
 
         function checkSession() {
             const isAuthenticated = sessionStorage.getItem('authenticated');
@@ -354,13 +388,28 @@
 
             availableMenus.forEach(item => {
                 const menuBtn = document.createElement('button');
-                menuBtn.className = 'menu-btn';
+                menuBtn.className = `menu-btn ${item.id}`;
                 menuBtn.textContent = item.title;
 
                 if (item.action === 'showGamePopup') {
-                    menuBtn.onclick = () => showGamePopup();
+                    // 모바일 터치 이벤트 지원을 위한 이벤트 리스너 추가
+                    menuBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showGamePopup();
+                    });
+                    menuBtn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        showGamePopup();
+                    });
                 } else {
-                    menuBtn.onclick = () => location.href = item.url;
+                    menuBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        location.href = item.url;
+                    });
+                    menuBtn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        location.href = item.url;
+                    });
                 }
 
                 menuGrid.appendChild(menuBtn);
@@ -437,6 +486,9 @@
                     cursor: pointer;
                     transition: all 0.2s;
                     text-align: left;
+                    -webkit-tap-highlight-color: transparent;
+                    touch-action: manipulation;
+                    user-select: none;
                 `;
 
                 gameBtn.innerHTML = `
@@ -464,9 +516,15 @@
                     gameBtn.style.boxShadow = 'none';
                 };
 
-                gameBtn.onclick = () => {
+                // 모바일 터치 이벤트 지원을 위한 이벤트 리스너 추가
+                gameBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     location.href = game.url;
-                };
+                });
+                gameBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    location.href = game.url;
+                });
 
                 gameGrid.appendChild(gameBtn);
             });
@@ -485,10 +543,28 @@
             }
         });
 
-        document.getElementById('password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
+        // 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 로그인 버튼 이벤트
+            document.getElementById('loginBtn').addEventListener('click', authenticate);
+            document.getElementById('loginBtn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
                 authenticate();
-            }
+            });
+
+            // 로그아웃 버튼 이벤트
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('logoutBtn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                logout();
+            });
+
+            // 비밀번호 입력 필드 엔터 키 이벤트
+            document.getElementById('password').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    authenticate();
+                }
+            });
         });
 
         window.addEventListener('load', checkSession);

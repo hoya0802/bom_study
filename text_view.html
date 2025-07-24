@@ -86,16 +86,7 @@
         }
 
         .timer-remaining-below {
-            font-size: 1.8rem;
-            color: #fff;
-            font-weight: bold;
-            margin-top: 0.5rem;
-            text-align: center;
-            background: var(--user-primary-color, #1976d2);
-            padding: 0.2rem 0.6rem;
-            border-radius: 0.8rem;
-            display: inline-block;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            display: none; /* 중복 표시 제거 */
         }
 
         .timer-bar-bg {
@@ -109,7 +100,7 @@
 
         .timer-bar {
             height: 100%;
-            background: var(--user-gradient, linear-gradient(90deg, #1976d2 60%, #42a5f5 100%));
+            background: var(--timer-bar-gradient, linear-gradient(90deg, #ff6b6b 0%, #ffa500 100%));
             transition: width 0.3s linear;
         }
 
@@ -385,7 +376,6 @@
             <div class="timer-bar-bg">
                 <div class="timer-bar" id="timer-bar" style="width:0%"></div>
             </div>
-            <div class="timer-remaining-below" id="timer-remaining-below"></div>
         </div>
 
         <div class="date-display" id="date-display"></div>
@@ -518,7 +508,7 @@
             const sec = remainSec % 60;
             const timeText = `${min}:${sec.toString().padStart(2, '0')}`;
             timerRemain.textContent = timeText;
-            document.getElementById('timer-remaining-below').textContent = timeText;
+            // 중복된 하단 타이머 표시 제거
             const percent = totalSec > 0 ? (remainSec / totalSec) * 100 : 0;
             timerBar.style.width = percent + '%';
         }

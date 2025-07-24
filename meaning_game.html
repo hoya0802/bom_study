@@ -8,7 +8,7 @@
     <script src="config.js"></script>
     <script src="user-theme.js"></script>
   <style>
-    body { font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin:0; }
+    body { font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif; background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%)); min-height: 100vh; margin:0; }
     .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px #0001; padding: 32px 18px; }
     .header { text-align: center; margin-bottom: 24px; }
     .header h1 { font-size: 2rem; color: #333; }
@@ -20,7 +20,7 @@
     .question-text { font-size: 1.3rem; font-weight: bold; color: #333; margin-bottom: 18px; }
     .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
     .option-btn { background: #fff; border: 2.5px solid #e9ecef; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; min-height: 60px; }
-    .option-btn.selected { border-color: #667eea; background: #667eea; color: #fff; }
+    .option-btn.selected { border-color: var(--user-primary-color, #667eea); background: var(--user-primary-color, #667eea); color: #fff; }
     .option-btn.correct { border-color: #28a745; background: #28a745; color: #fff; }
     .option-btn.incorrect { border-color: #dc3545; background: #dc3545; color: #fff; }
     .action-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 10px; }
