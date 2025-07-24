@@ -12,16 +12,52 @@
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
             background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
         .container {
-            max-width: 600px;
-            margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            padding: 40px 24px 32px 24px;
+            max-width: 600px;
+            width: 100%;
+            margin: 80px auto 32px auto;
         }
         .header {
             background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
@@ -142,59 +178,91 @@
             display: none;
         }
         @media (max-width: 600px) {
-            .container { margin: 10px; border-radius: 15px; }
-            .header { padding: 20px; }
-            .header h1 { font-size: 1.5rem; }
-            .content { padding: 20px; }
+            .container {
+                padding: 20px 15px;
+                margin: 70px auto 20px auto;
+            }
+            .header {
+                padding: 12px 15px;
+            }
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            .header p {
+                font-size: 0.8rem;
+            }
+            .header-buttons {
+                gap: 8px;
+            }
+            .back-btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            .form-group {
+                margin-bottom: 20px;
+            }
+            .form-group label {
+                font-size: 1rem;
+            }
+            .form-group input,
+            .form-group textarea {
+                padding: 12px;
+                font-size: 16px;
+            }
+            .create-btn {
+                padding: 15px;
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="header">
+        <div class="header-buttons">
             <button class="back-btn" onclick="location.href='stamp_pages.html'">← 뒤로</button>
-            <h1>✨ 새 스티커 페이지</h1>
-            <p>목표를 설정하고 스티커를 모아보세요!</p>
+            <button class="back-btn" onclick="location.href='index.html'" style="background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));">🏠 홈으로</button>
         </div>
-        <div class="content">
-            <form id="createForm">
-                <div class="form-group">
-                    <label for="title">페이지 제목</label>
-                    <input type="text" id="title" placeholder="예: 영어 단어 10개 외우기" required>
-                    <div class="error-message" id="titleError">제목을 입력해주세요.</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="stampCount">스티커 개수</label>
-                    <input type="number" id="stampCount" min="1" max="30" value="5" required>
-                    <div class="error-message" id="countError">1~30개 사이로 입력해주세요.</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="reward">달성 보상</label>
-                    <textarea id="reward" placeholder="예: 아이스크림 먹기, 게임 30분 하기, 선물 받기 등" required></textarea>
-                    <div class="error-message" id="rewardError">보상을 입력해주세요.</div>
-                </div>
-                
-                <button type="submit" class="create-btn" id="createBtn">
-                    🎯 스티커 페이지 만들기
-                </button>
-            </form>
+        <h1>✨ 새 스티커 페이지</h1>
+        <p>목표를 설정하고 스티커를 모아보세요!</p>
+    </div>
+    <div class="container">
+        <form id="createForm">
+            <div class="form-group">
+                <label for="title">페이지 제목</label>
+                <input type="text" id="title" placeholder="예: 영어 단어 10개 외우기" required>
+                <div class="error-message" id="titleError">제목을 입력해주세요.</div>
+            </div>
             
-            <div class="example-section">
-                <h3>💡 예시 아이디어</h3>
-                <div class="example-item">
-                    <div class="example-title">📚 영어 공부</div>
-                    <div class="example-desc">단어 10개 외우기 → 아이스크림 먹기</div>
-                </div>
-                <div class="example-item">
-                    <div class="example-title">🧹 집안일</div>
-                    <div class="example-desc">방 정리 5일 연속하기 → 게임 1시간 하기</div>
-                </div>
-                <div class="example-item">
-                    <div class="example-title">🏃‍♂️ 운동</div>
-                    <div class="example-desc">매일 30분 걷기 → 원하는 장난감 사기</div>
-                </div>
+            <div class="form-group">
+                <label for="stampCount">스티커 개수</label>
+                <input type="number" id="stampCount" min="1" max="30" value="5" required>
+                <div class="error-message" id="countError">1~30개 사이로 입력해주세요.</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="reward">달성 보상</label>
+                <textarea id="reward" placeholder="예: 아이스크림 먹기, 게임 30분 하기, 선물 받기 등" required></textarea>
+                <div class="error-message" id="rewardError">보상을 입력해주세요.</div>
+            </div>
+            
+            <button type="submit" class="create-btn" id="createBtn">
+                🎯 스티커 페이지 만들기
+            </button>
+        </form>
+        
+        <div class="example-section">
+            <h3>💡 예시 아이디어</h3>
+            <div class="example-item">
+                <div class="example-title">📚 영어 공부</div>
+                <div class="example-desc">단어 10개 외우기 → 아이스크림 먹기</div>
+            </div>
+            <div class="example-item">
+                <div class="example-title">🧹 집안일</div>
+                <div class="example-desc">방 정리 5일 연속하기 → 게임 1시간 하기</div>
+            </div>
+            <div class="example-item">
+                <div class="example-title">🏃‍♂️ 운동</div>
+                <div class="example-desc">매일 30분 걷기 → 원하는 장난감 사기</div>
             </div>
         </div>
     </div>

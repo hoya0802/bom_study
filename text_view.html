@@ -16,10 +16,24 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
             width: 100vw;
             overflow: auto;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         .main-content {
@@ -27,7 +41,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 1rem;
+            padding-top: 80px;
         }
 
         .timer-area {
@@ -357,12 +371,26 @@
             .timer-area {
                 padding: 0 2rem;
             }
+            .header {
+                padding: 12px 15px;
+                gap: 8px;
+            }
+            .back-btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            .main-content {
+                padding-top: 70px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <a href="text_upload.html" class="back-btn">← 뒤로가기</a>
+    <div class="header">
+        <a href="text_upload.html" class="back-btn">← 뒤로가기</a>
+        <a href="index.html" class="back-btn" style="background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));">🏠 홈으로</a>
+    </div>
 
     <div class="main-content">
         <div class="timer-area">
