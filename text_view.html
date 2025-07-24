@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +21,7 @@
             width: 100vw;
             overflow: auto;
         }
+
         .main-content {
             width: 100%;
             display: flex;
@@ -27,21 +29,25 @@
             align-items: center;
             padding-top: 1rem;
         }
+
         .timer-area {
-            width: 100vw;
+            width: 100%;
             max-width: 600px;
             margin-top: 1.2rem;
             margin-bottom: 0.7rem;
+            padding: 0 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.7rem;
         }
+
         .timer-controls {
             display: flex;
             gap: 0.7rem;
             align-items: center;
         }
+
         .timer-controls input[type="number"] {
             width: 4rem;
             font-size: 1.2rem;
@@ -50,33 +56,48 @@
             border: 1px solid #bbb;
             text-align: right;
         }
+
         .timer-controls button {
             font-size: 1.1rem;
             padding: 0.4rem 1.2rem;
             border-radius: 1.2rem;
             border: none;
-            background: #1976d2;
+            background: var(--user-primary-color, #1976d2);
             color: #fff;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
         }
+
         .timer-controls button:active {
-            background: #115293;
+            background: var(--user-secondary-color, #115293);
         }
+
         .timer-remaining {
             font-size: 2.2rem;
-            color: #1976d2;
+            color: #fff;
             font-weight: bold;
             margin-top: 0.2rem;
+            background: var(--user-primary-color, #1976d2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
+
         .timer-remaining-below {
             font-size: 1.8rem;
-            color: #1976d2;
+            color: #fff;
             font-weight: bold;
             margin-top: 0.5rem;
             text-align: center;
+            background: var(--user-primary-color, #1976d2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.8rem;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
         }
+
         .timer-bar-bg {
             width: 100%;
             height: 18px;
@@ -85,11 +106,13 @@
             overflow: hidden;
             margin-top: 0.2rem;
         }
+
         .timer-bar {
             height: 100%;
-            background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+            background: var(--user-gradient, linear-gradient(90deg, #1976d2 60%, #42a5f5 100%));
             transition: width 0.3s linear;
         }
+
         .date-display {
             font-size: 2.2rem;
             font-weight: 400;
@@ -101,16 +124,18 @@
             min-height: 3rem;
             width: 100vw;
         }
+
         .section {
             width: 100%;
             max-width: 600px;
             min-width: 600px;
             margin-bottom: 1.2rem;
             border-radius: 1rem;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
             background: #fff;
             overflow: hidden;
         }
+
         .section-header {
             display: flex;
             align-items: center;
@@ -123,20 +148,23 @@
             border-bottom: 1px solid #e0e0e0;
             transition: background 0.2s;
         }
+
         .section-header.inactive {
             background: #f0f0f0;
             color: #aaa;
             cursor: not-allowed;
         }
+
         .section-header .check {
             margin-left: auto;
             display: flex;
             align-items: center;
         }
+
         .section-header .check .complete-btn {
-            background: #e3f2fd;
-            color: #1976d2;
-            border: 2px solid #1976d2;
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--user-primary-color, #1976d2);
+            border: 2px solid var(--user-primary-color, #1976d2);
             padding: 0.5rem 1rem;
             border-radius: 1.5rem;
             font-size: 0.9rem;
@@ -148,27 +176,32 @@
             min-width: 80px;
             text-align: center;
         }
+
         .section-header .check .complete-btn:hover {
-            background: #1976d2;
+            background: var(--user-primary-color, #1976d2);
             color: #fff;
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+            box-shadow: 0 2px 8px var(--user-primary-color, rgba(25, 118, 210, 0.3));
         }
+
         .section-header .check .complete-btn.completed {
             background: #4caf50;
             color: #fff;
             border-color: #4caf50;
         }
+
         .section-header .check .complete-btn.completed:hover {
             background: #45a049;
             border-color: #45a049;
         }
+
         .section-header.inactive .check .complete-btn {
             background: #f5f5f5;
             color: #ccc;
             border-color: #ddd;
             cursor: not-allowed;
         }
+
         .section-header.inactive .check .complete-btn:hover {
             background: #f5f5f5;
             color: #ccc;
@@ -176,6 +209,7 @@
             transform: none;
             box-shadow: none;
         }
+
         .section-content {
             padding: 1.2rem 1.5rem 1.5rem 2.2rem;
             font-size: 1.2rem;
@@ -186,17 +220,26 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
+
         .section.active .section-content {
             display: block;
             animation: fadeIn 0.3s;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
+
         .section.inactive {
             opacity: 0.6;
         }
+
         .youtube-overlay {
             display: none;
             position: fixed;
@@ -205,25 +248,28 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
         }
+
         .youtube-container {
             background: #000;
             border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             position: relative;
             width: 80vw;
             height: 80vh;
             max-width: 1200px;
             max-height: 800px;
         }
+
         .youtube-iframe {
             border-radius: 1rem;
             width: 100%;
             height: 100%;
         }
+
         .youtube-close {
             position: absolute;
             top: -15px;
@@ -236,26 +282,30 @@
             font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
         }
+
         .youtube-close:hover {
             background: #f0f0f0;
         }
+
         .no-data {
             color: #b00;
             font-size: 1.3rem;
             margin-top: 3rem;
             text-align: center;
         }
+
         .loading {
-            color: #1976d2;
+            color: var(--user-primary-color, #1976d2);
             font-size: 1.3rem;
             margin-top: 3rem;
             text-align: center;
         }
+
         .back-btn {
             position: fixed;
             top: 1rem;
@@ -271,35 +321,58 @@
             transition: background 0.2s;
             z-index: 1000;
         }
+
         .back-btn:hover {
             background: #5a6268;
         }
+
         @media (max-width: 600px) {
-            .timer-area { max-width: 100vw; }
-            .section { 
-                min-width: 90vw; 
-                max-width: 90vw; 
-                width: 90vw; 
+            .timer-area {
+                max-width: 100vw;
+                padding: 0 1.5rem;
             }
-            .section-header { font-size: 1rem; padding: 0.7rem 0.7rem; }
-            .section-content { font-size: 1rem; padding: 0.7rem 0.7rem 1rem 1.2rem; }
-            #sections-wrap { 
-                min-width: 90vw; 
-                max-width: 90vw; 
-                width: 90vw; 
+
+            .section {
+                min-width: 90vw;
+                max-width: 90vw;
+                width: 90vw;
             }
-            .youtube-container { 
-                width: 95vw; 
-                height: 70vh; 
-                max-width: none; 
-                max-height: none; 
+
+            .section-header {
+                font-size: 1rem;
+                padding: 0.7rem 0.7rem;
+            }
+
+            .section-content {
+                font-size: 1rem;
+                padding: 0.7rem 0.7rem 1rem 1.2rem;
+            }
+
+            #sections-wrap {
+                min-width: 90vw;
+                max-width: 90vw;
+                width: 90vw;
+            }
+
+            .youtube-container {
+                width: 95vw;
+                height: 70vh;
+                max-width: none;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .timer-area {
+                padding: 0 2rem;
             }
         }
     </style>
 </head>
+
 <body>
     <a href="text_upload.html" class="back-btn">← 뒤로가기</a>
-    
+
     <div class="main-content">
         <div class="timer-area">
             <form class="timer-controls" onsubmit="return false;">
@@ -314,23 +387,28 @@
             </div>
             <div class="timer-remaining-below" id="timer-remaining-below"></div>
         </div>
-        
+
         <div class="date-display" id="date-display"></div>
-        
+
         <div id="content-area">
             <div class="loading">데이터를 불러오는 중...</div>
         </div>
     </div>
 
     <!-- 축하 팝업 -->
-    <div id="congrats-overlay" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);justify-content:center;align-items:center;">
-        <div id="congrats-box" style="background:#fff;border-radius:1.5rem;box-shadow:0 4px 32px rgba(0,0,0,0.18);padding:3rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:2rem;position:relative;">
-            <div style="font-size:2.2rem;font-weight:bold;color:#1976d2;">🎉 오늘 숙제도 잘했어요! 🎉</div>
-            <button id="congrats-ok" style="font-size:1.3rem;padding:0.7rem 2.5rem;border-radius:2rem;background:#1976d2;color:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-weight:600;cursor:pointer;">확인</button>
+    <div id="congrats-overlay"
+        style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);justify-content:center;align-items:center;">
+        <div id="congrats-box"
+            style="background:#fff;border-radius:1.5rem;box-shadow:0 4px 32px rgba(0,0,0,0.18);padding:3rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:2rem;position:relative;">
+            <div style="font-size:2.2rem;font-weight:bold;color:var(--user-primary-color, #1976d2);">🎉 오늘 숙제도 잘했어요! 🎉
+            </div>
+            <button id="congrats-ok"
+                style="font-size:1.3rem;padding:0.7rem 2.5rem;border-radius:2rem;background:var(--user-primary-color, #1976d2);color:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-weight:600;cursor:pointer;">확인</button>
         </div>
-        <canvas id="confetti-canvas" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;"></canvas>
+        <canvas id="confetti-canvas"
+            style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;"></canvas>
     </div>
-    
+
     <!-- 유튜브 영상 팝업 -->
     <div id="youtube-overlay" class="youtube-overlay">
         <div class="youtube-container">
@@ -365,13 +443,13 @@
             const monthNum = timestamp.getMonth() + 1;
             const day = timestamp.getDate();
             const weekdayNum = timestamp.getDay();
-            
+
             const monthNames = [
-                'January','February','March','April','May','June',
-                'July','August','September','October','November','December'
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
             ];
-            const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-            
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
             let suffix = 'th';
             if (!(day >= 11 && day <= 13)) {
                 switch (day % 10) {
@@ -380,17 +458,17 @@
                     case 3: suffix = 'rd'; break;
                 }
             }
-            
-            return `${year}. ${monthNames[monthNum-1]} ${day}${suffix}. ${dayNames[weekdayNum]}.`;
+
+            return `${year}. ${monthNames[monthNum - 1]} ${day}${suffix}. ${dayNames[weekdayNum]}.`;
         }
 
         // 키캡 숫자 이모지 구간 분할 (1️⃣~🔟)
         function splitByKeycapEmoji(text) {
             const keycapEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
-            
+
             const sections = [];
             const positions = [];
-            
+
             // 모든 키캡 이모지의 위치 찾기
             keycapEmojis.forEach(emoji => {
                 const pos = text.indexOf(emoji);
@@ -401,16 +479,16 @@
                     });
                 }
             });
-            
+
             // 위치순으로 정렬
             positions.sort((a, b) => a.position - b.position);
-            
+
             // 각 구간 처리
             for (let i = 0; i < positions.length; i++) {
                 const current = positions[i];
                 const start = current.position + current.emoji.length;
                 const end = positions[i + 1] ? positions[i + 1].position : text.length;
-                
+
                 const content = text.substring(start, end).trim();
                 if (content) {
                     sections.push({
@@ -419,7 +497,7 @@
                     });
                 }
             }
-            
+
             return sections.length > 0 ? sections : null;
         }
 
@@ -459,7 +537,7 @@
             }
         }
 
-        timerStart.addEventListener('click', function() {
+        timerStart.addEventListener('click', function () {
             totalSec = parseInt(timerInput.value, 10) * 60;
             if (isNaN(totalSec) || totalSec <= 0) return;
             remainSec = totalSec;
@@ -473,7 +551,7 @@
             paused = false;
         });
 
-        timerStop.addEventListener('click', function() {
+        timerStop.addEventListener('click', function () {
             if (timer) clearInterval(timer);
             timer = null;
             timerStop.style.display = 'none';
@@ -481,7 +559,7 @@
             paused = true;
         });
 
-        timerResume.addEventListener('click', function() {
+        timerResume.addEventListener('click', function () {
             if (!paused || remainSec <= 0) return;
             timer = setInterval(timerTick, 1000);
             timerStop.style.display = '';
@@ -496,9 +574,9 @@
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            
+
             let confetti = [];
-            for(let i = 0; i < 120; i++) {
+            for (let i = 0; i < 120; i++) {
                 confetti.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * -canvas.height,
@@ -509,7 +587,7 @@
                     tiltAngle: 0
                 });
             }
-            
+
             function draw() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 confetti.forEach(c => {
@@ -519,19 +597,19 @@
                     ctx.fill();
                 });
             }
-            
+
             function update() {
                 confetti.forEach(c => {
                     c.y += c.d;
                     c.x += Math.sin(c.tilt);
                     c.tilt += 0.05;
-                    if(c.y > canvas.height) {
+                    if (c.y > canvas.height) {
                         c.y = -10;
                         c.x = Math.random() * canvas.width;
                     }
                 });
             }
-            
+
             function loop() {
                 draw();
                 update();
@@ -541,7 +619,7 @@
         }
 
         function stopConfetti() {
-            if(confettiTimer) cancelAnimationFrame(confettiTimer);
+            if (confettiTimer) cancelAnimationFrame(confettiTimer);
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -577,7 +655,7 @@
         function hideCongrats() {
             document.getElementById('congrats-overlay').style.display = 'none';
             stopConfetti();
-            
+
             // 타이머가 아직 남아있으면 유튜브 영상 재생
             if (remainSec > 0) {
                 showYouTubeVideo();
@@ -590,12 +668,12 @@
         const storageKey = `section-check-${id}`;
 
         function updateSectionStates() {
-            for(let j = 0; j < sectionCount; j++) {
+            for (let j = 0; j < sectionCount; j++) {
                 const header = document.getElementById(`section-header-${j}`);
                 const content = document.getElementById(`section-content-${j}`);
                 const check = document.getElementById(`section-check-${j}`);
-                
-                if(j === 0 || sectionState[j-1]) {
+
+                if (j === 0 || sectionState[j - 1]) {
                     header.classList.remove('inactive');
                     header.parentElement.classList.add('active');
                     check.disabled = false;
@@ -605,7 +683,7 @@
                     check.disabled = true;
                     content.style.display = 'none';
                 }
-                
+
                 // 버튼 텍스트와 스타일 업데이트
                 if (sectionState[j]) {
                     check.textContent = '완료됨';
@@ -622,21 +700,21 @@
             const contentArea = document.getElementById('content-area');
             sectionCount = sections.length;
             sectionState = new Array(sectionCount).fill(false);
-            
+
             // 저장된 상태 복원
             const savedState = localStorage.getItem(storageKey);
             if (savedState) {
                 sectionState = JSON.parse(savedState);
             }
-            
+
             let sectionsHtml = `<div id="sections-wrap" style="width: 100%; max-width: 600px; min-width: 600px; display: flex; flex-direction: column; align-items: center;">`;
-            
+
             sections.forEach((sec, i) => {
                 sectionsHtml += `
                     <div class="section" data-idx="${i}">
                         <div class="section-header" id="section-header-${i}">
                             <span>${sec.emoji}</span>
-                            <span style="margin-left:0.7rem;">구간 ${i+1}</span>
+                            <span style="margin-left:0.7rem;">구간 ${i + 1}</span>
                             <span class="check">
                                 <button type="button" class="complete-btn" id="section-check-${i}" data-section="${i}">완료</button>
                             </span>
@@ -645,33 +723,33 @@
                     </div>
                 `;
             });
-            
+
             sectionsHtml += '</div>';
             contentArea.innerHTML = sectionsHtml;
-            
+
             // 이벤트 리스너 설정
-            for(let i = 0; i < sectionCount; i++) {
+            for (let i = 0; i < sectionCount; i++) {
                 const header = document.getElementById(`section-header-${i}`);
                 const content = document.getElementById(`section-content-${i}`);
                 const check = document.getElementById(`section-check-${i}`);
-                
+
                 // 클릭 이벤트(활성 구간만)
-                header.onclick = function(e) {
+                header.onclick = function (e) {
                     if (e.target.classList.contains('complete-btn')) {
                         return;
                     }
-                    
-                    if(header.classList.contains('inactive')) return;
+
+                    if (header.classList.contains('inactive')) return;
                     content.style.display = (content.style.display === 'block') ? 'none' : 'block';
                 };
-                
+
                 // 완료 버튼 이벤트
-                check.onclick = function() {
+                check.onclick = function () {
                     if (check.disabled) return;
-                    
+
                     sectionState[i] = !sectionState[i];
                     localStorage.setItem(storageKey, JSON.stringify(sectionState));
-                    
+
                     // 버튼 상태 업데이트
                     if (sectionState[i]) {
                         check.textContent = '완료됨';
@@ -680,25 +758,25 @@
                         check.textContent = '완료';
                         check.classList.remove('completed');
                     }
-                    
+
                     // 구간 상태 업데이트
                     updateSectionStates();
-                    
+
                     // 완료하면 다음 구간 자동 펼침
-                    if(sectionState[i] && i+1 < sectionCount) {
-                        document.getElementById(`section-content-${i+1}`).style.display = 'block';
+                    if (sectionState[i] && i + 1 < sectionCount) {
+                        document.getElementById(`section-content-${i + 1}`).style.display = 'block';
                     }
-                    
+
                     // 마지막 구간 완료 시 축하
-                    if(sectionState[i] && i === sectionCount - 1) {
+                    if (sectionState[i] && i === sectionCount - 1) {
                         setTimeout(showCongrats, 400);
                     }
                 };
             }
-            
+
             // 초기 상태 설정
             updateSectionStates();
-            
+
             // 첫 번째 구간은 기본적으로 보이도록 설정
             if (sectionCount > 0) {
                 document.getElementById('section-content-0').style.display = 'block';
@@ -766,23 +844,32 @@
         document.getElementById('youtube-close').addEventListener('click', hideYouTubeVideo);
 
         // ESC 키로 유튜브 영상 닫기
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && document.getElementById('youtube-overlay').style.display === 'flex') {
                 hideYouTubeVideo();
             }
         });
 
         // 윈도우 리사이즈 이벤트
-        window.addEventListener('resize', function() {
-            if(document.getElementById('congrats-overlay').style.display === 'flex') {
+        window.addEventListener('resize', function () {
+            if (document.getElementById('congrats-overlay').style.display === 'flex') {
                 const canvas = document.getElementById('confetti-canvas');
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
         });
 
-        // 페이지 로드 시 데이터 로드
-        document.addEventListener('DOMContentLoaded', loadTextData);
+        // 페이지 로드 시 사용자 테마 적용 및 데이터 로드
+        document.addEventListener('DOMContentLoaded', function () {
+            // 사용자 테마 적용
+            if (typeof userTheme !== 'undefined') {
+                userTheme.refresh();
+            }
+
+            // 데이터 로드
+            loadTextData();
+        });
     </script>
 </body>
-</html> 
+
+</html>

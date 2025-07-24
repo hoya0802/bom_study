@@ -64,6 +64,13 @@
   <script>
     // 권한 확인
     function checkPermission() {
+        // getCurrentUser 함수가 정의되어 있는지 확인
+        if (typeof getCurrentUser === 'undefined') {
+            alert('로그인이 필요합니다.');
+            location.href = 'index.html';
+            return false;
+        }
+        
         const currentUser = getCurrentUser();
         if (!currentUser) {
             alert('로그인이 필요합니다.');

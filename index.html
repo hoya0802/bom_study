@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,12 @@
     <script src="config.js"></script>
     <script src="user-theme.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
             background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
@@ -23,41 +29,96 @@
             align-items: center;
             padding: 20px;
         }
+
         .container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 40px;
             max-width: 500px;
             width: 100%;
             text-align: center;
         }
+
         .logo {
             font-size: 2.5rem;
             color: #333;
             margin-bottom: 30px;
             font-weight: bold;
         }
-        .auth-form { display: block; }
-        .menu { display: none; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
-        input[type="password"] {
-            width: 100%; padding: 15px; border: 2px solid #e1e5e9; border-radius: 10px;
-            font-size: 16px; transition: border-color 0.3s;
+
+        .auth-form {
+            display: block;
         }
-        input[type="password"]:focus { outline: none; border-color: #667eea; }
+
+        .menu {
+            display: none;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
         .btn {
             background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
-            color: white; border: none; padding: 15px 30px; border-radius: 10px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s; width: 100%; margin-bottom: 15px;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-bottom: 15px;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
-        .btn:active { transform: translateY(0); }
-        .btn-secondary { background: #6c757d; }
-        .btn-secondary:hover { box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3); }
-        .error-message { color: #dc3545; margin-top: 10px; font-size: 14px; display: none; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
         .user-info {
             background: var(--user-gradient, linear-gradient(135deg, #28a745 0%, #20c997 100%));
             color: white;
@@ -66,12 +127,14 @@
             margin-bottom: 20px;
             font-weight: 600;
         }
+
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 18px;
             margin-top: 30px;
         }
+
         .menu-btn {
             background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
             color: white;
@@ -89,20 +152,53 @@
             text-align: center;
             line-height: 1.3;
         }
+
         .menu-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px var(--user-primary-color, rgba(102, 126, 234, 0.3));
         }
-        .logout-btn { background: #dc3545; margin-top: 20px; }
-        .logout-btn:hover { box-shadow: 0 15px 30px rgba(220, 53, 69, 0.3); }
+
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.3);
+        }
+
         @media (max-width: 600px) {
-            .container { padding: 30px 10px; }
-            .logo { font-size: 2rem; }
-            .menu-grid { gap: 10px; grid-template-columns: 1fr; }
-            .menu-btn { font-size: 1rem; padding: 18px 0; min-height: 60px; }
+            .container {
+                padding: 30px 10px;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .menu-grid {
+                gap: 10px;
+                grid-template-columns: 1fr;
+            }
+
+            .menu-btn {
+                font-size: 1rem;
+                padding: 18px 0;
+                min-height: 60px;
+            }
+
+            #gamePopup>div {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            #gameGrid {
+                gap: 12px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="logo">새봄이 영어 공부</div>
@@ -127,6 +223,22 @@
             <button class="btn logout-btn" onclick="logout()">로그아웃</button>
         </div>
     </div>
+
+    <!-- 게임 선택 팝업 -->
+    <div id="gamePopup"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div
+            style="background:white; border-radius:20px; padding:30px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="color:#333; margin:0;">🎮 영어 게임 선택</h2>
+                <button onclick="hideGamePopup()"
+                    style="background:none; border:none; font-size:24px; cursor:pointer; color:#666;">×</button>
+            </div>
+            <div id="gameGrid" style="display:grid; grid-template-columns:1fr; gap:15px;">
+                <!-- 게임 버튼들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
     <script>
         // 사용자별 비밀번호 및 정보 정의
         // 사용자별 비밀번호 및 정보 정의
@@ -134,7 +246,7 @@
         function checkSession() {
             const isAuthenticated = sessionStorage.getItem('authenticated');
             const currentUser = sessionStorage.getItem('currentUser');
-            
+
             if (isAuthenticated === 'true' && currentUser) {
                 showMenu();
                 updateUserInfo();
@@ -169,7 +281,7 @@
             if (currentUser) {
                 // 공통 테마 적용
                 userTheme.refresh();
-                
+
                 // 사용자 역할에 따른 메뉴 생성
                 renderMenu(currentUser);
             }
@@ -178,31 +290,41 @@
         function renderMenu(user) {
             const menuGrid = document.getElementById('menuGrid');
             menuGrid.innerHTML = '';
-            
-            // 메뉴 항목 정의
-            const menuItems = [
+
+            // 게임 항목들 정의
+            const gameItems = [
                 {
                     id: 'phonics',
                     title: '🎵 발음 듣고 단어 찾기',
                     url: 'phonics.html',
-                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                    description: '소리를 듣고 올바른 단어를 찾는 게임'
                 },
                 {
                     id: 'meaning',
                     title: '💡 뜻 보고 단어 찾기',
                     url: 'meaning_game.html',
-                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                    description: '한국어 뜻을 보고 영어 단어를 찾는 게임'
                 },
                 {
                     id: 'image',
                     title: '🖼️ 그림 보고 단어 찾기',
                     url: 'image_game.html',
-                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                    description: '이모지를 보고 영어 단어를 찾는 게임'
                 },
                 {
                     id: 'spelling',
                     title: '✏️ 소리 듣고 단어 완성하기',
                     url: 'spelling_game.html',
+                    description: '소리를 듣고 빈칸을 채워 단어를 완성하는 게임'
+                }
+            ];
+
+            // 메뉴 항목 정의 (게임들을 하나로 통합)
+            const menuItems = [
+                {
+                    id: 'games',
+                    title: '🎮 영어 게임',
+                    action: 'showGamePopup',
                     roles: ['child', 'adult'] // 모든 사용자 접근 가능
                 },
                 {
@@ -224,20 +346,26 @@
                     roles: ['adult'] // 어른만 접근 가능
                 }
             ];
-            
+
             // 사용자 역할에 맞는 메뉴만 표시
-            const availableMenus = menuItems.filter(item => 
+            const availableMenus = menuItems.filter(item =>
                 item.roles.includes(user.role)
             );
-            
+
             availableMenus.forEach(item => {
                 const menuBtn = document.createElement('button');
                 menuBtn.className = 'menu-btn';
                 menuBtn.textContent = item.title;
-                menuBtn.onclick = () => location.href = item.url;
+
+                if (item.action === 'showGamePopup') {
+                    menuBtn.onclick = () => showGamePopup();
+                } else {
+                    menuBtn.onclick = () => location.href = item.url;
+                }
+
                 menuGrid.appendChild(menuBtn);
             });
-            
+
             // 새봄이인 경우 특별한 메시지 표시
             if (user.role === 'child') {
                 const childMessage = document.createElement('div');
@@ -258,7 +386,7 @@
 
         function adjustBrightness(hex, percent) {
             // 색상 밝기 조정 함수
-            const num = parseInt(hex.replace("#",""), 16);
+            const num = parseInt(hex.replace("#", ""), 16);
             const amt = Math.round(2.55 * percent);
             const R = (num >> 16) + amt;
             const G = (num >> 8 & 0x00FF) + amt;
@@ -294,7 +422,70 @@
         // 전역 함수로 등록 (다른 페이지에서 사용 가능)
         window.getCurrentUser = getCurrentUser;
 
-        document.getElementById('password').addEventListener('keypress', function(e) {
+        // 게임 팝업 관련 함수들
+        function showGamePopup() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.innerHTML = '';
+
+            gameItems.forEach(game => {
+                const gameBtn = document.createElement('div');
+                gameBtn.style.cssText = `
+                    background: white;
+                    border: 2px solid var(--user-primary-color, #667eea);
+                    border-radius: 15px;
+                    padding: 20px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    text-align: left;
+                `;
+
+                gameBtn.innerHTML = `
+                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--user-primary-color, #667eea); margin-bottom: 8px;">
+                        ${game.title}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666; line-height: 1.4;">
+                        ${game.description}
+                    </div>
+                `;
+
+                gameBtn.onmouseover = () => {
+                    gameBtn.style.background = 'var(--user-primary-color, #667eea)';
+                    gameBtn.querySelector('div:first-child').style.color = 'white';
+                    gameBtn.querySelector('div:last-child').style.color = 'white';
+                    gameBtn.style.transform = 'translateY(-2px)';
+                    gameBtn.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.3)';
+                };
+
+                gameBtn.onmouseout = () => {
+                    gameBtn.style.background = 'white';
+                    gameBtn.querySelector('div:first-child').style.color = 'var(--user-primary-color, #667eea)';
+                    gameBtn.querySelector('div:last-child').style.color = '#666';
+                    gameBtn.style.transform = 'translateY(0)';
+                    gameBtn.style.boxShadow = 'none';
+                };
+
+                gameBtn.onclick = () => {
+                    location.href = game.url;
+                };
+
+                gameGrid.appendChild(gameBtn);
+            });
+
+            document.getElementById('gamePopup').style.display = 'flex';
+        }
+
+        function hideGamePopup() {
+            document.getElementById('gamePopup').style.display = 'none';
+        }
+
+        // ESC 키로 팝업 닫기
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.getElementById('gamePopup').style.display === 'flex') {
+                hideGamePopup();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 authenticate();
             }
@@ -303,4 +494,5 @@
         window.addEventListener('load', checkSession);
     </script>
 </body>
-</html> 
+
+</html>
