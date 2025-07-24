@@ -175,7 +175,7 @@
         const vowel = getCurrentVowel(round);
         return phonicsData[vowel];
     }
-    let answer = [], selected = [], alphaPool = [];
+    let answer = [], alphaPool = [];
     function renderQuestion() {
       document.getElementById('round').textContent = currentRound+1;
       document.getElementById('score').textContent = score;
@@ -302,7 +302,6 @@
     const TOTAL_SETS = 3;
     let setScores = JSON.parse(localStorage.getItem('spellingSetScores') || '[0,0,0]');
     let clearedSets = JSON.parse(localStorage.getItem('spellingClearedSets') || '[false,false,false]');
-    let selected = [];
     function renderSetSelect() {
       const area = document.getElementById('setSelectArea');
       let html = '<div style="margin-bottom:10px; font-weight:600;">세트를 선택하세요</div>';
