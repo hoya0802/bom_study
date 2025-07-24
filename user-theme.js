@@ -176,6 +176,13 @@ class UserTheme {
                 });
             });
         });
+        
+        // 디버깅: 콘솔에 메뉴 색상 정보 출력
+        console.log('Menu Button Theme Applied:', {
+            userColor,
+            hue,
+            menuColors
+        });
     }
 
     // 색상에서 HSL Hue 값 추출
@@ -261,6 +268,7 @@ class UserTheme {
         // 삼각형 보색을 사용하여 조화로운 조합 생성
         const triadicHue1 = (hue + 120) % 360;
         const triadicHue2 = (hue + 240) % 360;
+        const complementaryHue = (hue + 180) % 360;
         
         // 플레이 버튼 색상 (삼각형 보색 1)
         const playColor1 = this.hslToHex(triadicHue1, 70, 55);
@@ -298,6 +306,7 @@ class UserTheme {
             hue,
             triadicHue1,
             triadicHue2,
+            complementaryHue,
             playColor1,
             playColor2,
             categoryColor1,
