@@ -302,8 +302,9 @@
         }
 
         .youtube-roulette-item.selected {
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-            border: 3px solid gold;
+            /* 테두리와 그림자 제거 - 깔끔하게 */
+            box-shadow: none;
+            border: none;
         }
 
         .roulette-controls {
@@ -852,7 +853,7 @@
             console.log('목표 설정:', { targetOffset, targetIndex, currentRouletteIndex });
             
             // 애니메이션 설정
-            const totalDuration = 8000; // 8초
+            const totalDuration = 5300; // 8초 → 5.3초로 수정 (1.5배 빠르게)
             const startTime = Date.now();
             const startPosition = currentRouletteIndex * 100;
             const targetPosition = targetIndex * 100;
