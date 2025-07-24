@@ -91,6 +91,23 @@ class UserTheme {
             btn.style.background = 'var(--user-gradient)';
         });
         
+        // 게임 버튼들도 직접 스타일 적용
+        const playButtons = document.querySelectorAll('.play-btn');
+        playButtons.forEach(btn => {
+            btn.style.background = 'var(--play-btn-gradient)';
+        });
+        
+        const successButtons = document.querySelectorAll('.btn-success');
+        successButtons.forEach(btn => {
+            btn.style.background = 'var(--play-btn-gradient)';
+        });
+        
+        // 로그아웃 버튼 스타일 적용
+        const logoutButtons = document.querySelectorAll('.logout-btn');
+        logoutButtons.forEach(btn => {
+            btn.style.background = 'var(--logout-btn-gradient)';
+        });
+        
         // 메뉴 버튼들은 테마에 따라 조화롭게 조정
         this.applyMenuButtonTheme();
         
@@ -100,6 +117,15 @@ class UserTheme {
         style.textContent = `
             .btn:hover, .add-btn:hover {
                 box-shadow: 0 10px 20px var(--user-primary-color, rgba(102, 126, 234, 0.3)) !important;
+            }
+            .play-btn:hover {
+                box-shadow: 0 10px 20px var(--play-btn-shadow, rgba(40, 167, 69, 0.3)) !important;
+            }
+            .btn-success:hover {
+                background: var(--play-btn-hover, #1e7e34) !important;
+            }
+            .logout-btn:hover {
+                box-shadow: 0 15px 30px var(--logout-btn-shadow, rgba(220, 53, 69, 0.3)) !important;
             }
             .tab.active {
                 color: var(--user-primary-color, #667eea) !important;
@@ -255,6 +281,31 @@ class UserTheme {
         // CSS 변수로 카테고리 버튼 그라데이션 설정
         document.documentElement.style.setProperty('--category-btn-gradient', 
             `linear-gradient(135deg, ${categoryColor1} 0%, ${categoryColor2} 100%)`);
+        
+        // 로그아웃 버튼 색상 (보완색의 어두운 버전)
+        const logoutColor1 = this.hslToHex(complementaryHue, 70, 45);
+        const logoutColor2 = this.hslToHex(complementaryHue, 80, 35);
+        
+        // CSS 변수로 로그아웃 버튼 그라데이션 설정
+        document.documentElement.style.setProperty('--logout-btn-gradient', 
+            `linear-gradient(135deg, ${logoutColor1} 0%, ${logoutColor2} 100%)`);
+        document.documentElement.style.setProperty('--logout-btn-shadow', 
+            `${logoutColor1}40`);
+        
+        // 디버깅: 콘솔에 색상 정보 출력
+        console.log('Game Button Theme Applied:', {
+            userColor,
+            hue,
+            triadicHue1,
+            triadicHue2,
+            playColor1,
+            playColor2,
+            categoryColor1,
+            categoryColor2,
+            logoutColor1,
+            logoutColor2,
+            playGradient: `linear-gradient(135deg, ${playColor1} 0%, ${playColor2} 100%)`
+        });
     }
 
     // 색상 밝기 조정
