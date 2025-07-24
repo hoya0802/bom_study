@@ -127,6 +127,9 @@ class UserTheme {
             .logout-btn:hover {
                 box-shadow: 0 15px 30px var(--logout-btn-shadow, rgba(220, 53, 69, 0.3)) !important;
             }
+            .menu-btn:hover {
+                transform: translateY(-3px) !important;
+            }
             .tab.active {
                 color: var(--user-primary-color, #667eea) !important;
                 border-bottom-color: var(--user-primary-color, #667eea) !important;
@@ -166,6 +169,8 @@ class UserTheme {
                 const color = menuColors[menuType];
                 const darkerColor = this.adjustBrightness(color, -25);
                 btn.style.background = `linear-gradient(135deg, ${color} 0%, ${darkerColor} 100%)`;
+                btn.style.color = 'white';
+                btn.style.border = 'none';
                 
                 // 호버 효과도 개별 색상에 맞게 조정
                 btn.addEventListener('mouseenter', () => {
@@ -177,11 +182,22 @@ class UserTheme {
             });
         });
         
+        // 모든 메뉴 버튼에 기본 스타일 적용 (색상이 설정되지 않은 경우)
+        const allMenuButtons = document.querySelectorAll('.menu-btn');
+        allMenuButtons.forEach(btn => {
+            if (!btn.style.background || btn.style.background === '') {
+                btn.style.background = 'var(--user-gradient)';
+                btn.style.color = 'white';
+                btn.style.border = 'none';
+            }
+        });
+        
         // 디버깅: 콘솔에 메뉴 색상 정보 출력
         console.log('Menu Button Theme Applied:', {
             userColor,
             hue,
-            menuColors
+            menuColors,
+            buttonCount: allMenuButtons.length
         });
     }
 

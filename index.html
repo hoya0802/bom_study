@@ -314,8 +314,16 @@
         function updateUserInfo() {
             const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
             if (currentUser) {
+                // 사용자 정보 표시 업데이트
+                const userInfoElement = document.getElementById('userInfo');
+                if (userInfoElement) {
+                    userInfoElement.innerHTML = `${currentUser.emoji} ${currentUser.name}님`;
+                }
+                
                 // 공통 테마 적용
-                userTheme.refresh();
+                if (typeof userTheme !== 'undefined') {
+                    userTheme.refresh();
+                }
 
                 // 사용자 역할에 따른 메뉴 생성
                 renderMenu(currentUser);
