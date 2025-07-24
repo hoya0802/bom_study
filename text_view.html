@@ -307,35 +307,7 @@
         }
 
         .roulette-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 20;
-        }
-
-        .roulette-btn {
-            background: var(--user-primary-color, #1976d2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .roulette-btn:hover {
-            background: var(--user-secondary-color, #115293);
-            transform: translateY(-2px);
-        }
-
-        .roulette-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
+            display: none; /* 버튼들 숨김 */
         }
 
         .roulette-status {
@@ -369,7 +341,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 25;
+            z-index: 100; /* 수정: 가장 높은 z-index로 변경 */
         }
 
         .youtube-close:hover {
@@ -470,19 +442,20 @@
                 max-height: none;
             }
             
-            .roulette-controls {
-                bottom: 10px;
-                gap: 5px;
-            }
-            
-            .roulette-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
-            
             .roulette-status {
                 font-size: 1.2rem;
                 padding: 15px 25px;
+            }
+            
+            /* 모바일에서 닫기 버튼 최적화 */
+            .youtube-close {
+                top: -10px;
+                right: -10px;
+                width: 35px;
+                height: 35px;
+                font-size: 1.4rem;
+                background: #fff;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
             }
         }
     </style>
@@ -534,10 +507,6 @@
         <div class="youtube-container">
             <button class="youtube-close" id="youtube-close">×</button>
             <div class="roulette-status" id="roulette-status">영상 선택 중...</div>
-            <div class="roulette-controls">
-                <button class="roulette-btn" id="roulette-prev">이전</button>
-                <button class="roulette-btn" id="roulette-next">다음</button>
-            </div>
             <div class="youtube-roulette" id="youtube-roulette">
                 <div class="youtube-roulette-item">
                     <iframe src="https://www.youtube.com/embed/pifz9JH1Re8?autoplay=1&mute=0&rel=0&modestbranding=1"
@@ -769,8 +738,15 @@
 
         // 유튜브 영상 관련
         function showYouTubeVideo() {
+            console.log('showYouTubeVideo 호출됨');
             document.getElementById('youtube-overlay').style.display = 'flex';
-            startVideoRoulette();
+            console.log('유튜브 오버레이 표시됨');
+            
+            // 약간의 지연 후 룰렛 시작 (DOM 렌더링 완료 대기)
+            setTimeout(() => {
+                console.log('룰렛 시작 지연 실행');
+                startVideoRoulette();
+            }, 100);
         }
 
         function hideYouTubeVideo() {
@@ -782,48 +758,113 @@
         let rouletteAnimation = null;
         let currentRouletteIndex = 0;
         let isRouletteSpinning = false;
-        const rouletteItems = document.querySelectorAll('.youtube-roulette-item');
-        const totalRouletteItems = rouletteItems.length;
+        let rouletteItems = null;
+        let totalRouletteItems = 0;
+
+        // 룰렛 요소 초기화
+        function initializeRoulette() {
+            rouletteItems = document.querySelectorAll('.youtube-roulette-item');
+            totalRouletteItems = rouletteItems.length;
+            
+            console.log('룰렛 초기화:', { totalRouletteItems, rouletteItems: rouletteItems.length });
+            
+            if (totalRouletteItems === 0) {
+                console.error('룰렛 아이템을 찾을 수 없습니다!');
+                return false;
+            }
+            
+            // 첫 번째 아이템 선택 상태로 설정
+            rouletteItems.forEach((item, index) => {
+                item.classList.toggle('selected', index === 0);
+            });
+            
+            // 룰렛 위치 초기화
+            const roulette = document.getElementById('youtube-roulette');
+            if (roulette) {
+                roulette.style.transform = 'translateX(0%)';
+            }
+            
+            return true;
+        }
 
         // 감속 함수 (부드러운 감속 효과)
         function easeOutQuart(t) {
             return 1 - Math.pow(1 - t, 4);
         }
 
+        // 더 자연스러운 룰렛 감속 효과
+        function easeOutExpo(t) {
+            return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        }
+
+        // 룰렛 전용 감속 함수 (실제 룰렛처럼 점점 느려짐)
+        function rouletteEasing(t) {
+            // 처음에는 빠르게, 나중에는 매우 느리게
+            if (t < 0.3) {
+                // 초기 30%: 빠른 회전
+                return t / 0.3 * 0.2;
+            } else if (t < 0.7) {
+                // 중간 40%: 중간 속도
+                return 0.2 + (t - 0.3) / 0.4 * 0.5;
+            } else {
+                // 마지막 30%: 매우 느린 회전
+                return 0.7 + (t - 0.7) / 0.3 * 0.3;
+            }
+        }
+
         // 룰렛 시작
         function startVideoRoulette() {
-            if (isRouletteSpinning) return;
+            console.log('룰렛 시작 시도...');
+            
+            // 룰렛 요소들이 초기화되었는지 확인
+            if (!rouletteItems || totalRouletteItems === 0) {
+                console.log('룰렛 요소 재초기화 시도...');
+                if (!initializeRoulette()) {
+                    console.error('룰렛 초기화 실패!');
+                    return;
+                }
+            }
+            
+            if (isRouletteSpinning) {
+                console.log('룰렛이 이미 회전 중입니다.');
+                return;
+            }
+            
+            console.log('룰렛 시작!', { currentRouletteIndex, totalRouletteItems });
             
             isRouletteSpinning = true;
             const roulette = document.getElementById('youtube-roulette');
             const status = document.getElementById('roulette-status');
             
+            if (!roulette || !status) {
+                console.error('룰렛 또는 상태 요소를 찾을 수 없습니다!');
+                return;
+            }
+            
             // 상태 표시
             status.style.display = 'block';
             status.textContent = '🎰 영상 선택 중...';
             
-            // 룰렛 컨트롤 비활성화
-            document.getElementById('roulette-prev').disabled = true;
-            document.getElementById('roulette-next').disabled = true;
-            
             // 랜덤 목표 위치 설정 (현재 위치에서 3-8개 아이템 뒤)
             const targetOffset = Math.floor(Math.random() * 6) + 3;
             const targetIndex = (currentRouletteIndex + targetOffset) % totalRouletteItems;
+            
+            console.log('목표 설정:', { targetOffset, targetIndex, currentRouletteIndex });
             
             // 애니메이션 설정
             const totalDuration = 8000; // 8초
             const startTime = Date.now();
             const startPosition = currentRouletteIndex * 100;
             const targetPosition = targetIndex * 100;
-            const totalDistance = targetPosition - startPosition + (targetOffset * 100);
+            const totalDistance = targetPosition - startPosition; // 수정: 불필요한 추가 거리 제거
             
             // 애니메이션 함수
             function animateRoulette() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / totalDuration, 1);
                 
-                // 감속 효과 적용
-                const easedProgress = easeOutQuart(progress);
+                // 더 자연스러운 감속 효과 적용
+                const easedProgress = rouletteEasing(progress);
                 const currentPosition = startPosition + (totalDistance * easedProgress);
                 
                 // 위치 업데이트
@@ -841,6 +882,7 @@
                     rouletteAnimation = requestAnimationFrame(animateRoulette);
                 } else {
                     // 애니메이션 완료
+                    console.log('룰렛 완료!');
                     finishRoulette(targetIndex);
                 }
             }
@@ -861,16 +903,22 @@
                 status.style.display = 'none';
             }, 2000);
             
-            // 룰렛 컨트롤 활성화
-            document.getElementById('roulette-prev').disabled = false;
-            document.getElementById('roulette-next').disabled = false;
-            
             // 선택된 영상 재생
             const selectedItem = rouletteItems[selectedIndex];
             const iframe = selectedItem.querySelector('iframe');
             if (iframe) {
                 // 영상 재생 (이미 autoplay=1로 설정되어 있음)
                 console.log('선택된 영상 재생:', iframe.src);
+                
+                // 선택된 영상이 화면 중앙에 오도록 위치 조정
+                const roulette = document.getElementById('youtube-roulette');
+                const finalPosition = selectedIndex * 100;
+                roulette.style.transform = `translateX(-${finalPosition}%)`;
+                
+                // 선택 상태 업데이트
+                rouletteItems.forEach((item, index) => {
+                    item.classList.toggle('selected', index === selectedIndex);
+                });
             }
         }
 
@@ -884,37 +932,14 @@
             
             // 상태 초기화
             document.getElementById('roulette-status').style.display = 'none';
-            document.getElementById('roulette-prev').disabled = false;
-            document.getElementById('roulette-next').disabled = false;
             
             // 선택 상태 제거
             rouletteItems.forEach(item => item.classList.remove('selected'));
         }
 
-        // 수동 네비게이션
-        function navigateRoulette(direction) {
-            if (isRouletteSpinning) return;
-            
-            const roulette = document.getElementById('youtube-roulette');
-            
-            if (direction === 'prev') {
-                currentRouletteIndex = (currentRouletteIndex - 1 + totalRouletteItems) % totalRouletteItems;
-            } else {
-                currentRouletteIndex = (currentRouletteIndex + 1) % totalRouletteItems;
-            }
-            
-            const position = currentRouletteIndex * 100;
-            roulette.style.transform = `translateX(-${position}%)`;
-            
-            // 선택 상태 업데이트
-            rouletteItems.forEach((item, index) => {
-                item.classList.toggle('selected', index === currentRouletteIndex);
-            });
-        }
-
         // 이벤트 리스너 설정
-        document.getElementById('roulette-prev').addEventListener('click', () => navigateRoulette('prev'));
-        document.getElementById('roulette-next').addEventListener('click', () => navigateRoulette('next'));
+        document.getElementById('congrats-ok').addEventListener('click', hideCongrats);
+        document.getElementById('youtube-close').addEventListener('click', hideYouTubeVideo);
 
         function extractYouTubeVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -929,12 +954,17 @@
         }
 
         function hideCongrats() {
+            console.log('hideCongrats 호출됨');
             document.getElementById('congrats-overlay').style.display = 'none';
             stopConfetti();
 
             // 타이머가 아직 남아있으면 유튜브 영상 재생
+            console.log('남은 시간 확인:', remainSec);
             if (remainSec > 0) {
+                console.log('유튜브 영상 재생 시작');
                 showYouTubeVideo();
+            } else {
+                console.log('타이머가 종료되어 유튜브 영상 재생하지 않음');
             }
         }
 
@@ -1148,22 +1178,6 @@
             // 데이터 로드
             loadTextData();
         });
-
-        // 룰렛 초기화
-        function initializeRoulette() {
-            const rouletteItems = document.querySelectorAll('.youtube-roulette-item');
-            
-            // 첫 번째 아이템 선택 상태로 설정
-            rouletteItems.forEach((item, index) => {
-                item.classList.toggle('selected', index === 0);
-            });
-            
-            // 룰렛 위치 초기화
-            const roulette = document.getElementById('youtube-roulette');
-            if (roulette) {
-                roulette.style.transform = 'translateX(0%)';
-            }
-        }
     </script>
 </body>
 
