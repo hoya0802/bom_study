@@ -550,11 +550,14 @@
 
         // 날짜 포맷팅 함수
         function formatDate(dateStr) {
-            const timestamp = new Date(dateStr);
-            const year = timestamp.getFullYear();
-            const monthNum = timestamp.getMonth() + 1;
-            const day = timestamp.getDate();
-            const weekdayNum = timestamp.getDay();
+            // UTC 시간을 한국 시간으로 변환하여 날짜 추출
+            const utcDate = new Date(dateStr);
+            const koreaTime = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+            
+            const year = koreaTime.getFullYear();
+            const monthNum = koreaTime.getMonth() + 1;
+            const day = koreaTime.getDate();
+            const weekdayNum = koreaTime.getDay();
 
             const monthNames = [
                 'January', 'February', 'March', 'April', 'May', 'June',
