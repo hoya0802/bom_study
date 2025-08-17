@@ -1124,8 +1124,7 @@
                     document.getElementById('date-display').textContent = dateMatch[1];
                 } else {
                     // 추출할 수 없으면 created_at 날짜 사용
-                    const dateStr = data.created_at ? data.created_at.substr(0, 10) : '';
-                    document.getElementById('date-display').textContent = formatDate(dateStr);
+                    document.getElementById('date-display').textContent = formatDate(data.created_at);
                 }
 
                 // 텍스트 내용 처리
