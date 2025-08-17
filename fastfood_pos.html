@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>패스트푸드점 포스기</title>
+    <title>포스 시스템</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6b35">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="패스트푸드점 포스기">
+    <meta name="apple-mobile-web-app-title" content="포스 시스템">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="config.js"></script>
     <script src="user-theme.js"></script>
@@ -49,6 +49,74 @@
             flex-direction: column;
             height: calc(100vh - 80px);
             overflow-y: auto;
+        }
+
+        /* 가게 선택 화면 */
+        .store-selection {
+            flex: 1;
+            background: #fff;
+            margin: 10px;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .store-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .store-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 30px 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .store-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .store-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .store-icon {
+            font-size: 2.5rem;
+        }
+
+        /* 주문 화면 */
+        .order-screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
         }
 
         /* 상단 주문 표시 영역 */
@@ -99,6 +167,11 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .order-item:hover {
+            transform: scale(1.05);
         }
 
         .order-item.new {
@@ -198,10 +271,219 @@
             background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
         }
 
+        /* 상품 선택 화면 */
+        .product-selection {
+            display: none;
+            flex: 1;
+            background: #fff;
+            margin: 10px;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .product-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.3s;
+        }
+
+        .product-item:hover {
+            border-color: #ff6b35;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            font-size: 1rem;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.9);
+        }
+
+        .quantity-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .product-confirm-btn {
+            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .product-confirm-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 결제 화면 */
+        .payment-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .payment-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .payment-info {
+            margin-bottom: 20px;
+        }
+
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .payment-total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ff6b35;
+        }
+
+        .payment-btn {
+            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .payment-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 뒤로가기 버튼 */
+        .back-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
         /* 반응형 디자인 */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.3rem;
+            }
+            
+            .store-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .store-btn {
+                padding: 25px 15px;
+                font-size: 1.1rem;
             }
             
             .order-display {
@@ -221,7 +503,7 @@
                 font-size: 1.2rem;
             }
             
-            .input-section {
+            .input-section, .product-selection {
                 margin: 5px;
                 padding: 10px;
                 min-height: 350px;
@@ -243,6 +525,11 @@
                 font-size: 1.2rem;
             }
             
+            .store-btn {
+                padding: 20px 10px;
+                font-size: 1rem;
+            }
+            
             .order-display {
                 margin: 3px;
                 padding: 8px;
@@ -260,7 +547,7 @@
                 font-size: 1.1rem;
             }
             
-            .input-section {
+            .input-section, .product-selection {
                 margin: 3px;
                 padding: 8px;
                 min-height: 300px;
@@ -281,54 +568,177 @@
 
 <body>
     <div class="header">
-        <h1>🍔 패스트푸드점 포스기 🍟</h1>
+        <h1 id="headerTitle">🏪 포스 시스템</h1>
     </div>
 
     <div class="main-container">
-        <!-- 상단 주문 표시 영역 -->
-        <div class="order-display">
-            <div class="order-title">📋 주문 대기 목록</div>
-            <div class="order-numbers" id="orderNumbers">
-                <div class="order-item" style="opacity: 0.5;">주문 번호를 입력해주세요</div>
+        <!-- 가게 선택 화면 -->
+        <div class="store-selection" id="storeSelection">
+            <div class="store-title">가게를 선택해주세요</div>
+            <div class="store-grid">
+                <button class="store-btn" onclick="selectStore('cafe')">
+                    <div class="store-icon">☕</div>
+                    <div>카페</div>
+                </button>
+                <button class="store-btn" onclick="selectStore('bakery')">
+                    <div class="store-icon">🥖</div>
+                    <div>빵집</div>
+                </button>
+                <button class="store-btn" onclick="selectStore('icecream')">
+                    <div class="store-icon">🍦</div>
+                    <div>아이스크림</div>
+                </button>
             </div>
         </div>
 
-        <!-- 하단 입력 영역 -->
-        <div class="input-section">
-            <input type="text" class="number-input" id="numberInput" placeholder="주문 번호를 입력하세요" readonly>
-            
-            <!-- 숫자 패드 -->
-            <div class="number-pad">
-                <button class="number-btn" onclick="addNumber('1')">1</button>
-                <button class="number-btn" onclick="addNumber('2')">2</button>
-                <button class="number-btn" onclick="addNumber('3')">3</button>
-                <button class="number-btn" onclick="addNumber('4')">4</button>
-                <button class="number-btn" onclick="addNumber('5')">5</button>
-                <button class="number-btn" onclick="addNumber('6')">6</button>
-                <button class="number-btn" onclick="addNumber('7')">7</button>
-                <button class="number-btn" onclick="addNumber('8')">8</button>
-                <button class="number-btn" onclick="addNumber('9')">9</button>
-                <button class="number-btn clear" onclick="clearInput()">C</button>
-                <button class="number-btn" onclick="addNumber('0')">0</button>
-                <button class="number-btn clear" onclick="deleteLastChar()">←</button>
+        <!-- 주문 화면 -->
+        <div class="order-screen" id="orderScreen">
+            <!-- 상단 주문 표시 영역 -->
+            <div class="order-display">
+                <div class="order-title">📋 주문 대기 목록</div>
+                <div class="order-numbers" id="orderNumbers">
+                    <div class="order-item" style="opacity: 0.5;">주문 번호를 입력해주세요</div>
+                </div>
             </div>
 
-            <!-- 액션 버튼 -->
-            <div class="action-buttons">
-                <button class="action-btn" onclick="confirmOrder()">✅ 확인</button>
-                <button class="action-btn clear-all" onclick="clearAllOrders()">🗑️ 전체 삭제</button>
+            <!-- 하단 입력 영역 -->
+            <div class="input-section">
+                <button class="back-btn" onclick="goBackToStoreSelection()">← 가게 선택으로</button>
+                <input type="text" class="number-input" id="numberInput" placeholder="주문 번호를 입력하세요" readonly>
+                
+                <!-- 숫자 패드 -->
+                <div class="number-pad">
+                    <button class="number-btn" onclick="addNumber('1')">1</button>
+                    <button class="number-btn" onclick="addNumber('2')">2</button>
+                    <button class="number-btn" onclick="addNumber('3')">3</button>
+                    <button class="number-btn" onclick="addNumber('4')">4</button>
+                    <button class="number-btn" onclick="addNumber('5')">5</button>
+                    <button class="number-btn" onclick="addNumber('6')">6</button>
+                    <button class="number-btn" onclick="addNumber('7')">7</button>
+                    <button class="number-btn" onclick="addNumber('8')">8</button>
+                    <button class="number-btn" onclick="addNumber('9')">9</button>
+                    <button class="number-btn clear" onclick="clearInput()">C</button>
+                    <button class="number-btn" onclick="addNumber('0')">0</button>
+                    <button class="number-btn clear" onclick="deleteLastChar()">←</button>
+                </div>
+
+                <!-- 액션 버튼 -->
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="confirmOrder()">✅ 확인</button>
+                    <button class="action-btn clear-all" onclick="clearAllOrders()">🗑️ 전체 삭제</button>
+                </div>
             </div>
+        </div>
+
+        <!-- 상품 선택 화면 -->
+        <div class="product-selection" id="productSelection">
+            <button class="back-btn" onclick="goBackToOrderScreen()">← 주문 화면으로</button>
+            <div class="product-title" id="productTitle">상품을 선택해주세요</div>
+            <div class="product-list" id="productList">
+                <!-- 상품 목록이 동적으로 생성됩니다 -->
+            </div>
+            <button class="product-confirm-btn" onclick="confirmProductSelection()">✅ 주문 확인</button>
+        </div>
+    </div>
+
+    <!-- 결제 화면 -->
+    <div class="payment-screen" id="paymentScreen">
+        <div class="payment-modal">
+            <div class="payment-title">💳 결제 정보</div>
+            <div class="payment-info" id="paymentInfo">
+                <!-- 결제 정보가 동적으로 생성됩니다 -->
+            </div>
+            <button class="payment-btn" onclick="completePayment()">💳 결제 완료</button>
         </div>
     </div>
 
     <script>
-        // 주문 번호 배열 (최대 3개)
+        // 전역 변수
+        let currentStore = '';
         let orderNumbers = [];
         let currentInput = '';
+        let selectedProducts = {};
+        let currentOrderNumber = null;
+
+        // 가게별 상품 데이터
+        const storeProducts = {
+            cafe: [
+                { id: 1, name: '아메리카노', price: 4500 },
+                { id: 2, name: '카페라떼', price: 5000 },
+                { id: 3, name: '카푸치노', price: 5000 },
+                { id: 4, name: '에스프레소', price: 3500 },
+                { id: 5, name: '카페모카', price: 5500 },
+                { id: 6, name: '바닐라라떼', price: 5500 },
+                { id: 7, name: '카라멜마끼아또', price: 5500 },
+                { id: 8, name: '녹차라떼', price: 5000 },
+                { id: 9, name: '딸기스무디', price: 6000 },
+                { id: 10, name: '망고스무디', price: 6000 }
+            ],
+            bakery: [
+                { id: 1, name: '바게트', price: 3500 },
+                { id: 2, name: '크로아상', price: 2800 },
+                { id: 3, name: '베이글', price: 2500 },
+                { id: 4, name: '식빵', price: 3000 },
+                { id: 5, name: '단팥빵', price: 1200 },
+                { id: 6, name: '크림빵', price: 1500 },
+                { id: 7, name: '소금빵', price: 1800 },
+                { id: 8, name: '치아바타', price: 3200 },
+                { id: 9, name: '브리오슈', price: 2200 },
+                { id: 10, name: '도넛', price: 2000 }
+            ],
+            icecream: [
+                { id: 1, name: '바닐라아이스크림', price: 3000 },
+                { id: 2, name: '초코아이스크림', price: 3200 },
+                { id: 3, name: '딸기아이스크림', price: 3200 },
+                { id: 4, name: '민트초코아이스크림', price: 3500 },
+                { id: 5, name: '쿠키앤크림', price: 3500 },
+                { id: 6, name: '망고아이스크림', price: 3300 },
+                { id: 7, name: '커피아이스크림', price: 3200 },
+                { id: 8, name: '피스타치오아이스크림', price: 3800 },
+                { id: 9, name: '라즈베리아이스크림', price: 3300 },
+                { id: 10, name: '솜사탕아이스크림', price: 3000 }
+            ]
+        };
+
+        // 가게 선택
+        function selectStore(storeType) {
+            currentStore = storeType;
+            const storeNames = {
+                cafe: '☕ 카페',
+                bakery: '🥖 빵집',
+                icecream: '🍦 아이스크림'
+            };
+            
+            document.getElementById('headerTitle').textContent = storeNames[storeType];
+            document.getElementById('storeSelection').style.display = 'none';
+            document.getElementById('orderScreen').style.display = 'flex';
+        }
+
+        // 가게 선택으로 돌아가기
+        function goBackToStoreSelection() {
+            currentStore = '';
+            orderNumbers = [];
+            selectedProducts = {};
+            currentOrderNumber = null;
+            document.getElementById('headerTitle').textContent = '🏪 포스 시스템';
+            document.getElementById('storeSelection').style.display = 'flex';
+            document.getElementById('orderScreen').style.display = 'none';
+            document.getElementById('productSelection').style.display = 'none';
+            updateOrderDisplay();
+        }
+
+        // 주문 화면으로 돌아가기
+        function goBackToOrderScreen() {
+            selectedProducts = {};
+            currentOrderNumber = null;
+            document.getElementById('orderScreen').style.display = 'flex';
+            document.getElementById('productSelection').style.display = 'none';
+            updateProductList();
+        }
 
         // 숫자 입력
         function addNumber(num) {
-            if (currentInput.length < 3) { // 최대 3자리까지만 입력 가능
+            if (currentInput.length < 3) {
                 currentInput += num;
                 updateInputDisplay();
             }
@@ -369,17 +779,17 @@
             
             // 최대 3개까지만 유지
             if (orderNumbers.length > 3) {
-                orderNumbers.shift(); // 가장 오래된 번호 제거
+                orderNumbers.shift();
             }
 
             // 화면 업데이트
             updateOrderDisplay();
             
-            // 사운드 재생
-            playOrderSound(orderNumber);
-            
             // 입력창 초기화
             clearInput();
+            
+            // 상품 선택 화면으로 이동
+            selectOrderForProduct(orderNumber);
         }
 
         // 주문 표시 업데이트
@@ -403,21 +813,211 @@
                     orderItem.classList.add('new');
                 }
                 
+                // 클릭 이벤트 추가 - 사운드만 재생
+                orderItem.onclick = () => playOrderReadySound(number);
+                
                 orderNumbersContainer.appendChild(orderItem);
             });
         }
 
-        // 사운드 재생 (Web Speech API 사용)
-        function playOrderSound(orderNumber) {
+        // 주문 선택하여 상품 선택 화면으로 이동
+        function selectOrderForProduct(orderNumber) {
+            currentOrderNumber = orderNumber;
+            selectedProducts = {};
+            
+            document.getElementById('orderScreen').style.display = 'none';
+            document.getElementById('productSelection').style.display = 'block';
+            
+            updateProductList();
+        }
+
+        // 상품 목록 업데이트
+        function updateProductList() {
+            const productList = document.getElementById('productList');
+            const products = storeProducts[currentStore];
+            
+            productList.innerHTML = '';
+            
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                
+                const quantity = selectedProducts[product.id] || 0;
+                
+                productItem.innerHTML = `
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString()}원</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+                        <div class="quantity-display">${quantity}</div>
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                    </div>
+                `;
+                
+                productList.appendChild(productItem);
+            });
+        }
+
+        // 수량 변경
+        function changeQuantity(productId, change) {
+            const currentQuantity = selectedProducts[productId] || 0;
+            const newQuantity = Math.max(0, currentQuantity + change);
+            
+            if (newQuantity === 0) {
+                delete selectedProducts[productId];
+            } else {
+                selectedProducts[productId] = newQuantity;
+            }
+            
+            updateProductList();
+        }
+
+        // 상품 선택 확인
+        function confirmProductSelection() {
+            const selectedItems = Object.keys(selectedProducts);
+            
+            if (selectedItems.length === 0) {
+                alert('상품을 선택해주세요!');
+                return;
+            }
+
+            // 결제 화면 표시
+            showPaymentScreen();
+        }
+
+        // 결제 화면 표시
+        function showPaymentScreen() {
+            const paymentInfo = document.getElementById('paymentInfo');
+            const products = storeProducts[currentStore];
+            let totalAmount = 0;
+            
+            let paymentHTML = `
+                <div class="payment-item">
+                    <strong>주문 번호: ${currentOrderNumber}번</strong>
+                </div>
+            `;
+            
+            Object.keys(selectedProducts).forEach(productId => {
+                const product = products.find(p => p.id === parseInt(productId));
+                const quantity = selectedProducts[productId];
+                const itemTotal = product.price * quantity;
+                totalAmount += itemTotal;
+                
+                paymentHTML += `
+                    <div class="payment-item">
+                        <span>${product.name} x ${quantity}</span>
+                        <span>${itemTotal.toLocaleString()}원</span>
+                    </div>
+                `;
+            });
+            
+            paymentHTML += `
+                <div class="payment-item payment-total">
+                    <span>총 금액</span>
+                    <span>${totalAmount.toLocaleString()}원</span>
+                </div>
+            `;
+            
+            paymentInfo.innerHTML = paymentHTML;
+            document.getElementById('paymentScreen').style.display = 'flex';
+        }
+
+        // 결제 완료
+        function completePayment() {
+            // 화면 초기화
+            document.getElementById('paymentScreen').style.display = 'none';
+            document.getElementById('productSelection').style.display = 'none';
+            document.getElementById('orderScreen').style.display = 'flex';
+            
+            selectedProducts = {};
+            currentOrderNumber = null;
+            
+            updateOrderDisplay();
+            
+            // 결제 완료 사운드 재생
+            playPaymentCompleteSound();
+        }
+
+        // 사운드 재생
+        function playOrderSound(orderNumber, productName) {
             if ('speechSynthesis' in window) {
+                const koreanNumber = numberToKorean(orderNumber);
                 const utterance = new SpeechSynthesisUtterance();
-                utterance.text = `${orderNumber}번 손님 주문이 준비되었습니다.`;
+                utterance.text = `${koreanNumber}번 손님 ${productName} 주문이 준비되었습니다.`;
                 utterance.lang = 'ko-KR';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
                 
-                // 음성 재생
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 결제 완료 사운드 재생
+        function playPaymentCompleteSound() {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance();
+                utterance.text = '결제가 완료되었습니다.';
+                utterance.lang = 'ko-KR';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 숫자를 한글 발음으로 변환
+        function numberToKorean(number) {
+            const units = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+            const tens = ['', '십', '백'];
+            
+            if (number === 0) return '영';
+            if (number < 10) return units[number];
+            
+            let result = '';
+            let num = number;
+            let position = 0;
+            
+            while (num > 0) {
+                const digit = num % 10;
+                if (digit > 0) {
+                    if (position === 0) {
+                        result = units[digit] + result;
+                    } else if (position === 1) {
+                        if (digit === 1) {
+                            result = '십' + result;
+                        } else {
+                            result = units[digit] + '십' + result;
+                        }
+                    } else if (position === 2) {
+                        if (digit === 1) {
+                            result = '백' + result;
+                        } else {
+                            result = units[digit] + '백' + result;
+                        }
+                    }
+                }
+                num = Math.floor(num / 10);
+                position++;
+            }
+            
+            return result;
+        }
+
+        // 대기 목록 클릭 시 사운드 재생
+        function playOrderReadySound(orderNumber) {
+            if ('speechSynthesis' in window) {
+                const koreanNumber = numberToKorean(orderNumber);
+                const utterance = new SpeechSynthesisUtterance();
+                utterance.text = `${koreanNumber}번 손님 주문이 준비되었습니다.`;
+                utterance.lang = 'ko-KR';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
                 speechSynthesis.speak(utterance);
             }
         }
