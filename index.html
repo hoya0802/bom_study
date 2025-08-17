@@ -356,40 +356,18 @@
             console.log('사용자 데이터:', user);
             console.log('사용자 역할:', user.role);
 
-            // 게임 항목들 정의
-            const gameItems = [
-                {
-                    id: 'phonics',
-                    title: '🎵 발음 듣고 단어 찾기',
-                    url: 'phonics.html',
-                    description: '소리를 듣고 올바른 단어를 찾는 게임'
-                },
-                {
-                    id: 'meaning',
-                    title: '💡 뜻 보고 단어 찾기',
-                    url: 'meaning_game.html',
-                    description: '한국어 뜻을 보고 영어 단어를 찾는 게임'
-                },
-                {
-                    id: 'image',
-                    title: '🖼️ 그림 보고 단어 찾기',
-                    url: 'image_game.html',
-                    description: '이모지를 보고 영어 단어를 찾는 게임'
-                },
-                {
-                    id: 'spelling',
-                    title: '✏️ 소리 듣고 단어 완성하기',
-                    url: 'spelling_game.html',
-                    description: '소리를 듣고 빈칸을 채워 단어를 완성하는 게임'
-                }
-            ];
-
             // 메뉴 항목 정의 (게임들을 하나로 통합)
             const menuItems = [
                 {
                     id: 'games',
                     title: '🎮 영어 게임',
                     action: 'showGamePopup',
+                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
+                },
+                {
+                    id: 'fastfood_pos',
+                    title: '🍔 패스트푸드 포스기',
+                    url: 'fastfood_pos.html',
                     roles: ['child', 'adult'] // 모든 사용자 접근 가능
                 },
                 {
