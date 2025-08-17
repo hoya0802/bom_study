@@ -204,14 +204,8 @@
         let stamps = [];
 
         async function loadData() {
-            // 현재 사용자 정보 확인
+            // 로그인 기능이 제거되었으므로 항상 성인 사용자로 간주
             const currentUser = getCurrentUser();
-            if (!currentUser) {
-                alert('로그인이 필요합니다.');
-                location.href = 'index.html';
-                return;
-            }
-
             console.log('현재 사용자:', currentUser);
 
             // 페이지 데이터 로드 (모든 사용자가 공유)
