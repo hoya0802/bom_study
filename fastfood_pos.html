@@ -48,34 +48,36 @@
             display: flex;
             flex-direction: column;
             height: calc(100vh - 80px);
+            overflow-y: auto;
         }
 
         /* 상단 주문 표시 영역 */
         .order-display {
-            flex: 1;
+            flex: 0 0 auto;
             background: #fff;
             margin: 10px;
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 200px;
+            min-height: 120px;
+            max-height: 150px;
         }
 
         .order-title {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-weight: bold;
         }
 
         .order-numbers {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 8px;
             width: 100%;
             max-width: 300px;
         }
@@ -83,10 +85,10 @@
         .order-item {
             background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(255, 107, 53, 0.3);
             transform: scale(1);
@@ -105,11 +107,13 @@
 
         /* 하단 입력 영역 */
         .input-section {
+            flex: 1;
             background: #fff;
             margin: 10px;
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
         }
 
         .number-input {
@@ -189,19 +193,32 @@
         }
 
         /* 반응형 디자인 */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.3rem;
             }
             
             .order-display {
                 margin: 5px;
-                padding: 15px;
+                padding: 10px;
+                min-height: 100px;
+                max-height: 120px;
+            }
+            
+            .order-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .order-item {
+                padding: 8px 12px;
+                font-size: 0.9rem;
             }
             
             .input-section {
                 margin: 5px;
-                padding: 15px;
+                padding: 10px;
+                min-height: 350px;
             }
             
             .number-btn {
@@ -212,6 +229,45 @@
             .action-btn {
                 padding: 12px;
                 font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .order-display {
+                margin: 3px;
+                padding: 8px;
+                min-height: 80px;
+                max-height: 100px;
+            }
+            
+            .order-title {
+                font-size: 0.8rem;
+                margin-bottom: 5px;
+            }
+            
+            .order-item {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .input-section {
+                margin: 3px;
+                padding: 8px;
+                min-height: 300px;
+            }
+            
+            .number-btn {
+                padding: 10px;
+                font-size: 1rem;
+            }
+            
+            .action-btn {
+                padding: 10px;
+                font-size: 0.9rem;
             }
         }
     </style>
