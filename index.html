@@ -401,8 +401,10 @@
 
             // 디버깅: 필터링 결과 확인
             console.log('사용 가능한 메뉴:', availableMenus);
+            console.log('포스기 메뉴 포함 여부:', availableMenus.some(item => item.id === 'fastfood_pos'));
 
             availableMenus.forEach(item => {
+                console.log('메뉴 항목 생성:', item.id, item.title);
                 const menuBtn = document.createElement('button');
                 menuBtn.className = `menu-btn ${item.id}`;
                 menuBtn.textContent = item.title;

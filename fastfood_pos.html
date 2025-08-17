@@ -76,23 +76,29 @@
 
         .order-numbers {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            flex-direction: row;
+            gap: 10px;
             width: 100%;
-            max-width: 300px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .order-item {
             background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 18px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.3rem;
             font-weight: bold;
-            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
             transform: scale(1);
             transition: transform 0.3s ease;
+            min-width: 80px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
         }
 
         .order-item.new {
@@ -206,13 +212,13 @@
             }
             
             .order-title {
-                font-size: 0.9rem;
+                font-size: 1.2rem;
                 margin-bottom: 8px;
             }
             
             .order-item {
-                padding: 8px 12px;
-                font-size: 0.9rem;
+                padding: 10px 15px;
+                font-size: 1.2rem;
             }
             
             .input-section {
@@ -245,13 +251,13 @@
             }
             
             .order-title {
-                font-size: 0.8rem;
+                font-size: 1.1rem;
                 margin-bottom: 5px;
             }
             
             .order-item {
-                padding: 6px 10px;
-                font-size: 0.8rem;
+                padding: 8px 12px;
+                font-size: 1.1rem;
             }
             
             .input-section {
