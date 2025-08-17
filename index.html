@@ -298,107 +298,23 @@
         function authenticate() {
             const password = document.getElementById('password').value.trim();
             const errorMessage = document.getElementById('errorMessage');
-            
-            console.log('로그인 시도:', password);
-            console.log('Supabase 클라이언트 상태:', supabaseClient);
-            
-            if (!password) {
-                console.log('비밀번호가 비어있음');
-                errorMessage.textContent = '비밀번호를 입력해주세요.';
-                errorMessage.style.display = 'block';
-                return;
-            }
-            
             (async () => {
-                try {
-                    console.log('Supabase 쿼리 시작');
-                    console.log('쿼리 조건: password_hash =', password);
-                    
-                    // 먼저 전체 사용자 목록을 확인 (디버깅용)
-                    const { data: debugUsers, error: listError } = await supabaseClient
-                        .from('users')
-                        .select('*');
-                    
-                    console.log('전체 사용자 목록:', debugUsers);
-                    console.log('목록 조회 오류:', listError);
-                    
-                    // 임시 테스트용 하드코딩된 사용자 (데이터베이스 문제 시 사용)
-                    const testUsers = [
-                        {
-                            id: 1,
-                            name: '새봄이',
-                            emoji: '👧',
-                            role: 'child',
-                            password_hash: 'child123'
-                        },
-                        {
-                            id: 2,
-                            name: '엄마',
-                            emoji: '👩',
-                            role: 'adult',
-                            password_hash: 'adult123'
-                        }
-                    ];
-                    
-                    // 하드코딩된 사용자로 먼저 테스트
-                    const testUser = testUsers.find(user => user.password_hash === password);
-                    if (testUser) {
-                        console.log('테스트 사용자로 로그인 성공:', testUser);
-                        sessionStorage.setItem('authenticated', 'true');
-                        sessionStorage.setItem('currentUser', JSON.stringify(testUser));
-                        showMenu();
-                        updateUserInfo();
-                        errorMessage.style.display = 'none';
-                        return;
-                    }
-                    
-                    // 실제 로그인 쿼리 - RLS 정책을 우회하기 위해 모든 사용자를 가져와서 클라이언트에서 필터링
-                    const { data: allUsers, error } = await supabaseClient
-                        .from('users')
-                        .select('*');
-                    
-                    if (error) {
-                        console.error('Supabase 오류:', error);
-                        errorMessage.textContent = `데이터베이스 오류: ${error.message}`;
-                        errorMessage.style.display = 'block';
-                        return;
-                    }
-                    
-                    // 클라이언트에서 비밀번호 매칭
-                    const data = allUsers.find(user => user.password_hash === password);
-                    
-                    console.log('Supabase 응답:', { data, error });
-                    console.log('데이터 타입:', typeof data);
-                    console.log('데이터 내용:', JSON.stringify(data, null, 2));
-                    
-                    if (error) {
-                        console.error('Supabase 오류:', error);
-                        errorMessage.textContent = `데이터베이스 오류: ${error.message}`;
-                        errorMessage.style.display = 'block';
-                        return;
-                    }
-                    
-                    if (!data) {
-                        console.log('사용자를 찾을 수 없음');
-                        errorMessage.textContent = '잘못된 비밀번호입니다.';
-                        errorMessage.style.display = 'block';
-                        document.getElementById('password').value = '';
-                        document.getElementById('password').focus();
-                        return;
-                    }
-                    
-                    console.log('로그인 성공:', data);
-                    sessionStorage.setItem('authenticated', 'true');
-                    sessionStorage.setItem('currentUser', JSON.stringify(data));
-                    showMenu();
-                    updateUserInfo();
-                    errorMessage.style.display = 'none';
-                    
-                } catch (err) {
-                    console.error('예상치 못한 오류:', err);
-                    errorMessage.textContent = `시스템 오류: ${err.message}`;
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('password_hash', password)
+                    .single();
+                if (error || !data) {
                     errorMessage.style.display = 'block';
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                    return;
                 }
+                sessionStorage.setItem('authenticated', 'true');
+                sessionStorage.setItem('currentUser', JSON.stringify(data));
+                showMenu();
+                updateUserInfo();
+                errorMessage.style.display = 'none';
             })();
         }
 
@@ -440,18 +356,40 @@
             console.log('사용자 데이터:', user);
             console.log('사용자 역할:', user.role);
 
+            // 게임 항목들 정의
+            const gameItems = [
+                {
+                    id: 'phonics',
+                    title: '🎵 발음 듣고 단어 찾기',
+                    url: 'phonics.html',
+                    description: '소리를 듣고 올바른 단어를 찾는 게임'
+                },
+                {
+                    id: 'meaning',
+                    title: '💡 뜻 보고 단어 찾기',
+                    url: 'meaning_game.html',
+                    description: '한국어 뜻을 보고 영어 단어를 찾는 게임'
+                },
+                {
+                    id: 'image',
+                    title: '🖼️ 그림 보고 단어 찾기',
+                    url: 'image_game.html',
+                    description: '이모지를 보고 영어 단어를 찾는 게임'
+                },
+                {
+                    id: 'spelling',
+                    title: '✏️ 소리 듣고 단어 완성하기',
+                    url: 'spelling_game.html',
+                    description: '소리를 듣고 빈칸을 채워 단어를 완성하는 게임'
+                }
+            ];
+
             // 메뉴 항목 정의 (게임들을 하나로 통합)
             const menuItems = [
                 {
                     id: 'games',
                     title: '🎮 영어 게임',
                     action: 'showGamePopup',
-                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
-                },
-                {
-                    id: 'fastfood_pos',
-                    title: '🍔 패스트푸드 포스기',
-                    url: 'fastfood_pos.html',
                     roles: ['child', 'adult'] // 모든 사용자 접근 가능
                 },
                 {
@@ -485,10 +423,8 @@
 
             // 디버깅: 필터링 결과 확인
             console.log('사용 가능한 메뉴:', availableMenus);
-            console.log('포스기 메뉴 포함 여부:', availableMenus.some(item => item.id === 'fastfood_pos'));
 
             availableMenus.forEach(item => {
-                console.log('메뉴 항목 생성:', item.id, item.title);
                 const menuBtn = document.createElement('button');
                 menuBtn.className = `menu-btn ${item.id}`;
                 menuBtn.textContent = item.title;
