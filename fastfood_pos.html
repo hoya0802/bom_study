@@ -271,17 +271,18 @@
             background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
         }
 
-        /* 상품 선택 화면 */
-        .product-selection {
-            display: none;
-            flex: 1;
-            background: #fff;
-            margin: 10px;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-        }
+                 /* 상품 선택 화면 */
+         .product-selection {
+             display: none;
+             flex: 1;
+             background: #fff;
+             margin: 10px;
+             border-radius: 15px;
+             padding: 15px;
+             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+             overflow-y: auto;
+             flex-direction: column;
+         }
 
         .product-title {
             font-size: 1.3rem;
@@ -292,9 +293,11 @@
         }
 
         .product-list {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
+            flex: 1;
+            margin-bottom: 20px;
         }
 
         .product-item {
@@ -302,98 +305,188 @@
             border: 2px solid #e9ecef;
             border-radius: 10px;
             padding: 15px;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+            min-height: 120px;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            transition: border-color 0.3s;
         }
 
         .product-item:hover {
             border-color: #ff6b35;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.2);
+        }
+
+        .product-item.selected {
+            border-color: #ff6b35;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(247, 147, 30, 0.1) 100%);
         }
 
         .product-info {
-            flex: 1;
+            text-align: center;
         }
 
         .product-name {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
 
         .product-price {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #ff6b35;
             font-weight: bold;
         }
 
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+                 .quantity-badge {
+             color: #dc3545;
+             font-size: 1.3rem;
+             font-weight: bold;
+             margin-top: 5px;
+             text-align: center;
+         }
 
-        .quantity-btn {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
             color: white;
             border: none;
-            width: 35px;
-            height: 35px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            font-size: 1.2rem;
+            font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            user-select: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
-        .quantity-btn:active {
-            transform: scale(0.9);
+        .product-item.selected .remove-btn {
+            display: flex;
         }
 
-        .quantity-display {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-            min-width: 30px;
-            text-align: center;
+        .remove-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
         }
 
         .product-confirm-btn {
             background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s;
-            margin-top: 20px;
+            margin-top: auto;
             width: 100%;
+            flex-shrink: 0;
         }
 
         .product-confirm-btn:active {
             transform: scale(0.95);
         }
 
-        /* 결제 화면 */
-        .payment-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+        .product-confirm-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
+
+                 /* 결제 화면 */
+         .payment-screen {
+             display: none;
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 100vh;
+             background: rgba(0, 0, 0, 0.8);
+             z-index: 1000;
+             justify-content: center;
+             align-items: center;
+         }
+
+         /* 주문 완료 화면 */
+         .order-complete-screen {
+             display: none;
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 100vh;
+             background: rgba(0, 0, 0, 0.8);
+             z-index: 1000;
+             justify-content: center;
+             align-items: center;
+         }
+
+         .order-complete-modal {
+             background: white;
+             border-radius: 20px;
+             padding: 30px;
+             max-width: 500px;
+             width: 90%;
+             max-height: 80vh;
+             overflow-y: auto;
+             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+         }
+
+         .order-complete-title {
+             font-size: 1.5rem;
+             color: #333;
+             margin-bottom: 20px;
+             font-weight: bold;
+             text-align: center;
+         }
+
+         .order-complete-info {
+             margin-bottom: 20px;
+         }
+
+         .order-complete-item {
+             display: flex;
+             justify-content: space-between;
+             padding: 10px 0;
+             border-bottom: 1px solid #eee;
+         }
+
+         .order-complete-total {
+             font-size: 1.3rem;
+             font-weight: bold;
+             color: #ff6b35;
+             margin-top: 20px;
+             padding-top: 15px;
+             border-top: 2px solid #ff6b35;
+         }
+
+         .order-complete-btn {
+             background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+             color: white;
+             border: none;
+             padding: 15px 30px;
+             border-radius: 10px;
+             font-size: 1.2rem;
+             font-weight: bold;
+             cursor: pointer;
+             transition: transform 0.2s;
+             width: 100%;
+             margin-top: 20px;
+         }
+
+         .order-complete-btn:active {
+             transform: scale(0.95);
+         }
 
         .payment-modal {
             background: white;
@@ -588,6 +681,10 @@
                     <div class="store-icon">🍦</div>
                     <div>아이스크림</div>
                 </button>
+                <button class="store-btn" onclick="selectStore('burger')">
+                    <div class="store-icon">🍔</div>
+                    <div>햄버거</div>
+                </button>
             </div>
         </div>
 
@@ -653,79 +750,134 @@
     </div>
 
     <script>
-        // 전역 변수
-        let currentStore = '';
-        let orderNumbers = [];
-        let currentInput = '';
-        let selectedProducts = {};
-        let currentOrderNumber = null;
+                 // 전역 변수
+         let currentStore = '';
+         let orderNumbers = [];
+         let currentInput = '';
+         let selectedProducts = {};
+         let currentOrderNumber = null;
+         let orderDetails = {}; // 주문 번호별 상품 정보 저장
 
-        // 가게별 상품 데이터
-        const storeProducts = {
-            cafe: [
-                { id: 1, name: '아메리카노', price: 4500 },
-                { id: 2, name: '카페라떼', price: 5000 },
-                { id: 3, name: '카푸치노', price: 5000 },
-                { id: 4, name: '에스프레소', price: 3500 },
-                { id: 5, name: '카페모카', price: 5500 },
-                { id: 6, name: '바닐라라떼', price: 5500 },
-                { id: 7, name: '카라멜마끼아또', price: 5500 },
-                { id: 8, name: '녹차라떼', price: 5000 },
-                { id: 9, name: '딸기스무디', price: 6000 },
-                { id: 10, name: '망고스무디', price: 6000 }
-            ],
-            bakery: [
-                { id: 1, name: '바게트', price: 3500 },
-                { id: 2, name: '크로아상', price: 2800 },
-                { id: 3, name: '베이글', price: 2500 },
-                { id: 4, name: '식빵', price: 3000 },
-                { id: 5, name: '단팥빵', price: 1200 },
-                { id: 6, name: '크림빵', price: 1500 },
-                { id: 7, name: '소금빵', price: 1800 },
-                { id: 8, name: '치아바타', price: 3200 },
-                { id: 9, name: '브리오슈', price: 2200 },
-                { id: 10, name: '도넛', price: 2000 }
-            ],
-            icecream: [
-                { id: 1, name: '바닐라아이스크림', price: 3000 },
-                { id: 2, name: '초코아이스크림', price: 3200 },
-                { id: 3, name: '딸기아이스크림', price: 3200 },
-                { id: 4, name: '민트초코아이스크림', price: 3500 },
-                { id: 5, name: '쿠키앤크림', price: 3500 },
-                { id: 6, name: '망고아이스크림', price: 3300 },
-                { id: 7, name: '커피아이스크림', price: 3200 },
-                { id: 8, name: '피스타치오아이스크림', price: 3800 },
-                { id: 9, name: '라즈베리아이스크림', price: 3300 },
-                { id: 10, name: '솜사탕아이스크림', price: 3000 }
-            ]
-        };
+                 // 가게별 상품 데이터
+         const storeProducts = {
+             cafe: [
+                 { id: 1, name: '아메리카노', price: 4500 },
+                 { id: 2, name: '카페라떼', price: 5000 },
+                 { id: 3, name: '카푸치노', price: 5000 },
+                 { id: 4, name: '에스프레소', price: 3500 },
+                 { id: 5, name: '카페모카', price: 5500 },
+                 { id: 6, name: '바닐라라떼', price: 5500 },
+                 { id: 7, name: '카라멜마끼아또', price: 5500 },
+                 { id: 8, name: '녹차라떼', price: 5000 },
+                 { id: 9, name: '딸기스무디', price: 6000 },
+                 { id: 10, name: '망고스무디', price: 6000 },
+                 { id: 11, name: '레몬에이드', price: 5500 },
+                 { id: 12, name: '오렌지주스', price: 4500 },
+                 { id: 13, name: '사과주스', price: 4500 },
+                 { id: 14, name: '토마토주스', price: 4000 },
+                 { id: 15, name: '우유', price: 3000 },
+                 { id: 16, name: '초코우유', price: 3500 },
+                 { id: 17, name: '딸기우유', price: 3500 },
+                 { id: 18, name: '바나나우유', price: 3500 },
+                 { id: 19, name: '요구르트', price: 2500 },
+                 { id: 20, name: '아이스티', price: 4000 }
+             ],
+             bakery: [
+                 { id: 1, name: '바게트', price: 3500 },
+                 { id: 2, name: '크로아상', price: 2800 },
+                 { id: 3, name: '베이글', price: 2500 },
+                 { id: 4, name: '식빵', price: 3000 },
+                 { id: 5, name: '단팥빵', price: 1200 },
+                 { id: 6, name: '크림빵', price: 1500 },
+                 { id: 7, name: '소금빵', price: 1800 },
+                 { id: 8, name: '치아바타', price: 3200 },
+                 { id: 9, name: '브리오슈', price: 2200 },
+                 { id: 10, name: '도넛', price: 2000 },
+                 { id: 11, name: '초코케이크', price: 4500 },
+                 { id: 12, name: '치즈케이크', price: 5000 },
+                 { id: 13, name: '티라미수', price: 5500 },
+                 { id: 14, name: '마카롱', price: 2500 },
+                 { id: 15, name: '쿠키', price: 1500 },
+                 { id: 16, name: '머핀', price: 2000 },
+                 { id: 17, name: '스콘', price: 1800 },
+                 { id: 18, name: '타르트', price: 3500 },
+                 { id: 19, name: '크로플', price: 3000 },
+                 { id: 20, name: '와플', price: 4000 }
+             ],
+             icecream: [
+                 { id: 1, name: '바닐라아이스크림', price: 3000 },
+                 { id: 2, name: '초코아이스크림', price: 3200 },
+                 { id: 3, name: '딸기아이스크림', price: 3200 },
+                 { id: 4, name: '민트초코아이스크림', price: 3500 },
+                 { id: 5, name: '쿠키앤크림', price: 3500 },
+                 { id: 6, name: '망고아이스크림', price: 3300 },
+                 { id: 7, name: '커피아이스크림', price: 3200 },
+                 { id: 8, name: '피스타치오아이스크림', price: 3800 },
+                 { id: 9, name: '라즈베리아이스크림', price: 3300 },
+                 { id: 10, name: '솜사탕아이스크림', price: 3000 },
+                 { id: 11, name: '레몬셔벗', price: 3500 },
+                 { id: 12, name: '오렌지셔벗', price: 3500 },
+                 { id: 13, name: '그라니타', price: 2800 },
+                 { id: 14, name: '아이스크림콘', price: 2500 },
+                 { id: 15, name: '아이스크림바', price: 2000 },
+                 { id: 16, name: '아이스크림샌드', price: 3000 },
+                 { id: 17, name: '아이스크림케이크', price: 8000 },
+                 { id: 18, name: '아이스크림파르페', price: 6000 },
+                 { id: 19, name: '아이스크림밀크셰이크', price: 4500 },
+                 { id: 20, name: '아이스크림플로트', price: 4000 }
+             ],
+             burger: [
+                 { id: 1, name: '치즈버거', price: 6500 },
+                 { id: 2, name: '불고기버거', price: 7000 },
+                 { id: 3, name: '치킨버거', price: 6000 },
+                 { id: 4, name: '더블버거', price: 8500 },
+                 { id: 5, name: '베이컨버거', price: 7500 },
+                 { id: 6, name: '새우버거', price: 7000 },
+                 { id: 7, name: '감자튀김', price: 3000 },
+                 { id: 8, name: '치킨너겟', price: 4000 },
+                 { id: 9, name: '콜라', price: 2000 },
+                 { id: 10, name: '사이다', price: 2000 },
+                 { id: 11, name: '트리플버거', price: 9500 },
+                 { id: 12, name: '치킨텐더버거', price: 6500 },
+                 { id: 13, name: '피쉬버거', price: 6000 },
+                 { id: 14, name: '비프버거', price: 8000 },
+                 { id: 15, name: '양파링', price: 2500 },
+                 { id: 16, name: '치즈스틱', price: 3500 },
+                 { id: 17, name: '새우튀김', price: 4000 },
+                 { id: 18, name: '오렌지주스', price: 2500 },
+                 { id: 19, name: '사과주스', price: 2500 },
+                 { id: 20, name: '밀크셰이크', price: 3500 }
+             ]
+         };
 
-        // 가게 선택
-        function selectStore(storeType) {
-            currentStore = storeType;
-            const storeNames = {
-                cafe: '☕ 카페',
-                bakery: '🥖 빵집',
-                icecream: '🍦 아이스크림'
-            };
-            
-            document.getElementById('headerTitle').textContent = storeNames[storeType];
-            document.getElementById('storeSelection').style.display = 'none';
-            document.getElementById('orderScreen').style.display = 'flex';
-        }
+                 // 가게 선택
+         function selectStore(storeType) {
+             currentStore = storeType;
+             const storeNames = {
+                 cafe: '☕ 카페',
+                 bakery: '🥖 빵집',
+                 icecream: '🍦 아이스크림',
+                 burger: '🍔 햄버거'
+             };
+             
+             document.getElementById('headerTitle').textContent = storeNames[storeType];
+             document.getElementById('storeSelection').style.display = 'none';
+             document.getElementById('orderScreen').style.display = 'flex';
+         }
 
-        // 가게 선택으로 돌아가기
-        function goBackToStoreSelection() {
-            currentStore = '';
-            orderNumbers = [];
-            selectedProducts = {};
-            currentOrderNumber = null;
-            document.getElementById('headerTitle').textContent = '🏪 포스 시스템';
-            document.getElementById('storeSelection').style.display = 'flex';
-            document.getElementById('orderScreen').style.display = 'none';
-            document.getElementById('productSelection').style.display = 'none';
-            updateOrderDisplay();
-        }
+                 // 가게 선택으로 돌아가기
+         function goBackToStoreSelection() {
+             currentStore = '';
+             orderNumbers = [];
+             selectedProducts = {};
+             currentOrderNumber = null;
+             orderDetails = {}; // 주문 상세 정보도 초기화
+             document.getElementById('headerTitle').textContent = '🏪 포스 시스템';
+             document.getElementById('storeSelection').style.display = 'flex';
+             document.getElementById('orderScreen').style.display = 'none';
+             document.getElementById('productSelection').style.display = 'none';
+             updateOrderDisplay();
+         }
 
         // 주문 화면으로 돌아가기
         function goBackToOrderScreen() {
@@ -813,66 +965,79 @@
                     orderItem.classList.add('new');
                 }
                 
-                // 클릭 이벤트 추가 - 사운드만 재생
-                orderItem.onclick = () => playOrderReadySound(number);
+                                 // 클릭 이벤트 추가 - 사운드 재생 후 상품 리스트 표시
+                 orderItem.onclick = () => {
+                     playOrderReadySound(number);
+                     showOrderCompleteScreen(number);
+                 };
                 
                 orderNumbersContainer.appendChild(orderItem);
             });
         }
 
-        // 주문 선택하여 상품 선택 화면으로 이동
-        function selectOrderForProduct(orderNumber) {
-            currentOrderNumber = orderNumber;
-            selectedProducts = {};
-            
-            document.getElementById('orderScreen').style.display = 'none';
-            document.getElementById('productSelection').style.display = 'block';
-            
-            updateProductList();
-        }
+                 // 주문 선택하여 상품 선택 화면으로 이동
+         function selectOrderForProduct(orderNumber) {
+             currentOrderNumber = orderNumber;
+             selectedProducts = {};
+             
+             document.getElementById('orderScreen').style.display = 'none';
+             document.getElementById('productSelection').style.display = 'flex';
+             
+             updateProductList();
+         }
 
-        // 상품 목록 업데이트
-        function updateProductList() {
-            const productList = document.getElementById('productList');
-            const products = storeProducts[currentStore];
-            
-            productList.innerHTML = '';
-            
-            products.forEach(product => {
-                const productItem = document.createElement('div');
-                productItem.className = 'product-item';
-                
-                const quantity = selectedProducts[product.id] || 0;
-                
-                productItem.innerHTML = `
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-price">${product.price.toLocaleString()}원</div>
-                    </div>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
-                        <div class="quantity-display">${quantity}</div>
-                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-                    </div>
-                `;
-                
-                productList.appendChild(productItem);
-            });
-        }
+                 // 상품 목록 업데이트
+         function updateProductList() {
+             const productList = document.getElementById('productList');
+             const products = storeProducts[currentStore];
+             
+             productList.innerHTML = '';
+             
+             products.forEach(product => {
+                 const productItem = document.createElement('div');
+                 productItem.className = 'product-item';
+                 
+                 const quantity = selectedProducts[product.id] || 0;
+                 
+                 // 수량이 0보다 크면 selected 클래스 추가
+                 if (quantity > 0) {
+                     productItem.classList.add('selected');
+                 }
+                 
+                                   productItem.innerHTML = `
+                      <div class="product-info">
+                          <div class="product-name">${product.name}</div>
+                          <div class="product-price">${product.price.toLocaleString()}원</div>
+                          ${quantity > 0 ? `<div class="quantity-badge">${quantity}</div>` : ''}
+                      </div>
+                      ${quantity > 0 ? `<button class="remove-btn" onclick="changeQuantity(${product.id}, -1, event)">×</button>` : ''}
+                  `;
+                 
+                 // 상품 클릭 시 수량 증가
+                 productItem.onclick = () => changeQuantity(product.id, 1);
+                 
+                 productList.appendChild(productItem);
+             });
+         }
 
-        // 수량 변경
-        function changeQuantity(productId, change) {
-            const currentQuantity = selectedProducts[productId] || 0;
-            const newQuantity = Math.max(0, currentQuantity + change);
-            
-            if (newQuantity === 0) {
-                delete selectedProducts[productId];
-            } else {
-                selectedProducts[productId] = newQuantity;
-            }
-            
-            updateProductList();
-        }
+                 // 수량 변경
+         function changeQuantity(productId, change, event) {
+             // 이벤트 전파 방지
+             if (event) {
+                 event.stopPropagation();
+             }
+             
+             const currentQuantity = selectedProducts[productId] || 0;
+             const newQuantity = Math.max(0, currentQuantity + change);
+             
+             if (newQuantity === 0) {
+                 delete selectedProducts[productId];
+             } else {
+                 selectedProducts[productId] = newQuantity;
+             }
+             
+             updateProductList();
+         }
 
         // 상품 선택 확인
         function confirmProductSelection() {
@@ -924,21 +1089,33 @@
             document.getElementById('paymentScreen').style.display = 'flex';
         }
 
-        // 결제 완료
-        function completePayment() {
-            // 화면 초기화
-            document.getElementById('paymentScreen').style.display = 'none';
-            document.getElementById('productSelection').style.display = 'none';
-            document.getElementById('orderScreen').style.display = 'flex';
-            
-            selectedProducts = {};
-            currentOrderNumber = null;
-            
-            updateOrderDisplay();
-            
-            // 결제 완료 사운드 재생
-            playPaymentCompleteSound();
-        }
+                 // 결제 완료
+         function completePayment() {
+             // 현재 주문의 상품 정보 저장
+             const selectedItems = Object.keys(selectedProducts);
+             if (selectedItems.length > 0) {
+                 const products = storeProducts[currentStore];
+                 // 모든 선택된 상품 정보를 저장
+                 const orderInfo = {
+                     products: selectedProducts,
+                     store: currentStore
+                 };
+                 orderDetails[currentOrderNumber] = orderInfo;
+             }
+             
+             // 화면 초기화
+             document.getElementById('paymentScreen').style.display = 'none';
+             document.getElementById('productSelection').style.display = 'none';
+             document.getElementById('orderScreen').style.display = 'flex';
+             
+             selectedProducts = {};
+             currentOrderNumber = null;
+             
+             updateOrderDisplay();
+             
+             // 결제 완료 사운드 재생
+             playPaymentCompleteSound();
+         }
 
         // 사운드 재생
         function playOrderSound(orderNumber, productName) {
@@ -1007,33 +1184,148 @@
             return result;
         }
 
-        // 대기 목록 클릭 시 사운드 재생
-        function playOrderReadySound(orderNumber) {
-            if ('speechSynthesis' in window) {
-                const koreanNumber = numberToKorean(orderNumber);
-                const utterance = new SpeechSynthesisUtterance();
-                utterance.text = `${koreanNumber}번 손님 주문이 준비되었습니다.`;
-                utterance.lang = 'ko-KR';
-                utterance.rate = 0.8;
-                utterance.pitch = 1.0;
-                utterance.volume = 1.0;
-                
-                speechSynthesis.speak(utterance);
-            }
-        }
+                 // 대기 목록 클릭 시 사운드 재생
+         function playOrderReadySound(orderNumber) {
+             if ('speechSynthesis' in window) {
+                 const koreanNumber = numberToKorean(orderNumber);
+                 let productName = '주문';
+                 
+                 // 주문 정보에서 첫 번째 상품명 가져오기
+                 if (orderDetails[orderNumber]) {
+                     if (typeof orderDetails[orderNumber] === 'string') {
+                         // 기존 형식 (문자열)
+                         productName = orderDetails[orderNumber];
+                     } else {
+                         // 새로운 형식 (객체)
+                         const orderInfo = orderDetails[orderNumber];
+                         const products = storeProducts[orderInfo.store];
+                         const firstProductId = parseInt(Object.keys(orderInfo.products)[0]);
+                         const firstProduct = products.find(p => p.id === firstProductId);
+                         productName = firstProduct ? firstProduct.name : '주문';
+                     }
+                 }
+                 
+                 const utterance = new SpeechSynthesisUtterance();
+                 utterance.text = `${koreanNumber}번 손님 ${productName} 준비되었습니다.`;
+                 utterance.lang = 'ko-KR';
+                 utterance.rate = 0.8;
+                 utterance.pitch = 1.0;
+                 utterance.volume = 1.0;
+                 
+                 speechSynthesis.speak(utterance);
+             }
+         }
 
-        // 전체 주문 삭제
-        function clearAllOrders() {
-            if (orderNumbers.length === 0) {
-                alert('삭제할 주문이 없습니다!');
-                return;
-            }
-            
-            if (confirm('모든 주문을 삭제하시겠습니까?')) {
-                orderNumbers = [];
-                updateOrderDisplay();
-            }
-        }
+         // 주문 완료 화면 표시
+         function showOrderCompleteScreen(orderNumber) {
+             let orderInfo = orderDetails[orderNumber];
+             let orderHTML = '';
+             
+             if (orderInfo) {
+                 if (typeof orderInfo === 'string') {
+                     // 기존 형식 (문자열) - 첫 번째 상품만 표시
+                     orderHTML = `
+                         <div class="order-complete-item">
+                             <span>주문 상품</span>
+                             <span>${orderInfo}</span>
+                         </div>
+                     `;
+                 } else {
+                     // 새로운 형식 (객체) - 모든 상품과 수량 표시
+                     const products = storeProducts[orderInfo.store];
+                     let totalAmount = 0;
+                     
+                     Object.keys(orderInfo.products).forEach(productId => {
+                         const product = products.find(p => p.id === parseInt(productId));
+                         const quantity = orderInfo.products[productId];
+                         const itemTotal = product.price * quantity;
+                         totalAmount += itemTotal;
+                         
+                         orderHTML += `
+                             <div class="order-complete-item">
+                                 <span>${product.name} x ${quantity}</span>
+                                 <span>${itemTotal.toLocaleString()}원</span>
+                             </div>
+                         `;
+                     });
+                     
+                     orderHTML += `
+                         <div class="order-complete-item order-complete-total">
+                             <span>총 금액</span>
+                             <span>${totalAmount.toLocaleString()}원</span>
+                         </div>
+                     `;
+                 }
+             } else {
+                 orderHTML = `
+                     <div class="order-complete-item">
+                         <span>주문 상품</span>
+                         <span>주문</span>
+                     </div>
+                 `;
+             }
+             
+             // 주문 완료 화면 HTML 생성
+             const orderCompleteHTML = `
+                 <div class="order-complete-screen" id="orderCompleteScreen">
+                     <div class="order-complete-modal">
+                         <div class="order-complete-title">✅ 주문 완료</div>
+                         <div class="order-complete-info">
+                             <div class="order-complete-item">
+                                 <span>주문 번호</span>
+                                 <span>${orderNumber}번</span>
+                             </div>
+                             ${orderHTML}
+                         </div>
+                         <button class="order-complete-btn" onclick="completeOrder(${orderNumber})">확인</button>
+                     </div>
+                 </div>
+             `;
+             
+             // 기존 주문 완료 화면이 있다면 제거
+             const existingScreen = document.getElementById('orderCompleteScreen');
+             if (existingScreen) {
+                 existingScreen.remove();
+             }
+             
+             // 새로운 주문 완료 화면 추가
+             document.body.insertAdjacentHTML('beforeend', orderCompleteHTML);
+             
+             // 화면 표시
+             document.getElementById('orderCompleteScreen').style.display = 'flex';
+         }
+
+         // 주문 완료 처리
+         function completeOrder(orderNumber) {
+             // 주문 번호 제거
+             const index = orderNumbers.indexOf(orderNumber);
+             if (index > -1) {
+                 orderNumbers.splice(index, 1);
+             }
+             
+             // 주문 상세 정보 제거
+             delete orderDetails[orderNumber];
+             
+             // 주문 완료 화면 닫기
+             document.getElementById('orderCompleteScreen').remove();
+             
+             // 주문 목록 업데이트
+             updateOrderDisplay();
+         }
+
+                 // 전체 주문 삭제
+         function clearAllOrders() {
+             if (orderNumbers.length === 0) {
+                 alert('삭제할 주문이 없습니다!');
+                 return;
+             }
+             
+             if (confirm('모든 주문을 삭제하시겠습니까?')) {
+                 orderNumbers = [];
+                 orderDetails = {}; // 주문 상세 정보도 삭제
+                 updateOrderDisplay();
+             }
+         }
 
         // 키보드 이벤트 처리
         document.addEventListener('keydown', function(event) {
