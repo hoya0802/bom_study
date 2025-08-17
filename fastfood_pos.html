@@ -282,6 +282,7 @@
              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
              overflow-y: auto;
              flex-direction: column;
+             padding-bottom: 100px; /* 하단 여유 공간 추가 */
          }
 
         .product-title {
@@ -379,20 +380,23 @@
             transform: scale(1.1);
         }
 
-        .product-confirm-btn {
-            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: auto;
-            width: 100%;
-            flex-shrink: 0;
-        }
+                 .product-confirm-btn {
+             background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+             color: white;
+             border: none;
+             padding: 15px 20px;
+             border-radius: 10px;
+             font-size: 1.1rem;
+             font-weight: bold;
+             cursor: pointer;
+             transition: transform 0.2s;
+             margin-top: 20px;
+             width: 100%;
+             flex-shrink: 0;
+             position: sticky;
+             bottom: 0;
+             z-index: 10;
+         }
 
         .product-confirm-btn:active {
             transform: scale(0.95);
@@ -564,54 +568,58 @@
         }
 
         /* 반응형 디자인 */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.3rem;
-            }
-            
-            .store-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .store-btn {
-                padding: 25px 15px;
-                font-size: 1.1rem;
-            }
-            
-            .order-display {
-                margin: 5px;
-                padding: 10px;
-                min-height: 100px;
-                max-height: 120px;
-            }
-            
-            .order-title {
-                font-size: 1.2rem;
-                margin-bottom: 8px;
-            }
-            
-            .order-item {
-                padding: 10px 15px;
-                font-size: 1.2rem;
-            }
-            
-            .input-section, .product-selection {
-                margin: 5px;
-                padding: 10px;
-                min-height: 350px;
-            }
-            
-            .number-btn {
-                padding: 12px;
-                font-size: 1.1rem;
-            }
-            
-            .action-btn {
-                padding: 12px;
-                font-size: 1rem;
-            }
-        }
+                 @media (max-width: 768px) {
+             .header h1 {
+                 font-size: 1.3rem;
+             }
+             
+             .store-grid {
+                 grid-template-columns: 1fr;
+                 gap: 15px;
+             }
+             
+             .store-btn {
+                 padding: 25px 15px;
+                 font-size: 1.1rem;
+             }
+             
+             .order-display {
+                 margin: 5px;
+                 padding: 10px;
+                 min-height: 100px;
+                 max-height: 120px;
+             }
+             
+             .order-title {
+                 font-size: 1.2rem;
+                 margin-bottom: 8px;
+             }
+             
+             .order-item {
+                 padding: 10px 15px;
+                 font-size: 1.2rem;
+             }
+             
+             .input-section, .product-selection {
+                 margin: 5px;
+                 padding: 10px;
+                 min-height: 350px;
+             }
+             
+             .product-selection {
+                 padding-bottom: 120px; /* 태블릿에서 더 많은 여유 공간 */
+             }
+             
+             .number-btn {
+                 padding: 12px;
+                 font-size: 1.1rem;
+             }
+             
+             .action-btn {
+                 padding: 12px;
+                 font-size: 1rem;
+             }
+         }
 
         @media (max-width: 480px) {
             .header h1 {
