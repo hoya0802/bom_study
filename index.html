@@ -47,13 +47,9 @@
             font-weight: bold;
         }
 
-        .auth-form {
-            display: block;
-        }
-
-        .menu {
-            display: none;
-        }
+                 .menu {
+             display: block;
+         }
 
         .input-group {
             margin-bottom: 20px;
@@ -212,26 +208,15 @@
 <body>
     <div class="container">
         <div class="logo">새봄이 영어 공부</div>
-        <!-- 인증 폼 -->
-        <div class="auth-form" id="authForm">
-            <h2 style="margin-bottom: 30px; color: #333;">비밀번호를 입력하세요</h2>
-            <div class="input-group">
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" placeholder="비밀번호를 입력하세요">
-            </div>
-            <button class="btn" id="loginBtn">로그인</button>
-            <div class="error-message" id="errorMessage">잘못된 비밀번호입니다.</div>
-        </div>
-        <!-- 메뉴 -->
-        <div class="menu" id="mainMenu">
-            <div class="user-info" id="userInfo">
-                👤 사용자 정보
-            </div>
-            <div class="menu-grid" id="menuGrid">
-                <!-- 메뉴 버튼들이 동적으로 생성됩니다 -->
-            </div>
-            <button class="btn logout-btn" id="logoutBtn">로그아웃</button>
-        </div>
+                 <!-- 메뉴 -->
+         <div class="menu" id="mainMenu">
+             <div class="user-info" id="userInfo">
+                 👤 새봄이 영어 공부
+             </div>
+             <div class="menu-grid" id="menuGrid">
+                 <!-- 메뉴 버튼들이 동적으로 생성됩니다 -->
+             </div>
+         </div>
     </div>
 
     <!-- 게임 선택 팝업 -->
@@ -278,198 +263,93 @@
             }
         ];
 
-        function checkSession() {
-            const isAuthenticated = sessionStorage.getItem('authenticated');
-            const currentUser = sessionStorage.getItem('currentUser');
-            
-            console.log('checkSession 호출됨');
-            console.log('isAuthenticated:', isAuthenticated);
-            console.log('currentUser:', currentUser);
-
-            if (isAuthenticated === 'true' && currentUser) {
-                console.log('세션 유효, 메뉴 표시');
-                showMenu();
-                updateUserInfo();
-            } else {
-                console.log('세션 무효, 인증 폼 표시');
-            }
-        }
-
-        function authenticate() {
-            const password = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            (async () => {
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('password_hash', password)
-                    .single();
-                if (error || !data) {
-                    errorMessage.style.display = 'block';
-                    document.getElementById('password').value = '';
-                    document.getElementById('password').focus();
-                    return;
-                }
-                sessionStorage.setItem('authenticated', 'true');
-                sessionStorage.setItem('currentUser', JSON.stringify(data));
-                showMenu();
-                updateUserInfo();
-                errorMessage.style.display = 'none';
-            })();
-        }
-
-        function updateUserInfo() {
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-            console.log('updateUserInfo 호출됨, currentUser:', currentUser);
-            
-            if (currentUser) {
-                // 사용자 정보 표시 업데이트
-                const userInfoElement = document.getElementById('userInfo');
-                if (userInfoElement) {
-                    userInfoElement.innerHTML = `${currentUser.emoji} ${currentUser.name}님`;
-                }
-                
-                // 공통 테마 적용
-                if (typeof userTheme !== 'undefined') {
-                    userTheme.refresh();
-                }
-
-                // 사용자 역할에 따른 메뉴 생성
-                console.log('renderMenu 호출 전');
-                renderMenu(currentUser);
-                console.log('renderMenu 호출 후');
-            }
-        }
-
-        function renderMenu(user) {
-            const menuGrid = document.getElementById('menuGrid');
-            console.log('menuGrid 요소:', menuGrid);
-            
-            if (!menuGrid) {
-                console.error('menuGrid 요소를 찾을 수 없습니다!');
-                return;
-            }
-            
-            menuGrid.innerHTML = '';
-
-            // 디버깅: 사용자 데이터 확인
-            console.log('사용자 데이터:', user);
-            console.log('사용자 역할:', user.role);
-
-            // 게임 항목들 정의
-            const gameItems = [
-                {
-                    id: 'phonics',
-                    title: '🎵 발음 듣고 단어 찾기',
-                    url: 'phonics.html',
-                    description: '소리를 듣고 올바른 단어를 찾는 게임'
-                },
-                {
-                    id: 'meaning',
-                    title: '💡 뜻 보고 단어 찾기',
-                    url: 'meaning_game.html',
-                    description: '한국어 뜻을 보고 영어 단어를 찾는 게임'
-                },
-                {
-                    id: 'image',
-                    title: '🖼️ 그림 보고 단어 찾기',
-                    url: 'image_game.html',
-                    description: '이모지를 보고 영어 단어를 찾는 게임'
-                },
-                {
-                    id: 'spelling',
-                    title: '✏️ 소리 듣고 단어 완성하기',
-                    url: 'spelling_game.html',
-                    description: '소리를 듣고 빈칸을 채워 단어를 완성하는 게임'
-                }
-            ];
-
-            // 메뉴 항목 정의 (게임들을 하나로 통합)
-            const menuItems = [
-                {
-                    id: 'games',
-                    title: '🎮 영어 게임',
-                    action: 'showGamePopup',
-                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
-                },
-                {
-                    id: 'text',
-                    title: '📝 텍스트 업로드/출력',
-                    url: 'text_upload.html',
-                    roles: ['adult'] // 어른만 접근 가능
-                },
-                {
-                    id: 'stamp',
-                    title: '🏆 칭찬스티커',
-                    url: 'stamp_pages.html',
-                    roles: ['child', 'adult'] // 모든 사용자 접근 가능
-                },
-                {
-                    id: 'account_book',
-                    title: '📊 가계부',
-                    url: 'account_book.html',
-                    roles: ['adult'] // 어른만 접근 가능
-                }
-            ];
-
-            // 사용자 역할에 맞는 메뉴만 표시
-            const availableMenus = menuItems.filter(item => {
-                // 사용자 역할이 없거나 예상과 다른 경우 모든 메뉴 표시
-                if (!user.role || (user.role !== 'child' && user.role !== 'adult')) {
-                    return true;
-                }
-                return item.roles.includes(user.role);
-            });
-
-            // 디버깅: 필터링 결과 확인
-            console.log('사용 가능한 메뉴:', availableMenus);
-
-            availableMenus.forEach(item => {
-                const menuBtn = document.createElement('button');
-                menuBtn.className = `menu-btn ${item.id}`;
-                menuBtn.textContent = item.title;
-
-                if (item.action === 'showGamePopup') {
-                    // 모바일 터치 이벤트 지원을 위한 이벤트 리스너 추가
-                    menuBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        showGamePopup();
-                    });
-                    menuBtn.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        showGamePopup();
-                    });
-                } else {
-                    menuBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        location.href = item.url;
-                    });
-                    menuBtn.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        location.href = item.url;
-                    });
-                }
-
-                menuGrid.appendChild(menuBtn);
-            });
-
-            // 새봄이인 경우 특별한 메시지 표시
-            if (user.role === 'child') {
-                const childMessage = document.createElement('div');
-                childMessage.style.cssText = `
-                    text-align: center;
-                    color: #667eea;
-                    font-size: 0.9rem;
-                    margin-top: 15px;
-                    padding: 10px;
-                    background: rgba(102, 126, 234, 0.1);
-                    border-radius: 8px;
-                    border: 1px solid rgba(102, 126, 234, 0.2);
-                `;
-                childMessage.innerHTML = '🎯 <strong>새봄이</strong>는 모든 학습 게임을 즐길 수 있어요!';
-                menuGrid.appendChild(childMessage);
-            }
-        }
+                 function initializeMenu() {
+             // 공통 테마 적용
+             if (typeof userTheme !== 'undefined') {
+                 userTheme.refresh();
+             }
+ 
+             // 어른용 통합 메뉴 생성
+             renderMenu();
+         }
+ 
+         function renderMenu() {
+             const menuGrid = document.getElementById('menuGrid');
+             console.log('menuGrid 요소:', menuGrid);
+             
+             if (!menuGrid) {
+                 console.error('menuGrid 요소를 찾을 수 없습니다!');
+                 return;
+             }
+             
+             menuGrid.innerHTML = '';
+ 
+             // 어른용 통합 메뉴 항목 정의
+             const menuItems = [
+                 {
+                     id: 'games',
+                     title: '🎮 영어 게임',
+                     action: 'showGamePopup'
+                 },
+                 {
+                     id: 'memory_game',
+                     title: '🧠 메모리 게임',
+                     url: 'memory_game.html'
+                 },
+                 {
+                     id: 'fastfood_pos',
+                     title: '🍔 패스트푸드 포스기',
+                     url: 'fastfood_pos.html'
+                 },
+                 {
+                     id: 'text',
+                     title: '📝 텍스트 업로드/출력',
+                     url: 'text_upload.html'
+                 },
+                 {
+                     id: 'stamp',
+                     title: '🏆 칭찬스티커',
+                     url: 'stamp_pages.html'
+                 },
+                 {
+                     id: 'account_book',
+                     title: '📊 가계부',
+                     url: 'account_book.html'
+                 }
+             ];
+ 
+             console.log('어른용 통합 메뉴 생성:', menuItems);
+ 
+             menuItems.forEach(item => {
+                 console.log('메뉴 항목 생성:', item.id, item.title);
+                 const menuBtn = document.createElement('button');
+                 menuBtn.className = `menu-btn ${item.id}`;
+                 menuBtn.textContent = item.title;
+ 
+                 if (item.action === 'showGamePopup') {
+                     // 모바일 터치 이벤트 지원을 위한 이벤트 리스너 추가
+                     menuBtn.addEventListener('click', (e) => {
+                         e.preventDefault();
+                         showGamePopup();
+                     });
+                     menuBtn.addEventListener('touchstart', (e) => {
+                         e.preventDefault();
+                         showGamePopup();
+                     });
+                 } else {
+                     menuBtn.addEventListener('click', (e) => {
+                         e.preventDefault();
+                         location.href = item.url;
+                     });
+                     menuBtn.addEventListener('touchstart', (e) => {
+                         e.preventDefault();
+                         location.href = item.url;
+                     });
+                 }
+ 
+                 menuGrid.appendChild(menuBtn);
+             });
+         }
 
         function adjustBrightness(hex, percent) {
             // 색상 밝기 조정 함수
@@ -483,31 +363,17 @@
                 (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
         }
 
-        function showMenu() {
-            document.getElementById('authForm').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'block';
-        }
-
-        function showAuthForm() {
-            document.getElementById('authForm').style.display = 'block';
-            document.getElementById('mainMenu').style.display = 'none';
-        }
-
-        function logout() {
-            sessionStorage.removeItem('authenticated');
-            sessionStorage.removeItem('currentUser');
-            showAuthForm();
-            document.getElementById('password').value = '';
-        }
-
-        // 현재 사용자 정보를 가져오는 함수 (다른 페이지에서 사용)
-        function getCurrentUser() {
-            const userStr = sessionStorage.getItem('currentUser');
-            return userStr ? JSON.parse(userStr) : null;
-        }
-
-        // 전역 함수로 등록 (다른 페이지에서 사용 가능)
-        window.getCurrentUser = getCurrentUser;
+                 // 현재 사용자 정보를 가져오는 함수 (다른 페이지에서 사용)
+         function getCurrentUser() {
+             return {
+                 name: '사용자',
+                 emoji: '👤',
+                 role: 'adult'
+             };
+         }
+ 
+         // 전역 함수로 등록 (다른 페이지에서 사용 가능)
+         window.getCurrentUser = getCurrentUser;
 
         // 게임 팝업 관련 함수들
         function showGamePopup() {
@@ -581,31 +447,11 @@
             }
         });
 
-        // 이벤트 리스너 설정
-        document.addEventListener('DOMContentLoaded', function() {
-            // 로그인 버튼 이벤트
-            document.getElementById('loginBtn').addEventListener('click', authenticate);
-            document.getElementById('loginBtn').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                authenticate();
-            });
-
-            // 로그아웃 버튼 이벤트
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            document.getElementById('logoutBtn').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                logout();
-            });
-
-            // 비밀번호 입력 필드 엔터 키 이벤트
-            document.getElementById('password').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    authenticate();
-                }
-            });
-        });
-
-        window.addEventListener('load', checkSession);
+                 // 이벤트 리스너 설정
+         document.addEventListener('DOMContentLoaded', function() {
+             // 페이지 로드 시 바로 메뉴 초기화
+             initializeMenu();
+         });
     </script>
 </body>
 

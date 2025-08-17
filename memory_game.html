@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메모리 게임 - 새봄이 영어 공부</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="메모리 게임">
+    <script src="config.js"></script>
+    <script src="user-theme.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', '맑은 고딕', Arial, sans-serif;
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .score, .time, .moves {
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 시작 화면 */
+        .start-screen {
+            text-align: center;
+            width: 100%;
+        }
+
+        .start-screen h2 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .difficulty-btn {
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .difficulty-btn.easy { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); }
+        .difficulty-btn.medium { background: linear-gradient(135deg, #FF9800 0%, #f57c00 100%); }
+        .difficulty-btn.hard { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+
+        /* 게임 화면 */
+        .game-screen {
+            display: none;
+            width: 100%;
+        }
+
+        .card-grid {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .card-grid.easy { grid-template-columns: repeat(3, 1fr); }
+        .card-grid.medium { grid-template-columns: repeat(4, 1fr); }
+        .card-grid.hard { grid-template-columns: repeat(5, 1fr); }
+
+        .card {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: transform 0.3s ease;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 2rem;
+        }
+
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            border: 2px solid #e0e0e0;
+        }
+
+        .card-back img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .card.matched {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            transform: scale(0.95);
+        }
+
+        .card.matched .card-back {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        /* 결과 화면 */
+        .result-screen {
+            display: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        .result-screen h2 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+
+        .final-score {
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            background: var(--user-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn.home {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .card {
+                width: 60px;
+                height: 60px;
+            }
+
+            .card-back img {
+                width: 45px;
+                height: 45px;
+            }
+
+            .card-grid.easy { grid-template-columns: repeat(3, 1fr); }
+            .card-grid.medium { grid-template-columns: repeat(4, 1fr); }
+            .card-grid.hard { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 메모리 게임</h1>
+        <div class="game-info">
+            <div class="score">점수: <span id="score">0</span></div>
+            <div class="time">시간: <span id="time">00:00</span></div>
+            <div class="moves">이동: <span id="moves">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- 시작 화면 -->
+        <div class="start-screen" id="startScreen">
+            <h2>🎯 난이도를 선택하세요!</h2>
+            <p style="color: #666; margin-bottom: 20px;">
+                같은 캐릭터 두 장을 찾아서 짝을 맞춰보세요!
+            </p>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn easy" onclick="startGame('easy')">
+                    🟢 쉬움 (3x4)
+                </button>
+                <button class="difficulty-btn medium" onclick="startGame('medium')">
+                    🟡 보통 (4x4)
+                </button>
+                <button class="difficulty-btn hard" onclick="startGame('hard')">
+                    🔴 어려움 (4x5)
+                </button>
+            </div>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div class="game-screen" id="gameScreen">
+            <div class="card-grid" id="cardGrid">
+                <!-- 카드들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div class="result-screen" id="resultScreen">
+            <h2>🎉 게임 완료!</h2>
+            <div class="stars" id="stars">⭐⭐⭐</div>
+            <div class="final-score">
+                <div>최종 점수: <span id="finalScore">0</span>점</div>
+                <div>완료 시간: <span id="finalTime">00:00</span></div>
+                <div>총 이동: <span id="finalMoves">0</span>회</div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="restartGame()">다시하기</button>
+                <button class="action-btn home" onclick="goHome()">홈으로</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태 변수
+        let gameState = {
+            difficulty: '',
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            totalPairs: 0,
+            score: 0,
+            moves: 0,
+            startTime: null,
+            timer: null,
+            gameTime: 0
+        };
+
+        // 캐릭터 이미지 배열 (img 폴더의 이미지들)
+        const characterImages = [
+            'img/char_001.png', 'img/char_002.png', 'img/char_003.png', 'img/char_004.png',
+            'img/char_005.png', 'img/char_006.png', 'img/char_007.png', 'img/char_008.png',
+            'img/char_009.png', 'img/char_010.png', 'img/char_011.png', 'img/char_012.png',
+            'img/char_013.png', 'img/char_014.png', 'img/char_015.png', 'img/char_016.png',
+            'img/char_017.png', 'img/char_018.png', 'img/char_019.png', 'img/char_020.png',
+            'img/char_021.png', 'img/char_022.png', 'img/char_023.png', 'img/char_024.png',
+            'img/char_025.png', 'img/char_026.png', 'img/char_027.png', 'img/char_028.png',
+            'img/char_029.png', 'img/char_030.png', 'img/char_031.png', 'img/char_032.png',
+            'img/char_033.png', 'img/char_034.png', 'img/char_035.png', 'img/char_036.png',
+            'img/char_037.png', 'img/char_038.png', 'img/char_039.png', 'img/char_040.png',
+            'img/char_041.png', 'img/char_042.png', 'img/char_043.png', 'img/char_044.png',
+            'img/char_045.png', 'img/char_046.png', 'img/char_047.png', 'img/char_048.png',
+            'img/char_049.png', 'img/char_050.png', 'img/char_051.png', 'img/char_052.png',
+            'img/char_053.png', 'img/char_054.png', 'img/char_055.png', 'img/char_056.png',
+            'img/char_057.png', 'img/char_058.png', 'img/char_059.png', 'img/char_060.png',
+            'img/char_061.png', 'img/char_062.png', 'img/char_063.png', 'img/char_064.png',
+            'img/char_065.png', 'img/char_066.png', 'img/char_067.png', 'img/char_068.png',
+            'img/char_069.png', 'img/char_070.png', 'img/char_071.png', 'img/char_072.png',
+            'img/char_073.png', 'img/char_074.png', 'img/char_075.png', 'img/char_076.png',
+            'img/char_077.png', 'img/char_078.png', 'img/char_079.png', 'img/char_080.png',
+            'img/char_081.png', 'img/char_082.png', 'img/char_083.png', 'img/char_084.png',
+            'img/char_085.png', 'img/char_086.png', 'img/char_087.png', 'img/char_088.png',
+            'img/char_089.png', 'img/char_090.png', 'img/char_091.png', 'img/char_092.png',
+            'img/char_093.png', 'img/char_094.png', 'img/char_095.png', 'img/char_096.png',
+            'img/char_097.png', 'img/char_098.png', 'img/char_099.png', 'img/char_100.png',
+            'img/char_101.png', 'img/char_102.png', 'img/char_103.png', 'img/char_104.png',
+            'img/char_105.png', 'img/char_106.png', 'img/char_107.png', 'img/char_108.png',
+            'img/char_109.png', 'img/char_110.png', 'img/char_111.png', 'img/char_112.png',
+            'img/char_113.png', 'img/char_114.png', 'img/char_115.png', 'img/char_116.png',
+            'img/char_117.png', 'img/char_118.png', 'img/char_119.png', 'img/char_120.png',
+            'img/char_121.png', 'img/char_122.png', 'img/char_123.png', 'img/char_124.png',
+            'img/char_125.png', 'img/char_126.png', 'img/char_127.png', 'img/char_128.png',
+            'img/char_129.png', 'img/char_130.png', 'img/char_131.png', 'img/char_132.png',
+            'img/char_133.png'
+        ];
+
+        // 게임 시작
+        function startGame(difficulty) {
+            gameState.difficulty = difficulty;
+            gameState.matchedPairs = 0;
+            gameState.score = 0;
+            gameState.moves = 0;
+            gameState.gameTime = 0;
+            gameState.startTime = Date.now();
+
+            // 난이도별 설정
+            const difficultySettings = {
+                easy: { pairs: 6, cols: 3 },
+                medium: { pairs: 8, cols: 4 },
+                hard: { pairs: 10, cols: 5 }
+            };
+
+            const settings = difficultySettings[difficulty];
+            gameState.totalPairs = settings.pairs;
+
+            // 카드 생성
+            createCards(settings.pairs, settings.cols);
+
+            // 화면 전환
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('resultScreen').style.display = 'none';
+
+            // 타이머 시작
+            startTimer();
+
+            // 사운드 효과 (선택사항)
+            playSound('start');
+        }
+
+        // 카드 생성
+        function createCards(pairs, cols) {
+            const cardGrid = document.getElementById('cardGrid');
+            cardGrid.className = `card-grid ${gameState.difficulty}`;
+            cardGrid.innerHTML = '';
+
+            // 사용할 캐릭터 선택
+            const selectedCharacters = characterImages.slice(0, pairs);
+            const cardPairs = [...selectedCharacters, ...selectedCharacters];
+            
+            // 카드 섞기
+            shuffleArray(cardPairs);
+
+            // 카드 생성
+            cardPairs.forEach((image, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.image = image;
+
+                card.innerHTML = `
+                    <div class="card-front">❓</div>
+                    <div class="card-back">
+                        <img src="${image}" alt="캐릭터">
+                    </div>
+                `;
+
+                card.addEventListener('click', () => flipCard(card));
+                cardGrid.appendChild(card);
+            });
+        }
+
+        // 카드 뒤집기
+        function flipCard(card) {
+            // 이미 뒤집혀있거나 매칭된 카드는 무시
+            if (card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+
+            // 카드 뒤집기
+            card.classList.add('flipped');
+            gameState.flippedCards.push(card);
+
+            // 사운드 효과
+            playSound('flip');
+
+            // 두 장이 뒤집혔는지 확인
+            if (gameState.flippedCards.length === 2) {
+                gameState.moves++;
+                updateDisplay();
+                checkMatch();
+            }
+        }
+
+        // 매칭 확인
+        function checkMatch() {
+            const [card1, card2] = gameState.flippedCards;
+            const match = card1.dataset.image === card2.dataset.image;
+
+            setTimeout(() => {
+                if (match) {
+                    // 매칭 성공
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    gameState.matchedPairs++;
+                    gameState.score += 10;
+                    playSound('success');
+                } else {
+                    // 매칭 실패
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    gameState.score = Math.max(0, gameState.score - 1);
+                    playSound('fail');
+                }
+
+                gameState.flippedCards = [];
+                updateDisplay();
+
+                // 게임 완료 확인
+                if (gameState.matchedPairs === gameState.totalPairs) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // 타이머 시작
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                gameState.gameTime++;
+                updateDisplay();
+            }, 1000);
+        }
+
+        // 타이머 정지
+        function stopTimer() {
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+        }
+
+        // 화면 업데이트
+        function updateDisplay() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('moves').textContent = gameState.moves;
+            
+            const minutes = Math.floor(gameState.gameTime / 60);
+            const seconds = gameState.gameTime % 60;
+            document.getElementById('time').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 게임 종료
+        function endGame() {
+            stopTimer();
+            
+            // 시간 보너스 계산
+            const timeBonus = Math.max(0, 50 - Math.floor(gameState.gameTime / 10));
+            gameState.score += timeBonus;
+
+            // 별점 계산
+            const stars = calculateStars();
+
+            // 결과 화면 표시
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalTime').textContent = document.getElementById('time').textContent;
+            document.getElementById('finalMoves').textContent = gameState.moves;
+            document.getElementById('stars').textContent = stars;
+
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+
+            playSound('complete');
+        }
+
+        // 별점 계산
+        function calculateStars() {
+            const timePerPair = gameState.gameTime / gameState.totalPairs;
+            const moveEfficiency = gameState.moves / gameState.totalPairs;
+
+            if (timePerPair <= 3 && moveEfficiency <= 2) return '⭐⭐⭐';
+            if (timePerPair <= 5 && moveEfficiency <= 3) return '⭐⭐';
+            return '⭐';
+        }
+
+        // 게임 재시작
+        function restartGame() {
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+
+        // 홈으로 이동
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        // 배열 섞기
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 사운드 효과 (선택사항)
+        function playSound(type) {
+            // 실제 구현에서는 Web Audio API나 HTML5 Audio를 사용
+            console.log(`사운드 재생: ${type}`);
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 테마 적용
+            if (typeof userTheme !== 'undefined') {
+                userTheme.refresh();
+            }
+        });
+    </script>
+</body>
+</html>
